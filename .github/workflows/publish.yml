@@ -12,6 +12,7 @@ permissions:
   pull-requests: write
   packages: write
   id-token: write
+  actions: read
 
 jobs:
   release:
@@ -20,6 +21,9 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
+        with:
+          # This makes Actions able to push to protected branches
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js 18.x
         uses: actions/setup-node@v4
