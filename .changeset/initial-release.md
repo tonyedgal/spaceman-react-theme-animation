@@ -1,5 +1,5 @@
 ---
-'@space-man/react-theme-animation': major
+'@space-man/react-theme-animation': patch
 ---
 
 Initial release of @space-man/react-theme-animation with smooth view transition animations, multi-theme support, and comprehensive TypeScript support.
