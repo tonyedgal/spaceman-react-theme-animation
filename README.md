@@ -1,229 +1,383 @@
-# @spaceman/react-theme-animation
+# @space-man/react-theme-animation
 
-React theme switching with smooth view transition animations and multi-theme support.
+React theme switching with smooth view transition animations, multi-theme support, and synchronized state management.
 
 ## Features
 
-- 🎨 **Smooth Animations**: Beautiful view transition animations for theme switching
+- 🎨 **Smooth Animations**: Beautiful view transition animations for theme switching with customizable origins
 - 🌓 **Multi-Theme Support**: Support for light, dark, and system themes
 - 🎯 **Color Themes**: Additional color theme variants (brand colors, etc.)
 - 🪝 **Powerful Hook**: `useThemeAnimation` hook with full control
 - 🧩 **Ready Components**: `ThemeSwitcher` and `ThemeSelector` components
+- 🎛️ **Provider Pattern**: Centralized theme state management with `SpacemanThemeProvider`
+- 🔄 **State Synchronization**: Prevents state drift between multiple components
 - 📱 **Responsive**: Works on all screen sizes including high-resolution displays
 - ⚡ **Performance**: Optimized animations with reduced motion support
 - 🔧 **TypeScript**: Full TypeScript support with comprehensive types
 - 🎛️ **Customizable**: Extensive configuration options
+- 🔙 **Backward Compatible**: Works with existing implementations
 
 ## Installation
 
 ```bash
-npm install @spaceman/react-theme-animation
+npm install @space-man/react-theme-animation
 ```
 
-## Quick Start
+## Usage Patterns
 
-### Basic Usage
+This library supports two main usage patterns:
+
+1. **Hook-Only Usage**: Direct hook usage for custom implementations
+2. **Provider Pattern**: Centralized state management (recommended)
+
+📚 **[See the complete Getting Started Guide](./getting-started.md)** for detailed examples, advanced configurations, and best practices.
+
+🚀 **[View the Code Example](./example/)** to see this package in action with a complete implementation of both hook and provider pattern.
+
+---
+
+## 1. Hook-Only Usage For Light and Dark mode animation
+
+Perfect for custom theme toggle buttons and complete control over animated theme logic.
+
+### Basic Theme Toggle
 
 ```tsx
-import { useThemeAnimation, ThemeSwitcher } from '@spaceman/react-theme-animation';
+import { useThemeAnimation } from '@space-man/react-theme-animation';
 
-function App() {
-  const { theme, toggleTheme } = useThemeAnimation();
+function ThemeToggle() {
+  const { theme, toggleTheme, ref } = useThemeAnimation();
 
   return (
-    <div>
-      <ThemeSwitcher />
-      <button onClick={toggleTheme}>
-        Current theme: {theme}
-      </button>
-    </div>
+    <button ref={ref} onClick={toggleTheme} className="theme-toggle-btn">
+      {theme === 'light' ? '🌙' : '🌞'} {theme}
+    </button>
   );
 }
 ```
 
-### Advanced Usage
+---
+
+## 2. Provider Pattern (Recommended)
+
+The most powerful pattern using `SpacemanThemeProvider` for centralized theme state management. This prevents state drift and provides synchronized animations.
+
+### Basic Provider Setup
 
 ```tsx
-import { 
-  useThemeAnimation, 
-  ThemeSwitcher, 
+import {
+  SpacemanThemeProvider,
+  ThemeSwitcher,
   ThemeSelector,
-  ThemeAnimationType 
-} from '@spaceman/react-theme-animation';
+} from '@space-man/react-theme-animation';
 
 function App() {
-  const {
-    ref,
-    theme,
-    colorTheme,
-    resolvedTheme,
-    setTheme,
-    setColorTheme,
-    toggleTheme,
-    switchTheme,
-  } = useThemeAnimation({
-    themes: ['light', 'dark', 'system'],
-    colorThemes: ['default', 'blue', 'green', 'purple'],
-    animationType: ThemeAnimationType.BLUR_CIRCLE,
-    duration: 500,
-    onThemeChange: (theme) => console.log('Theme changed:', theme),
-    onColorThemeChange: (colorTheme) => console.log('Color theme changed:', colorTheme),
-  });
-
   return (
-    <div>
-      {/* Toggle-style switcher */}
-      <ThemeSwitcher
-        themes={['light', 'dark', 'system']}
-        animationType={ThemeAnimationType.CIRCLE}
-        size="lg"
-        variant="outline"
-      />
+    <SpacemanThemeProvider>
+      <div className="app">
+        <header>
+          <ThemeSwitcher />
+        </header>
 
-      {/* Dropdown-style selector */}
-      <ThemeSelector
-        themes={['light', 'dark', 'system']}
-        colorThemes={['default', 'blue', 'green', 'purple']}
-        animationType={ThemeAnimationType.BLUR_CIRCLE}
-      />
+        <aside>
+          <ThemeSelector colorThemes={['default', 'blue', 'green', 'purple']} />
+        </aside>
 
-      {/* Custom button with animation */}
-      <button ref={ref} onClick={toggleTheme}>
-        Toggle Theme ({resolvedTheme})
-      </button>
-    </div>
+        <main>
+          <YourAppContent />
+        </main>
+      </div>
+    </SpacemanThemeProvider>
   );
 }
 ```
+
+---
 
 ## API Reference
 
-### `useThemeAnimation(props?)`
+### SpacemanThemeProvider
 
-The main hook that provides theme switching with animations.
+Context provider for centralized theme state management.
 
-#### Props
+```tsx
+<SpacemanThemeProvider
+  defaultTheme="system"
+  defaultColorTheme="blue"
+  themes={['light', 'dark', 'system']}
+  colorThemes={['default', 'blue', 'green', 'purple']}
+  animationType={ThemeAnimationType.CIRCLE}
+  duration={800}
+  onThemeChange={theme => console.log('Theme:', theme)}
+  onColorThemeChange={colorTheme => console.log('Color:', colorTheme)}
+>
+  <App />
+</SpacemanThemeProvider>
+```
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `duration` | `number` | `750` | Animation duration in milliseconds |
-| `easing` | `string` | `'ease-in-out'` | CSS easing function |
-| `animationType` | `ThemeAnimationType` | `'circle'` | Animation type: `'circle'` or `'blur-circle'` |
-| `blurAmount` | `number` | `2` | Blur amount for blur-circle animation |
-| `themes` | `Theme[]` | `['light', 'dark']` | Available themes |
-| `colorThemes` | `string[]` | `['default']` | Available color themes |
-| `defaultTheme` | `Theme` | `'system'` | Default theme |
-| `defaultColorTheme` | `string` | `'default'` | Default color theme |
-| `globalClassName` | `string` | `'dark'` | CSS class for dark mode |
-| `colorThemePrefix` | `string` | `'theme-'` | Prefix for color theme classes |
-| `theme` | `Theme` | - | External theme control |
-| `colorTheme` | `string` | - | External color theme control |
-| `onThemeChange` | `(theme: Theme) => void` | - | Theme change callback |
-| `onColorThemeChange` | `(colorTheme: string) => void` | - | Color theme change callback |
+#### SpacemanThemeProvider Props
+
+| Property             | Type                               | Default                       | Description                           |
+| -------------------- | ---------------------------------- | ----------------------------- | ------------------------------------- |
+| `defaultTheme`       | `Theme`                            | `'system'`                    | Initial theme                         |
+| `defaultColorTheme`  | `ColorTheme`                       | `'default'`                   | Initial color theme                   |
+| `themes`             | `Theme[]`                          | `['light', 'dark', 'system']` | Available themes                      |
+| `colorThemes`        | `ColorTheme[]`                     | `['default']`                 | Available color themes                |
+| `animationType`      | `ThemeAnimationType`               | `ThemeAnimationType.CIRCLE`   | Animation type                        |
+| `duration`           | `number`                           | `500`                         | Animation duration in ms              |
+| `blurAmount`         | `number`                           | `2`                           | Blur amount for blur-circle animation |
+| `onThemeChange`      | `(theme: Theme) => void`           | -                             | Global theme change callback          |
+| `onColorThemeChange` | `(colorTheme: ColorTheme) => void` | -                             | Global color theme change callback    |
+
+### useSpacemanTheme
+
+Hook to access theme state from SpacemanThemeProvider context.
+
+```tsx
+const { theme, colorTheme, switchTheme, setColorTheme, switchThemeFromElement, ref } =
+  useSpacemanTheme();
+```
 
 #### Returns
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `ref` | `RefObject<HTMLButtonElement>` | Ref for animation trigger element |
-| `theme` | `Theme` | Current theme |
-| `colorTheme` | `string` | Current color theme |
-| `resolvedTheme` | `'light' \| 'dark'` | Resolved theme (system theme resolved) |
-| `setTheme` | `(theme: Theme) => void` | Set theme without animation |
-| `setColorTheme` | `(colorTheme: string) => void` | Set color theme |
-| `toggleTheme` | `() => Promise<void>` | Toggle between light/dark with animation |
-| `switchTheme` | `(theme: Theme) => Promise<void>` | Switch to specific theme with animation |
+| Property                 | Type                                                    | Description                                       |
+| ------------------------ | ------------------------------------------------------- | ------------------------------------------------- |
+| `theme`                  | `Theme`                                                 | Current theme                                     |
+| `colorTheme`             | `ColorTheme`                                            | Current color theme                               |
+| `switchTheme`            | `(theme: Theme) => Promise<void>`                       | Switch to specific theme                          |
+| `setColorTheme`          | `(colorTheme: ColorTheme) => void`                      | Set color theme                                   |
+| `switchThemeFromElement` | `(theme: Theme, element: HTMLElement) => Promise<void>` | Switch theme with animation from specific element |
+| `ref`                    | `RefObject<HTMLElement>`                                | Ref for animation origin                          |
 
-### `<ThemeSwitcher />`
+### useThemeAnimation
 
-A toggle-style component for switching themes.
+Standalone hook for theme management and animations.
 
-#### Props
+```tsx
+const { theme, colorTheme, switchTheme, setColorTheme, toggleTheme, ref } = useThemeAnimation({
+  themes: ['light', 'dark', 'system'],
+  colorThemes: ['default', 'blue', 'green', 'purple'],
+  animationType: ThemeAnimationType.SCALE,
+  duration: 800,
+  onThemeChange: theme => console.log('Theme changed:', theme),
+  onColorThemeChange: colorTheme => console.log('Color changed:', colorTheme),
+});
+```
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `themes` | `Theme[]` | `['light', 'dark', 'system']` | Available themes |
-| `currentTheme` | `Theme` | - | External theme control |
-| `onThemeChange` | `(theme: Theme) => void` | - | Theme change callback |
-| `animationType` | `ThemeAnimationType` | - | Animation type |
-| `duration` | `number` | - | Animation duration |
-| `className` | `string` | - | Additional CSS classes |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Component size |
-| `variant` | `'default' \| 'outline' \| 'ghost'` | `'default'` | Visual variant |
-| `icons` | `object` | - | Custom icons for themes |
+#### Options
 
-### `<ThemeSelector />`
+| Property             | Type                               | Default                       | Description                           |
+| -------------------- | ---------------------------------- | ----------------------------- | ------------------------------------- |
+| `themes`             | `Theme[]`                          | `['light', 'dark', 'system']` | Available themes                      |
+| `colorThemes`        | `ColorTheme[]`                     | `['default']`                 | Available color themes                |
+| `theme`              | `Theme`                            | `'system'`                    | Initial theme                         |
+| `colorTheme`         | `ColorTheme`                       | `'default'`                   | Initial color theme                   |
+| `animationType`      | `ThemeAnimationType`               | `ThemeAnimationType.CIRCLE`   | Animation type                        |
+| `duration`           | `number`                           | `500`                         | Animation duration in ms              |
+| `blurAmount`         | `number`                           | `2`                           | Blur amount for blur-circle animation |
+| `onThemeChange`      | `(theme: Theme) => void`           | -                             | Theme change callback                 |
+| `onColorThemeChange` | `(colorTheme: ColorTheme) => void` | -                             | Color theme change callback           |
 
-A dropdown-style component for selecting themes and color themes.
+#### Return
 
-#### Props
+| Property        | Type                               | Description               |
+| --------------- | ---------------------------------- | ------------------------- |
+| `theme`         | `Theme`                            | Current theme             |
+| `colorTheme`    | `ColorTheme`                       | Current color theme       |
+| `switchTheme`   | `(theme: Theme) => Promise<void>`  | Switch to specific theme  |
+| `setColorTheme` | `(colorTheme: ColorTheme) => void` | Set color theme           |
+| `toggleTheme`   | `() => Promise<void>`              | Toggle between light/dark |
+| `ref`           | `RefObject<HTMLElement>`           | Ref for animation origin  |
 
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `themes` | `Theme[]` | `['light', 'dark', 'system']` | Available themes |
-| `colorThemes` | `string[]` | `['default']` | Available color themes |
-| `currentTheme` | `Theme` | - | External theme control |
-| `currentColorTheme` | `string` | - | External color theme control |
-| `onThemeChange` | `(theme: Theme) => void` | - | Theme change callback |
-| `onColorThemeChange` | `(colorTheme: string) => void` | - | Color theme change callback |
-| `animationType` | `ThemeAnimationType` | - | Animation type |
-| `duration` | `number` | - | Animation duration |
-| `className` | `string` | - | Additional CSS classes |
-| `placeholder` | `string` | `'Choose a theme'` | Select placeholder |
-| `themeLabel` | `string` | `'Theme'` | Theme selector label |
-| `colorThemeLabel` | `string` | `'Color Theme'` | Color theme selector label |
+### ThemeSwitcher
 
-## CSS Setup
+Pre-built theme switcher component with animated buttons.
 
-The package automatically injects base styles, but you need to set up your CSS for theme classes:
+```tsx
+<ThemeSwitcher
+  themes={['light', 'dark', 'system']}
+  currentTheme="light"
+  onThemeChange={theme => console.log(theme)}
+  animationType={ThemeAnimationType.CIRCLE}
+  duration={600}
+  className="custom-class"
+/>
+```
 
-```css
-/* Base theme styles */
-:root {
-  --background: white;
-  --foreground: black;
-}
+#### ThemeSwitcher Props
 
-.dark {
-  --background: black;
-  --foreground: white;
-}
+| Property        | Type                     | Default                       | Description                         |
+| --------------- | ------------------------ | ----------------------------- | ----------------------------------- |
+| `themes`        | `Theme[]`                | `['light', 'dark', 'system']` | Available themes                    |
+| `currentTheme`  | `Theme`                  | -                             | Controlled current theme (optional) |
+| `onThemeChange` | `(theme: Theme) => void` | -                             | Theme change callback (optional)    |
+| `animationType` | `ThemeAnimationType`     | `ThemeAnimationType.CIRCLE`   | Animation type                      |
+| `duration`      | `number`                 | `500`                         | Animation duration in ms            |
+| `className`     | `string`                 | -                             | Additional CSS classes              |
 
-/* Color theme variants */
-.theme-blue {
-  --primary: blue;
-}
+> **Note**: When used with `SpacemanThemeProvider`, `currentTheme` and `onThemeChange` are automatically handled by the context.
 
-.theme-green {
-  --primary: green;
-}
+### ThemeSelector
 
-.theme-blue.dark {
-  --primary: lightblue;
-}
+Dropdown selector for color themes.
 
-.theme-green.dark {
-  --primary: lightgreen;
+```tsx
+<ThemeSelector
+  colorThemes={['default', 'blue', 'green', 'purple']}
+  currentColorTheme="blue"
+  onColorThemeChange={colorTheme => console.log(colorTheme)}
+  animationType={ThemeAnimationType.BLUR_CIRCLE}
+  duration={400}
+/>
+```
+
+#### ThemeSelector Props
+
+| Property             | Type                               | Default                       | Description                               |
+| -------------------- | ---------------------------------- | ----------------------------- | ----------------------------------------- |
+| `themes`             | `Theme[]`                          | `['light', 'dark', 'system']` | Available themes (for standalone hook)    |
+| `colorThemes`        | `ColorTheme[]`                     | `['default']`                 | Available color themes                    |
+| `currentColorTheme`  | `ColorTheme`                       | -                             | Controlled current color theme (optional) |
+| `onColorThemeChange` | `(colorTheme: ColorTheme) => void` | -                             | Color theme change callback (optional)    |
+| `animationType`      | `ThemeAnimationType`               | `ThemeAnimationType.CIRCLE`   | Animation type                            |
+| `duration`           | `number`                           | `500`                         | Animation duration in ms                  |
+
+> **Note**: When used with `SpacemanThemeProvider`, `currentColorTheme` and `onColorThemeChange` are automatically handled by the context.
+
+### ThemeAnimationType
+
+Animation types for theme transitions.
+
+```tsx
+enum ThemeAnimationType {
+  CIRCLE = 'circle',
+  BLUR_CIRCLE = 'blur-circle',
 }
 ```
 
-## Animation Types
+### Types
 
-### Circle Animation
-A circular reveal animation that expands from the trigger element.
+```tsx
+type Theme = 'light' | 'dark' | 'system';
+type ColorTheme = string; // e.g., 'default', 'blue', 'green', etc.
 
-### Blur Circle Animation
-A circular reveal with a blur effect for a softer transition.
+interface SpacemanThemeProviderProps {
+  children: React.ReactNode;
+  defaultTheme?: Theme;
+  defaultColorTheme?: ColorTheme;
+  themes?: Theme[];
+  colorThemes?: ColorTheme[];
+  animationType?: ThemeAnimationType;
+  duration?: number;
+  blurAmount?: number;
+  onThemeChange?: (theme: Theme) => void;
+  onColorThemeChange?: (colorTheme: ColorTheme) => void;
+}
+
+interface UseThemeAnimationProps {
+  themes?: Theme[];
+  colorThemes?: ColorTheme[];
+  theme?: Theme;
+  colorTheme?: ColorTheme;
+  animationType?: ThemeAnimationType;
+  duration?: number;
+  blurAmount?: number;
+  onThemeChange?: (theme: Theme) => void;
+  onColorThemeChange?: (colorTheme: ColorTheme) => void;
+}
+
+interface UseThemeAnimationReturn {
+  theme: Theme;
+  colorTheme: ColorTheme;
+  switchTheme: (theme: Theme) => Promise<void>;
+  setColorTheme: (colorTheme: ColorTheme) => void;
+  toggleTheme: () => Promise<void>;
+  ref: RefObject<HTMLElement>;
+}
+
+interface ThemeSwitcherProps {
+  themes?: Theme[];
+  currentTheme?: Theme;
+  onThemeChange?: (theme: Theme) => void;
+  animationType?: ThemeAnimationType;
+  duration?: number;
+  className?: string;
+}
+
+interface ThemeSelectorProps {
+  themes?: Theme[];
+  colorThemes?: ColorTheme[];
+  currentColorTheme?: ColorTheme;
+  onColorThemeChange?: (colorTheme: ColorTheme) => void;
+  animationType?: ThemeAnimationType;
+  duration?: number;
+}
+```
+
+---
+
+## CSS Variables
+
+The library uses CSS custom properties for theming. Define these in your CSS:
+
+```css
+/* Base theme variables */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+}
+
+/* Dark theme */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+}
+
+/* Add other theme variants from design system or tweakcn */
+
+.theme-supabase {
+  --background: oklch(0.9911 0 0);
+  --foreground: oklch(0.2046 0 0);
+}
+
+.theme-supabase.dark {
+  --background: oklch(0.1822 0 0);
+  --foreground: oklch(0.9288 0.0126 255.5078);
+}
+
+.theme-mono {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.1448 0 0);
+}
+
+.theme-mono.dark {
+  --background: oklch(0.1448 0 0);
+  --foreground: oklch(1 0 0);
+}
+```
+
+---
 
 ## Browser Support
 
-- Modern browsers with View Transition API support get smooth animations
-- Fallback to instant theme switching for unsupported browsers
+- **View Transitions API**: Chrome 111+, Edge 111+
+- **Fallback**: All modern browsers with CSS transitions
+- **Reduced Motion**: Respects `prefers-reduced-motion` setting
+- **Framework Support**: React 16.8+ (hooks required)
+
+---
+
+## Performance
+
+- Animations use the View Transitions API when available
+- Optimized for 60fps animations
 - Respects `prefers-reduced-motion` setting
 
-## TypeScript
+---
 
-Full TypeScript support with comprehensive type definitions included.
+## Contributing
+
+Contributions are welcome! Please read our contributing guidelines and submit pull requests to our repository.
 
 ## License
 
