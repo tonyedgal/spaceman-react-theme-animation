@@ -50,7 +50,11 @@
     "lint": "eslint \"**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix . --ext .{js,jsx,ts,tsx}",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "changeset": "changeset",
+    "changeset": "changeset add --type patch",
+    "changeset:patch": "changeset add --type patch",
+    "changeset:feature": "changeset add --type minor",
+    "changeset:breaking": "changeset add --type major",
+    "changeset:custom": "changeset",
     "version-packages": "changeset version",
     "release": "npm run build && changeset publish"
   },
