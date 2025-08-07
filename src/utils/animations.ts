@@ -79,12 +79,14 @@ export interface AnimationConfig {
 
 export const createCircleAnimation = (config: AnimationConfig): void => {
   const { x, y, duration, easing } = config;
-  
+
+  // Calculate the distance to each corner of the viewport
   const topLeft = Math.hypot(x, y);
   const topRight = Math.hypot(window.innerWidth - x, y);
   const bottomLeft = Math.hypot(x, window.innerHeight - y);
   const bottomRight = Math.hypot(window.innerWidth - x, window.innerHeight - y);
 
+  // Find the maximum distance to ensure animation covers the entire viewport
   const maxRadius = Math.max(topLeft, topRight, bottomLeft, bottomRight);
 
   document.documentElement.animate(
@@ -101,7 +103,7 @@ export const createCircleAnimation = (config: AnimationConfig): void => {
 
 export const createBlurCircleAnimation = (config: AnimationConfig): void => {
   const { x, y, duration, easing, blurAmount, styleId } = config;
-  
+
   const existingStyle = document.getElementById(styleId);
   if (existingStyle) {
     existingStyle.remove();
@@ -110,8 +112,8 @@ export const createBlurCircleAnimation = (config: AnimationConfig): void => {
   const viewportSize = Math.max(window.innerWidth, window.innerHeight) + 200;
   const isHighResolution = window.innerWidth >= 3000 || window.innerHeight >= 2000;
   const scaleFactor = isHighResolution ? 2.5 : 4;
-  const optimalMaskSize = isHighResolution 
-    ? Math.min(viewportSize * scaleFactor, 5000) 
+  const optimalMaskSize = isHighResolution
+    ? Math.min(viewportSize * scaleFactor, 5000)
     : viewportSize * scaleFactor;
 
   const topLeft = Math.hypot(x, y);
@@ -171,7 +173,7 @@ export const createBlurCircleAnimation = (config: AnimationConfig): void => {
       }
     }
   `;
-  
+
   document.head.appendChild(styleElement);
 
   setTimeout(() => {

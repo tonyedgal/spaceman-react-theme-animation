@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { type JSX, useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 import { clsx } from 'clsx';
 import { ThemeSwitcherProps, Theme } from '../types';
 import { useThemeAnimation } from '../hooks/use-theme-animation';
+import { useSpacemanTheme } from './SpacemanThemeProvider';
 
 const SunIcon = () => (
   <svg
@@ -51,67 +53,109 @@ const MonitorIcon = () => (
   </svg>
 );
 
-interface ThemeOptionProps {
-  theme: Theme;
-  isActive: boolean;
-  onClick: (theme: Theme) => void;
-  icon: React.ReactNode;
-  size: 'sm' | 'md' | 'lg';
-  variant: 'default' | 'outline' | 'ghost';
-  buttonRef?: React.RefObject<HTMLButtonElement>;
-}
-
-const ThemeOption: React.FC<ThemeOptionProps> = ({
-  theme,
-  isActive,
-  onClick,
+const ThemeOption = ({
   icon,
-  size,
-  variant,
+  value,
+  isActive,
+  isHovered,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
   buttonRef,
+}: {
+  icon: JSX.Element;
+  value: string;
+  isActive?: boolean;
+  isHovered?: boolean;
+  onClick: (value: string, event?: React.MouseEvent<HTMLButtonElement>) => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+  buttonRef?: React.RefObject<HTMLButtonElement | null>;
 }) => {
-  const sizeClasses = {
-    sm: 'h-7 w-7 [&_svg]:h-3 [&_svg]:w-3',
-    md: 'h-8 w-8 [&_svg]:h-4 [&_svg]:w-4',
-    lg: 'h-10 w-10 [&_svg]:h-5 [&_svg]:w-5',
-  };
-
-  const variantClasses = {
-    default: isActive
-      ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
-      : 'text-gray-400 hover:text-gray-900 dark:text-gray-500 dark:hover:text-gray-100',
-    outline: isActive
-      ? 'border-gray-900 bg-gray-900 text-white dark:border-gray-100 dark:bg-gray-100 dark:text-gray-900'
-      : 'border-gray-200 text-gray-400 hover:border-gray-900 hover:text-gray-900 dark:border-gray-700 dark:text-gray-500 dark:hover:border-gray-100 dark:hover:text-gray-100',
-    ghost: isActive
-      ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-      : 'text-gray-400 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-100',
-  };
-
-  const baseClasses = clsx(
-    'relative flex cursor-pointer items-center justify-center rounded-full transition-all duration-200',
-    'focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 dark:focus:ring-gray-600',
-    sizeClasses[size],
-    variantClasses[variant],
-    variant === 'outline' && 'border'
-  );
-
   return (
     <button
-      ref={isActive ? buttonRef : undefined}
-      className={baseClasses}
+      ref={isActive ? (buttonRef as React.RefObject<HTMLButtonElement>) : undefined}
+      className={clsx(
+        'relative flex h-9 w-12 cursor-pointer items-center justify-center transition-all duration-200 ease-in-out',
+        'text-muted-foreground hover:text-foreground',
+        isActive && 'text-foreground font-medium'
+      )}
       role="radio"
       aria-checked={isActive}
-      aria-label={`Switch to ${theme} theme`}
-      onClick={() => onClick(theme)}
+      aria-label={`Switch to ${value} theme`}
+      onClick={(event) => onClick(value, event)}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={{
+        borderRadius: 'var(--radius)',
+      }}
     >
-      {icon}
-      {isActive && variant === 'default' && (
-        <div className="absolute inset-0 rounded-full border border-gray-300 dark:border-gray-600" />
+      {/* Hover background */}
+      {isHovered && (
+        <motion.div
+          layoutId="theme-hover-bg"
+          className="absolute inset-0 bg-muted backdrop-blur-sm"
+          style={{
+            borderRadius: 'var(--radius)',
+          }}
+          transition={{
+            type: 'spring',
+            bounce: 0,
+            stiffness: 100,
+            damping: 10,
+            duration: 0.3,
+          }}
+        />
+      )}
+
+      {/* Icon with scaling animation */}
+      <motion.div
+        className="relative z-10 flex items-center justify-center"
+        animate={{
+          scale: isActive ? 1.1 : 1,
+        }}
+        transition={{
+          type: 'spring',
+          bounce: 0.2,
+          duration: 0.4,
+        }}
+      >
+        <div className="[&_svg]:size-4">{icon}</div>
+      </motion.div>
+
+      {/* Active indicator */}
+      {isActive && (
+        <motion.div
+          layoutId="theme-active-indicator"
+          className="absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2 rounded-full"
+          style={{
+            backgroundColor: 'hsl(var(--primary))',
+          }}
+          transition={{
+            type: 'spring',
+            bounce: 0.3,
+            duration: 0.6,
+          }}
+        />
       )}
     </button>
   );
 };
+
+const THEME_OPTIONS = [
+  {
+    icon: <MonitorIcon />,
+    value: 'system',
+  },
+  {
+    icon: <SunIcon />,
+    value: 'light',
+  },
+  {
+    icon: <MoonIcon />,
+    value: 'dark',
+  },
+];
 
 export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   themes = ['light', 'dark', 'system'],
@@ -120,56 +164,85 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   animationType,
   duration,
   className,
-  size = 'md',
-  variant = 'default',
-  icons,
 }) => {
-  const {
-    ref,
-    theme,
-    switchTheme,
-  } = useThemeAnimation({
-    themes,
-    theme: currentTheme,
-    onThemeChange,
+  // Try to use SpacemanTheme context if available (controlled mode)
+  let contextTheme: any = null;
+  try {
+    contextTheme = useSpacemanTheme();
+  } catch {
+    // Context not available, use standalone mode
+  }
+
+  // Use context if available, otherwise fall back to standalone hook
+  const standaloneHook = useThemeAnimation({
     animationType,
     duration,
+    themes,
+    ...(currentTheme !== undefined && { theme: currentTheme }),
+    onThemeChange,
   });
 
-  const defaultIcons = {
-    light: <SunIcon />,
-    dark: <MoonIcon />,
-    system: <MonitorIcon />,
+  const isControlled = contextTheme !== null;
+  const { ref, theme, switchTheme } = isControlled ? 
+    { ref: contextTheme.ref, theme: contextTheme.theme, switchTheme: contextTheme.switchTheme } : 
+    standaloneHook;
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const handleThemeChange = async (newTheme: string, event?: React.MouseEvent<HTMLButtonElement>) => {
+    if (isControlled && contextTheme.switchThemeFromElement && event) {
+      // Use controlled mode with animation from clicked element
+      await contextTheme.switchThemeFromElement(newTheme as Theme, event.currentTarget);
+      // Also call the callback if provided
+      if (onThemeChange) {
+        onThemeChange(newTheme as Theme);
+      }
+    } else {
+      // Use standalone mode
+      await switchTheme(newTheme as Theme);
+    }
   };
 
-  const themeIcons = { ...defaultIcons, ...icons };
+  if (!isMounted) {
+    return <div className="flex h-9 w-fit" />;
+  }
 
-  const handleThemeChange = async (newTheme: Theme) => {
-    await switchTheme(newTheme);
-  };
-
-  const containerClasses = clsx(
-    'inline-flex items-center overflow-hidden rounded-full',
-    variant === 'default' && 'bg-white ring-1 ring-gray-200 ring-inset dark:bg-gray-950 dark:ring-gray-700',
-    variant === 'outline' && 'border border-gray-200 dark:border-gray-700',
-    variant === 'ghost' && 'gap-1',
-    className
-  );
+  const filteredOptions = THEME_OPTIONS.filter(option => themes.includes(option.value as Theme));
 
   return (
-    <div className={containerClasses} role="radiogroup">
-      {themes.map((themeOption) => (
+    <motion.div
+      key={String(isMounted)}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className={clsx(
+        'inline-flex items-center overflow-hidden bg-background shadow-sm border border-border',
+        'transition-all duration-200 ease-in-out',
+        className
+      )}
+      style={{
+        borderRadius: 'var(--radius)',
+        backgroundColor: 'hsl(var(--background))',
+      }}
+      role="radiogroup"
+    >
+      {filteredOptions.map(option => (
         <ThemeOption
-          key={themeOption}
-          theme={themeOption}
-          isActive={theme === themeOption}
+          key={option.value}
+          icon={option.icon}
+          value={option.value}
+          isActive={theme === option.value}
+          isHovered={false}
           onClick={handleThemeChange}
-          icon={themeIcons[themeOption]}
-          size={size}
-          variant={variant}
-          buttonRef={theme === themeOption ? ref : undefined}
+          onMouseEnter={() => {}}
+          onMouseLeave={() => {}}
+          buttonRef={theme === option.value ? ref : undefined}
         />
       ))}
-    </div>
+    </motion.div>
   );
 };

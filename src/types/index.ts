@@ -19,27 +19,30 @@ export interface UseThemeAnimationProps {
   colorThemes?: ColorTheme[];
   defaultTheme?: Theme;
   defaultColorTheme?: ColorTheme;
-  
+
   globalClassName?: string;
   colorThemePrefix?: string;
 
+  storageKey?: string;
+  colorStorageKey?: string;
+
   theme?: Theme;
   colorTheme?: ColorTheme;
-  
+
   onThemeChange?: (theme: Theme) => void;
   onColorThemeChange?: (colorTheme: ColorTheme) => void;
 }
 
 export interface UseThemeAnimationReturn {
-  ref: RefObject<HTMLButtonElement>;
-  
+  ref: RefObject<HTMLButtonElement | null>;
+
   theme: Theme;
   colorTheme: ColorTheme;
   resolvedTheme: 'light' | 'dark';
-  
+
   setTheme: (theme: Theme) => void;
   setColorTheme: (colorTheme: ColorTheme) => void;
-  
+
   toggleTheme: () => Promise<void>;
   switchTheme: (theme: Theme) => Promise<void>;
 }
@@ -48,14 +51,14 @@ export interface ThemeSwitcherProps {
   themes?: Theme[];
   currentTheme?: Theme;
   onThemeChange?: (theme: Theme) => void;
-  
+
   animationType?: ThemeAnimationType;
   duration?: number;
-  
+
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   variant?: 'default' | 'outline' | 'ghost';
-  
+
   icons?: {
     light?: React.ReactNode;
     dark?: React.ReactNode;
@@ -68,16 +71,16 @@ export interface ThemeSelectorProps {
   colorThemes?: ColorTheme[];
   currentTheme?: Theme;
   currentColorTheme?: ColorTheme;
-  
+
   onThemeChange?: (theme: Theme) => void;
   onColorThemeChange?: (colorTheme: ColorTheme) => void;
-  
+
   animationType?: ThemeAnimationType;
   duration?: number;
-  
+
   className?: string;
   placeholder?: string;
-  
+
   themeLabel?: string;
   colorThemeLabel?: string;
 }

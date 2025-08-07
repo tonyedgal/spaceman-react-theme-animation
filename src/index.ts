@@ -2,6 +2,7 @@ export { useThemeAnimation } from './hooks/use-theme-animation';
 
 export { ThemeSwitcher } from './components/ThemeSwitcher';
 export { ThemeSelector } from './components/ThemeSelector';
+export { SpacemanThemeProvider, useSpacemanTheme } from './components/SpacemanThemeProvider';
 
 export type {
   UseThemeAnimationProps,

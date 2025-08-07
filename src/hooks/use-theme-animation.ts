@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { flushSync } from 'react-dom';
-import { 
-  UseThemeAnimationProps, 
-  UseThemeAnimationReturn, 
+import {
+  UseThemeAnimationProps,
+  UseThemeAnimationReturn,
   ThemeAnimationType,
-  Theme 
+  Theme,
 } from '../types';
 import {
   injectBaseStyles,
@@ -25,18 +25,21 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     animationType = ThemeAnimationType.CIRCLE,
     blurAmount = 2,
     styleId = 'spaceman-theme-style',
-    
-    themes = ['light', 'dark'],
+
+    themes = ['light', 'dark', 'system'],
     colorThemes = ['default'],
     defaultTheme = 'system',
     defaultColorTheme = 'default',
-    
+
     globalClassName = 'dark',
     colorThemePrefix = 'theme-',
-    
+
+    storageKey = 'theme',
+    colorStorageKey = 'color-theme',
+
     theme: externalTheme,
     colorTheme: externalColorTheme,
-    
+
     onThemeChange,
     onColorThemeChange,
   } = props;
@@ -50,20 +53,20 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
 
   const [internalTheme, setInternalTheme] = useState<Theme>(() => {
     if (!isBrowser) return defaultTheme;
-    const saved = localStorage.getItem('spaceman-theme') as Theme | null;
+    const saved = localStorage.getItem(storageKey) as Theme | null;
     return saved && themes.indexOf(saved) !== -1 ? saved : defaultTheme;
   });
 
   const [internalColorTheme, setInternalColorTheme] = useState(() => {
     if (!isBrowser) return defaultColorTheme;
-    const saved = localStorage.getItem('spaceman-color-theme');
+    const saved = localStorage.getItem(colorStorageKey);
     return saved && colorThemes.indexOf(saved) !== -1 ? saved : defaultColorTheme;
   });
 
   const currentTheme = externalTheme ?? internalTheme;
   const currentColorTheme = externalColorTheme ?? internalColorTheme;
 
-  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => getSystemTheme());
+  const [, setSystemTheme] = useState<'light' | 'dark'>(() => getSystemTheme());
   const resolvedTheme = resolveTheme(currentTheme);
 
   useEffect(() => {
@@ -71,69 +74,110 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = () => setSystemTheme(getSystemTheme());
-    
+
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
+  // Apply theme classes to DOM
+  useEffect(() => {
+    if (!isBrowser) return;
+
+    // Apply theme class (light/dark) - use resolvedTheme instead of manual resolution
+    if (resolvedTheme === 'dark') {
+      document.documentElement.classList.add(globalClassName);
+    } else {
+      document.documentElement.classList.remove(globalClassName);
+    }
+
+    // Apply color theme classes
+    // Remove all existing color theme classes
+    colorThemes.forEach(theme => {
+      document.documentElement.classList.remove(`${colorThemePrefix}${theme}`);
+    });
+    // Add current color theme class
+    document.documentElement.classList.add(`${colorThemePrefix}${currentColorTheme}`);
+  }, [resolvedTheme, currentColorTheme, globalClassName, colorThemePrefix, colorThemes]);
+
   const ref = useRef<HTMLButtonElement>(null);
 
-  const setTheme = useCallback((newTheme: Theme) => {
-    if (onThemeChange) {
-      onThemeChange(newTheme);
-    } else {
-      setInternalTheme(newTheme);
+  const setTheme = useCallback(
+    (newTheme: Theme) => {
+      // Always save to localStorage
       if (isBrowser) {
-        localStorage.setItem('spaceman-theme', newTheme);
+        localStorage.setItem(storageKey, newTheme);
       }
-    }
-  }, [onThemeChange]);
 
-  const setColorTheme = useCallback((newColorTheme: string) => {
-    if (onColorThemeChange) {
-      onColorThemeChange(newColorTheme);
-    } else {
-      setInternalColorTheme(newColorTheme);
+      // Update internal state if no external control
+      if (externalTheme === undefined) {
+        setInternalTheme(newTheme);
+      }
+
+      // Call external callback if provided
+      if (onThemeChange) {
+        onThemeChange(newTheme);
+      }
+    },
+    [onThemeChange, externalTheme, storageKey]
+  );
+
+  const setColorTheme = useCallback(
+    (newColorTheme: string) => {
+      // Always save to localStorage
       if (isBrowser) {
-        localStorage.setItem('spaceman-color-theme', newColorTheme);
+        localStorage.setItem(colorStorageKey, newColorTheme);
       }
-    }
-  }, [onColorThemeChange]);
 
-  const switchTheme = useCallback(async (newTheme: Theme) => {
-    if (!ref.current || !supportsViewTransitions() || prefersReducedMotion()) {
-      setTheme(newTheme);
-      return;
-    }
+      // Update internal state if no external control
+      if (externalColorTheme === undefined) {
+        setInternalColorTheme(newColorTheme);
+      }
 
-    const { top, left, width, height } = ref.current.getBoundingClientRect();
-    const x = left + width / 2;
-    const y = top + height / 2;
+      // Call external callback if provided
+      if (onColorThemeChange) {
+        onColorThemeChange(newColorTheme);
+      }
+    },
+    [onColorThemeChange, externalColorTheme, colorStorageKey]
+  );
 
-    const animationConfig = {
-      x,
-      y,
-      duration,
-      easing,
-      animationType,
-      blurAmount,
-      styleId,
-    };
-
-    if (animationType === ThemeAnimationType.BLUR_CIRCLE) {
-      createBlurCircleAnimation(animationConfig);
-    }
-
-    await (document as any).startViewTransition(() => {
-      flushSync(() => {
+  const switchTheme = useCallback(
+    async (newTheme: Theme) => {
+      if (!ref.current || !supportsViewTransitions() || prefersReducedMotion()) {
         setTheme(newTheme);
-      });
-    }).ready;
+        return;
+      }
 
-    if (animationType === ThemeAnimationType.CIRCLE) {
-      createCircleAnimation(animationConfig);
-    }
-  }, [setTheme, duration, easing, animationType, blurAmount, styleId]);
+      const { top, left, width, height } = ref.current.getBoundingClientRect();
+      const x = left + width / 2;
+      const y = top + height / 2;
+
+      const animationConfig = {
+        x,
+        y,
+        duration,
+        easing,
+        animationType,
+        blurAmount,
+        styleId,
+      };
+
+      if (animationType === ThemeAnimationType.BLUR_CIRCLE) {
+        createBlurCircleAnimation(animationConfig);
+      }
+
+      await (document as Document).startViewTransition(() => {
+        flushSync(() => {
+          setTheme(newTheme);
+        });
+      }).ready;
+
+      if (animationType === ThemeAnimationType.CIRCLE) {
+        createCircleAnimation(animationConfig);
+      }
+    },
+    [setTheme, duration, easing, animationType, blurAmount, styleId]
+  );
 
   const toggleTheme = useCallback(async () => {
     const newTheme: Theme = resolvedTheme === 'dark' ? 'light' : 'dark';
@@ -144,7 +188,7 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     if (!isBrowser) return;
 
     const root = document.documentElement;
-    
+
     if (resolvedTheme === 'dark') {
       root.classList.add(globalClassName);
     } else {
@@ -154,7 +198,7 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     colorThemes.forEach(theme => {
       root.classList.remove(`${colorThemePrefix}${theme}`);
     });
-    
+
     if (currentColorTheme !== 'default') {
       root.classList.add(`${colorThemePrefix}${currentColorTheme}`);
     }
