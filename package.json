@@ -1,6 +1,6 @@
 {
   "name": "@space-man/react-theme-animation",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "React theme switching with smooth view transition animations and multi-theme support",
   "keywords": [
     "react",
