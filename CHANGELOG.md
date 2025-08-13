@@ -1,5 +1,12 @@
 # @space-man/react-theme-animation
 
+## 1.0.2
+
+### Patch Changes
+
+- cc37368: Fix hydration errors in Next.js
+  - Ensure `SpacemanThemeProvider` only renders children after the component has mounted
+
 ## 1.0.1
 
 ### Patch Changes
