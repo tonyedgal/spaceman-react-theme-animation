@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { useThemeAnimation } from '../hooks/useThemeAnimation';
 import { Theme, ColorTheme, ThemeAnimationType } from '../types';
 
@@ -37,7 +37,8 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
   animationType = ThemeAnimationType.CIRCLE,
   duration = 750,
 }) => {
-  // This is our master hook instance - the single source of truth
+  const [mounted, setMounted] = useState(false);
+
   const themeState = useThemeAnimation({
     themes,
     colorThemes,
@@ -47,20 +48,41 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
     duration,
   });
 
-  // Create a function to switch theme from a specific element
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const switchThemeFromElement = async (theme: Theme, element: HTMLButtonElement) => {
-    // Temporarily set the ref to the clicked element
     if (themeState.ref.current) {
       const originalRef = themeState.ref.current;
       themeState.ref.current = element;
       await themeState.switchTheme(theme);
-      // Restore the original ref after animation
       themeState.ref.current = originalRef;
     } else {
       themeState.ref.current = element;
       await themeState.switchTheme(theme);
     }
   };
+
+  if (!mounted) {
+    const loadingContextValue: SpacemanThemeContextType = {
+      theme: defaultTheme,
+      colorTheme: defaultColorTheme,
+      resolvedTheme: defaultTheme === 'dark' ? 'dark' : 'light',
+      setTheme: () => {},
+      setColorTheme: () => {},
+      toggleTheme: async () => {},
+      switchTheme: async () => {},
+      switchThemeFromElement: async () => {},
+      ref: { current: null },
+    };
+
+    return (
+      <SpacemanThemeContext.Provider value={loadingContextValue}>
+        {children}
+      </SpacemanThemeContext.Provider>
+    );
+  }
 
   const contextValue: SpacemanThemeContextType = {
     theme: themeState.theme,
@@ -75,9 +97,7 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
   };
 
   return (
-    <SpacemanThemeContext.Provider value={contextValue}>
-      {children}
-    </SpacemanThemeContext.Provider>
+    <SpacemanThemeContext.Provider value={contextValue}>{children}</SpacemanThemeContext.Provider>
   );
 };
 

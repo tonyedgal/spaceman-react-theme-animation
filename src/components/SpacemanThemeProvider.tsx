@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
 import { useThemeAnimation } from '../hooks/use-theme-animation';
 import { Theme, ColorTheme, ThemeAnimationType } from '../types';
 
@@ -34,10 +34,10 @@ interface SpacemanThemeProviderProps {
 
 /**
  * Spaceman Theme Provider - Provides centralized theme state management
- * 
+ *
  * This provider creates a single source of truth for theme state using the useThemeAnimation hook.
  * All theme-related components should consume from this context to ensure synchronization.
- * 
+ *
  * @param children - React children to wrap with theme context
  * @param themes - Available theme options (default: ['light', 'dark', 'system'])
  * @param colorThemes - Available color theme options (default: ['default'])
@@ -55,7 +55,8 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
   animationType = ThemeAnimationType.CIRCLE,
   duration = 750,
 }) => {
-  // This is our master hook instance - the single source of truth
+  const [mounted, setMounted] = useState(false);
+
   const themeState = useThemeAnimation({
     themes,
     colorThemes,
@@ -65,38 +66,53 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
     duration,
   });
 
-  /**
-   * Switch theme with animation originating from a specific element
-   * 
-   * @param theme - Theme to switch to
-   * @param element - HTML button element to use as animation origin
-   */
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const switchThemeFromElement = async (theme: Theme, element: HTMLButtonElement) => {
-    // Temporarily set the ref to the clicked element
     if (themeState.ref.current) {
       const originalRef = themeState.ref.current;
-      // Use Object.defineProperty to temporarily override the ref
       Object.defineProperty(themeState.ref, 'current', {
         value: element,
         writable: true,
-        configurable: true
+        configurable: true,
       });
       await themeState.switchTheme(theme);
-      // Restore the original ref after animation
       Object.defineProperty(themeState.ref, 'current', {
         value: originalRef,
         writable: true,
-        configurable: true
+        configurable: true,
       });
     } else {
       Object.defineProperty(themeState.ref, 'current', {
         value: element,
         writable: true,
-        configurable: true
+        configurable: true,
       });
       await themeState.switchTheme(theme);
     }
   };
+
+  if (!mounted) {
+    const loadingContextValue: SpacemanThemeContextType = {
+      theme: defaultTheme,
+      colorTheme: defaultColorTheme,
+      resolvedTheme: defaultTheme === 'dark' ? 'dark' : 'light',
+      setTheme: () => {},
+      setColorTheme: () => {},
+      toggleTheme: async () => {},
+      switchTheme: async () => {},
+      switchThemeFromElement: async () => {},
+      ref: { current: null },
+    };
+
+    return (
+      <SpacemanThemeContext.Provider value={loadingContextValue}>
+        {children}
+      </SpacemanThemeContext.Provider>
+    );
+  }
 
   const contextValue: SpacemanThemeContextType = {
     theme: themeState.theme,
@@ -111,15 +127,13 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
   };
 
   return (
-    <SpacemanThemeContext.Provider value={contextValue}>
-      {children}
-    </SpacemanThemeContext.Provider>
+    <SpacemanThemeContext.Provider value={contextValue}>{children}</SpacemanThemeContext.Provider>
   );
 };
 
 /**
  * Hook to consume the Spaceman Theme context
- * 
+ *
  * @returns Theme context value with all theme state and methods
  * @throws Error if used outside of SpacemanThemeProvider
  */

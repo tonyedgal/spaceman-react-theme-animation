@@ -47,21 +47,39 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
   const isHighResolution = isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000);
   const duration = isHighResolution ? Math.max(propsDuration * 0.8, 500) : propsDuration;
 
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     injectBaseStyles();
   }, []);
 
   const [internalTheme, setInternalTheme] = useState<Theme>(() => {
     if (!isBrowser) return defaultTheme;
-    const saved = localStorage.getItem(storageKey) as Theme | null;
-    return saved && themes.indexOf(saved) !== -1 ? saved : defaultTheme;
+    return defaultTheme;
   });
 
   const [internalColorTheme, setInternalColorTheme] = useState(() => {
     if (!isBrowser) return defaultColorTheme;
-    const saved = localStorage.getItem(colorStorageKey);
-    return saved && colorThemes.indexOf(saved) !== -1 ? saved : defaultColorTheme;
+    return defaultColorTheme;
   });
+
+  useEffect(() => {
+    setMounted(true);
+
+    if (isBrowser && !externalTheme) {
+      const saved = localStorage.getItem(storageKey) as Theme | null;
+      if (saved && themes.indexOf(saved) !== -1) {
+        setInternalTheme(saved);
+      }
+    }
+
+    if (isBrowser && !externalColorTheme) {
+      const saved = localStorage.getItem(colorStorageKey);
+      if (saved && colorThemes.indexOf(saved) !== -1) {
+        setInternalColorTheme(saved);
+      }
+    }
+  }, []);
 
   const currentTheme = externalTheme ?? internalTheme;
   const currentColorTheme = externalColorTheme ?? internalColorTheme;
@@ -81,23 +99,19 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
 
   // Apply theme classes to DOM
   useEffect(() => {
-    if (!isBrowser) return;
+    if (!isBrowser || !mounted) return;
 
-    // Apply theme class (light/dark) - use resolvedTheme instead of manual resolution
     if (resolvedTheme === 'dark') {
       document.documentElement.classList.add(globalClassName);
     } else {
       document.documentElement.classList.remove(globalClassName);
     }
 
-    // Apply color theme classes
-    // Remove all existing color theme classes
     colorThemes.forEach(theme => {
       document.documentElement.classList.remove(`${colorThemePrefix}${theme}`);
     });
-    // Add current color theme class
     document.documentElement.classList.add(`${colorThemePrefix}${currentColorTheme}`);
-  }, [resolvedTheme, currentColorTheme, globalClassName, colorThemePrefix, colorThemes]);
+  }, [resolvedTheme, currentColorTheme, globalClassName, colorThemePrefix, colorThemes, mounted]);
 
   const ref = useRef<HTMLButtonElement>(null);
 
@@ -183,8 +197,6 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     const newTheme: Theme = resolvedTheme === 'dark' ? 'light' : 'dark';
     await switchTheme(newTheme);
   }, [resolvedTheme, switchTheme]);
-
-
 
   return {
     ref,
