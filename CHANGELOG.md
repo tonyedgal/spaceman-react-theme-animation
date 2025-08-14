@@ -1,5 +1,13 @@
 # @space-man/react-theme-animation
 
+## 1.0.4
+
+### Patch Changes
+
+- a54a5fe: Add a `ViteThemeProvider` and fix `Themeswitcher` component
+  - This commit introduces a new `ViteThemeProvider` component that centralizes theme management for the `ThemeSelector` and `ThemeSwitcher` components in vite react SPAs.
+  - It also fixes the `Themeswitcher` component to ensure it works correctly with motion library.
+
 ## 1.0.3
 
 ### Patch Changes
