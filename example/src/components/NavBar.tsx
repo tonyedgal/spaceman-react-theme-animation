@@ -1,20 +1,20 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { useState } from 'react'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 const navItems = [
   { name: 'With-Components', path: '/' },
   { name: 'With-Hook', path: '/hook' },
-];
+]
 
 export default function NavBar() {
-  const pathName = usePathname() || '/';
+  const pathName = usePathname() || '/'
 
-  const [hoveredPath, setHoveredPath] = useState<string | null>(pathName);
+  const [hoveredPath, setHoveredPath] = useState<string | null>(pathName)
 
   return (
     <div className="border rounded-xs shadow-sm flex items-center border-border w-fit mx-auto p-1 fixed top-8 left-1/2 transform -translate-x-1/2 z-50 bg-transparent backdrop-blur-md">
@@ -29,7 +29,7 @@ export default function NavBar() {
           />
         </Link>
         {navItems.map(item => {
-          const active = pathName === item.path;
+          const active = pathName === item.path
 
           return (
             <Link
@@ -70,9 +70,9 @@ export default function NavBar() {
                 </motion.div>
               )}
             </Link>
-          );
+          )
         })}
       </nav>
     </div>
-  );
+  )
 }

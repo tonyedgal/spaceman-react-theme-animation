@@ -1,10 +1,10 @@
-'use client';
+'use client'
 
-import React, { type JSX, useEffect, useState } from 'react';
-import { motion } from 'motion/react';
-import { clsx } from 'clsx';
-import { ThemeSwitcherProps, Theme } from '../types';
-import { useSpacemanTheme } from './SpacemanThemeProvider';
+import React, { type JSX, useEffect, useState } from 'react'
+import { motion } from 'motion/react'
+import { clsx } from 'clsx'
+import { ThemeSwitcherProps, Theme } from '../types'
+import { useSpacemanTheme } from './SpacemanThemeProvider'
 
 const SunIcon = () => (
   <svg
@@ -20,7 +20,7 @@ const SunIcon = () => (
     <circle cx="12" cy="12" r="5" />
     <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
   </svg>
-);
+)
 
 const MoonIcon = () => (
   <svg
@@ -35,7 +35,7 @@ const MoonIcon = () => (
   >
     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
   </svg>
-);
+)
 
 const MonitorIcon = () => (
   <svg
@@ -52,7 +52,7 @@ const MonitorIcon = () => (
     <line x1="8" x2="16" y1="21" y2="21" />
     <line x1="12" x2="12" y1="17" y2="21" />
   </svg>
-);
+)
 
 const ThemeOption = ({
   icon,
@@ -63,13 +63,13 @@ const ThemeOption = ({
   onMouseEnter,
   onMouseLeave,
 }: {
-  icon: JSX.Element;
-  value: string;
-  isActive?: boolean;
-  isHovered?: boolean;
-  onClick: (value: string, event: React.MouseEvent<HTMLButtonElement>) => void;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
+  icon: JSX.Element
+  value: string
+  isActive?: boolean
+  isHovered?: boolean
+  onClick: (value: string, event: React.MouseEvent<HTMLButtonElement>) => void
+  onMouseEnter: () => void
+  onMouseLeave: () => void
 }) => {
   return (
     <button
@@ -81,7 +81,7 @@ const ThemeOption = ({
       role="radio"
       aria-checked={isActive}
       aria-label={`Switch to ${value} theme`}
-      onClick={(event) => onClick(value, event)}
+      onClick={event => onClick(value, event)}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={{
@@ -137,8 +137,8 @@ const ThemeOption = ({
         />
       )}
     </button>
-  );
-};
+  )
+}
 
 const THEME_OPTIONS = [
   {
@@ -153,7 +153,7 @@ const THEME_OPTIONS = [
     icon: <MoonIcon />,
     value: 'dark',
   },
-];
+]
 
 export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   themes = ['light', 'dark', 'system'],
@@ -162,29 +162,32 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   className,
 }) => {
   // Use controlled props and master hook's switchThemeFromElement for animations
-  const { switchThemeFromElement } = useSpacemanTheme();
-  const theme = currentTheme || 'system';
+  const { switchThemeFromElement } = useSpacemanTheme()
+  const theme = currentTheme || 'system'
 
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    setIsMounted(true)
+  }, [])
 
-  const handleThemeChange = async (newTheme: string, event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleThemeChange = async (
+    newTheme: string,
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
     // Use switchThemeFromElement for animated transitions from the clicked button
-    await switchThemeFromElement(newTheme as Theme, event.currentTarget);
+    await switchThemeFromElement(newTheme as Theme, event.currentTarget)
     // Also call the callback if provided
     if (onThemeChange) {
-      onThemeChange(newTheme as Theme);
+      onThemeChange(newTheme as Theme)
     }
-  };
-
-  if (!isMounted) {
-    return <div className="flex h-9 w-fit" />;
   }
 
-  const filteredOptions = THEME_OPTIONS.filter(option => themes.includes(option.value as Theme));
+  if (!isMounted) {
+    return <div className="flex h-9 w-fit" />
+  }
+
+  const filteredOptions = THEME_OPTIONS.filter(option => themes.includes(option.value as Theme))
 
   return (
     <motion.div
@@ -216,5 +219,5 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         />
       ))}
     </motion.div>
-  );
-};
+  )
+}

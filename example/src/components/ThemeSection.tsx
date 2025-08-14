@@ -1,19 +1,19 @@
-'use client';
+'use client'
 
-import { useState } from 'react';
-import { ThemeAnimationType } from '@/types';
-import { useSpacemanTheme } from './SpacemanThemeProvider';
-import { ThemeSelector } from './ThemeSelector';
-import { ThemeSwitcher } from './ThemeSwitcher';
+import { useState } from 'react'
+import { ThemeAnimationType } from '@/types'
+import { useSpacemanTheme } from './SpacemanThemeProvider'
+import { ThemeSelector } from './ThemeSelector'
+import { ThemeSwitcher } from './ThemeSwitcher'
 
 export const ThemeSection = () => {
-  const [animationType, setAnimationType] = useState<ThemeAnimationType>(ThemeAnimationType.CIRCLE);
+  const [animationType, setAnimationType] = useState<ThemeAnimationType>(ThemeAnimationType.CIRCLE)
   const {
     theme: currentTheme,
     colorTheme: currentColorTheme,
     setTheme,
     setColorTheme,
-  } = useSpacemanTheme();
+  } = useSpacemanTheme()
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -168,7 +168,7 @@ export const ThemeSection = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ThemeSection;
+export default ThemeSection

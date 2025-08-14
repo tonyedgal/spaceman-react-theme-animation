@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
-import { BlurThemeToggle } from '@/components/theme/BlurThemeToggle';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import { BlurThemeToggle } from '@/components/theme/BlurThemeToggle'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 
 export default function Home() {
   return (
@@ -17,5 +17,5 @@ export default function Home() {
         </div>
       </div>
     </main>
-  );
+  )
 }

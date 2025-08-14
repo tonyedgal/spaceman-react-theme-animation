@@ -1,15 +1,15 @@
-import { ThemeAnimationType } from '../types';
+import { ThemeAnimationType } from '../types'
 
-const isBrowser = typeof window !== 'undefined';
+const isBrowser = typeof window !== 'undefined'
 
 // Inject base CSS for view transitions
 export const injectBaseStyles = (): void => {
   if (isBrowser) {
-    const styleId = 'spaceman-theme-base-style';
+    const styleId = 'spaceman-theme-base-style'
     if (!document.getElementById(styleId)) {
-      const style = document.createElement('style');
-      style.id = styleId;
-      const isHighResolution = window.innerWidth >= 3000 || window.innerHeight >= 2000;
+      const style = document.createElement('style')
+      style.id = styleId
+      const isHighResolution = window.innerWidth >= 3000 || window.innerHeight >= 2000
 
       style.textContent = `
         ::view-transition-old(root),
@@ -33,62 +33,62 @@ export const injectBaseStyles = (): void => {
         `
             : ''
         }
-      `;
-      document.head.appendChild(style);
+      `
+      document.head.appendChild(style)
     }
   }
-};
+}
 
 export const createBlurCircleMask = (blur: number): string => {
-  const isHighResolution = isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000);
+  const isHighResolution = isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
 
-  const blurFilter = `<filter id="blur"><feGaussianBlur stdDeviation="${blur}" /></filter>`;
-  const circleRadius = isHighResolution ? 20 : 25;
+  const blurFilter = `<filter id="blur"><feGaussianBlur stdDeviation="${blur}" /></filter>`
+  const circleRadius = isHighResolution ? 20 : 25
 
-  return `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100"><defs>${blurFilter}</defs><circle cx="0" cy="0" r="${circleRadius}" fill="white" filter="url(%23blur)"/></svg>')`;
-};
+  return `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100"><defs>${blurFilter}</defs><circle cx="0" cy="0" r="${circleRadius}" fill="white" filter="url(%23blur)"/></svg>')`
+}
 
 export const getSystemTheme = (): 'light' | 'dark' => {
-  if (!isBrowser) return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-};
+  if (!isBrowser) return 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
 
 export const resolveTheme = (theme: string): 'light' | 'dark' => {
   if (theme === 'system') {
-    return getSystemTheme();
+    return getSystemTheme()
   }
-  return theme === 'dark' ? 'dark' : 'light';
-};
+  return theme === 'dark' ? 'dark' : 'light'
+}
 
 export const supportsViewTransitions = (): boolean => {
-  return isBrowser && 'startViewTransition' in document;
-};
+  return isBrowser && 'startViewTransition' in document
+}
 
 export const prefersReducedMotion = (): boolean => {
-  return isBrowser && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-};
+  return isBrowser && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
 
 export interface AnimationConfig {
-  x: number;
-  y: number;
-  duration: number;
-  easing: string;
-  animationType: ThemeAnimationType;
-  blurAmount: number;
-  styleId: string;
+  x: number
+  y: number
+  duration: number
+  easing: string
+  animationType: ThemeAnimationType
+  blurAmount: number
+  styleId: string
 }
 
 export const createCircleAnimation = (config: AnimationConfig): void => {
-  const { x, y, duration, easing } = config;
+  const { x, y, duration, easing } = config
 
   // Calculate the distance to each corner of the viewport
-  const topLeft = Math.hypot(x, y);
-  const topRight = Math.hypot(window.innerWidth - x, y);
-  const bottomLeft = Math.hypot(x, window.innerHeight - y);
-  const bottomRight = Math.hypot(window.innerWidth - x, window.innerHeight - y);
+  const topLeft = Math.hypot(x, y)
+  const topRight = Math.hypot(window.innerWidth - x, y)
+  const bottomLeft = Math.hypot(x, window.innerHeight - y)
+  const bottomRight = Math.hypot(window.innerWidth - x, window.innerHeight - y)
 
   // Find the maximum distance to ensure animation covers the entire viewport
-  const maxRadius = Math.max(topLeft, topRight, bottomLeft, bottomRight);
+  const maxRadius = Math.max(topLeft, topRight, bottomLeft, bottomRight)
 
   document.documentElement.animate(
     {
@@ -99,37 +99,37 @@ export const createCircleAnimation = (config: AnimationConfig): void => {
       easing,
       pseudoElement: '::view-transition-new(root)',
     }
-  );
-};
+  )
+}
 
 export const createBlurCircleAnimation = (config: AnimationConfig): void => {
-  const { x, y, duration, easing, blurAmount, styleId } = config;
+  const { x, y, duration, easing, blurAmount, styleId } = config
 
   // Remove existing style if present
-  const existingStyle = document.getElementById(styleId);
+  const existingStyle = document.getElementById(styleId)
   if (existingStyle) {
-    existingStyle.remove();
+    existingStyle.remove()
   }
 
-  const viewportSize = Math.max(window.innerWidth, window.innerHeight) + 200;
-  const isHighResolution = window.innerWidth >= 3000 || window.innerHeight >= 2000;
-  const scaleFactor = isHighResolution ? 2.5 : 4;
+  const viewportSize = Math.max(window.innerWidth, window.innerHeight) + 200
+  const isHighResolution = window.innerWidth >= 3000 || window.innerHeight >= 2000
+  const scaleFactor = isHighResolution ? 2.5 : 4
   const optimalMaskSize = isHighResolution
     ? Math.min(viewportSize * scaleFactor, 5000)
-    : viewportSize * scaleFactor;
+    : viewportSize * scaleFactor
 
   // Calculate maximum radius for corner positions
-  const topLeft = Math.hypot(x, y);
-  const topRight = Math.hypot(window.innerWidth - x, y);
-  const bottomLeft = Math.hypot(x, window.innerHeight - y);
-  const bottomRight = Math.hypot(window.innerWidth - x, window.innerHeight - y);
-  const maxRadius = Math.max(topLeft, topRight, bottomLeft, bottomRight);
+  const topLeft = Math.hypot(x, y)
+  const topRight = Math.hypot(window.innerWidth - x, y)
+  const bottomLeft = Math.hypot(x, window.innerHeight - y)
+  const bottomRight = Math.hypot(window.innerWidth - x, window.innerHeight - y)
+  const maxRadius = Math.max(topLeft, topRight, bottomLeft, bottomRight)
 
-  const styleElement = document.createElement('style');
-  styleElement.id = styleId;
+  const styleElement = document.createElement('style')
+  styleElement.id = styleId
 
-  const blurFactor = isHighResolution ? 1.5 : 1.2;
-  const finalMaskSize = Math.max(optimalMaskSize, maxRadius * 2.5);
+  const blurFactor = isHighResolution ? 1.5 : 1.2
+  const finalMaskSize = Math.max(optimalMaskSize, maxRadius * 2.5)
 
   styleElement.textContent = `
     ::view-transition-group(root) {
@@ -175,15 +175,15 @@ export const createBlurCircleAnimation = (config: AnimationConfig): void => {
         mask-position: ${x - finalMaskSize / 2}px ${y - finalMaskSize / 2}px;
       }
     }
-  `;
+  `
 
-  document.head.appendChild(styleElement);
+  document.head.appendChild(styleElement)
 
   // Clean up after animation
   setTimeout(() => {
-    const styleElement = document.getElementById(styleId);
+    const styleElement = document.getElementById(styleId)
     if (styleElement) {
-      styleElement.remove();
+      styleElement.remove()
     }
-  }, duration);
-};
+  }, duration)
+}

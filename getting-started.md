@@ -20,7 +20,7 @@ import {
   ThemeSwitcher,
   ThemeSelector,
   ThemeAnimationType,
-} from '@space-man/react-theme-animation';
+} from '@space-man/react-theme-animation'
 
 function App() {
   return (
@@ -34,15 +34,15 @@ function App() {
       duration={1000}
       onThemeChange={theme => {
         // Analytics, localStorage, etc.
-        console.log('Global theme changed:', theme);
+        console.log('Global theme changed:', theme)
       }}
       onColorThemeChange={colorTheme => {
-        console.log('Global color theme changed:', colorTheme);
+        console.log('Global color theme changed:', colorTheme)
       }}
     >
       <AppLayout />
     </SpacemanThemeProvider>
-  );
+  )
 }
 
 function AppLayout() {
@@ -52,7 +52,7 @@ function AppLayout() {
       <Sidebar />
       <MainContent />
     </div>
-  );
+  )
 }
 
 function Header() {
@@ -61,7 +61,7 @@ function Header() {
       <h1>My App</h1>
       <ThemeSwitcher className="ml-auto" />
     </header>
-  );
+  )
 }
 
 function Sidebar() {
@@ -70,7 +70,7 @@ function Sidebar() {
       <h2>Settings</h2>
       <ThemeSelector colorThemes={['default', 'blue', 'green', 'purple', 'red']} />
     </aside>
-  );
+  )
 }
 ```
 
@@ -79,16 +79,16 @@ function Sidebar() {
 Access theme state anywhere in your component tree. This hook also enables you to set a reference point for the animation to start from.
 
 ```tsx
-import { useSpacemanTheme } from '@space-man/react-theme-animation';
+import { useSpacemanTheme } from '@space-man/react-theme-animation'
 
 function ThemeStatus() {
   const { theme, colorTheme, switchTheme, setColorTheme, switchThemeFromElement } =
-    useSpacemanTheme();
+    useSpacemanTheme()
 
   const handleCustomThemeSwitch = event => {
     // Animate from the clicked element
-    switchThemeFromElement('dark', event.currentTarget);
-  };
+    switchThemeFromElement('dark', event.currentTarget)
+  }
 
   return (
     <div className="theme-status">
@@ -97,7 +97,7 @@ function ThemeStatus() {
 
       <button onClick={handleCustomThemeSwitch}>Switch to Dark (with animation)</button>
     </div>
-  );
+  )
 }
 ```
 
@@ -106,14 +106,14 @@ function ThemeStatus() {
 Here's a complete example showcasing all features:
 
 ```tsx
-import React from 'react';
+import React from 'react'
 import {
   SpacemanThemeProvider,
   ThemeSwitcher,
   ThemeSelector,
   useSpacemanTheme,
   ThemeAnimationType,
-} from '@space-man/react-theme-animation';
+} from '@space-man/react-theme-animation'
 
 // Main App with Provider
 function App() {
@@ -127,15 +127,15 @@ function App() {
       duration={800}
       onThemeChange={theme => {
         // Save to localStorage, analytics, etc.
-        localStorage.setItem('preferred-theme', theme);
+        localStorage.setItem('preferred-theme', theme)
       }}
       onColorThemeChange={colorTheme => {
-        localStorage.setItem('preferred-color-theme', colorTheme);
+        localStorage.setItem('preferred-color-theme', colorTheme)
       }}
     >
       <AppContent />
     </SpacemanThemeProvider>
-  );
+  )
 }
 
 // App Layout
@@ -150,7 +150,7 @@ function AppContent() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 // Header with Theme Switcher
@@ -164,7 +164,7 @@ function Header() {
         </div>
       </div>
     </header>
-  );
+  )
 }
 
 // Sidebar with Theme Selector
@@ -183,16 +183,16 @@ function Sidebar() {
 
       <ThemeInfo />
     </aside>
-  );
+  )
 }
 
 // Component using the theme hook
 function ThemeInfo() {
-  const { theme, colorTheme, switchThemeFromElement } = useSpacemanTheme();
+  const { theme, colorTheme, switchThemeFromElement } = useSpacemanTheme()
 
   const quickSwitchTheme = (newTheme, event) => {
-    switchThemeFromElement(newTheme, event.currentTarget);
-  };
+    switchThemeFromElement(newTheme, event.currentTarget)
+  }
 
   return (
     <div className="bg-card p-6 rounded-lg border">
@@ -221,7 +221,7 @@ function ThemeInfo() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 // Main content area
@@ -247,10 +247,10 @@ function MainContent() {
         ))}
       </div>
     </main>
-  );
+  )
 }
 
-export default App;
+export default App
 ```
 
 ## Custom Hook Implementation
@@ -258,8 +258,8 @@ export default App;
 For advanced use cases, you can create custom hooks that extend the base functionality:
 
 ```tsx
-import { useThemeAnimation } from '@space-man/react-theme-animation';
-import { useCallback } from 'react';
+import { useThemeAnimation } from '@space-man/react-theme-animation'
+import { useCallback } from 'react'
 
 function useCustomTheme() {
   const { theme, toggleTheme, switchTheme, ref } = useThemeAnimation({
@@ -267,21 +267,21 @@ function useCustomTheme() {
     animationType: ThemeAnimationType.CIRCLE,
     onThemeChange: newTheme => {
       // Custom analytics
-      analytics.track('theme_changed', { theme: newTheme });
+      analytics.track('theme_changed', { theme: newTheme })
 
       // Custom storage
-      localStorage.setItem('app_theme', newTheme);
+      localStorage.setItem('app_theme', newTheme)
     },
-  });
+  })
 
   const switchToSpecificTheme = useCallback(
     async (targetTheme: Theme) => {
       if (theme !== targetTheme) {
-        await switchTheme(targetTheme);
+        await switchTheme(targetTheme)
       }
     },
     [theme, switchTheme]
-  );
+  )
 
   return {
     theme,
@@ -291,7 +291,7 @@ function useCustomTheme() {
     isDark: theme === 'dark',
     isLight: theme === 'light',
     isSystem: theme === 'system',
-  };
+  }
 }
 ```
 

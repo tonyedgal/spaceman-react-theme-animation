@@ -8,5 +8,5 @@ export default function CrossBackground() {
                linear-gradient(90deg,#444cf7_2px,var(--border)_2px)_-1px_0]
       [background-size:50px_50px,50px_50px,25px_25px,25px_25px]"
     ></div>
-  );
+  )
 }

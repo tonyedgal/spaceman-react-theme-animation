@@ -1,24 +1,16 @@
+import * as React from 'react'
+import * as SelectPrimitive from '@radix-ui/react-select'
+import { clsx } from 'clsx'
 
-
-import * as React from "react"
-import * as SelectPrimitive from "@radix-ui/react-select"
-import { clsx } from "clsx"
-
-function Select({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Root>) {
+function Select({ ...props }: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot="select" {...props} />
 }
 
-function SelectGroup({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Group>) {
+function SelectGroup({ ...props }: React.ComponentProps<typeof SelectPrimitive.Group>) {
   return <SelectPrimitive.Group data-slot="select-group" {...props} />
 }
 
-function SelectValue({
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Value>) {
+function SelectValue({ ...props }: React.ComponentProps<typeof SelectPrimitive.Value>) {
   return <SelectPrimitive.Value data-slot="select-value" {...props} />
 }
 
@@ -35,7 +27,7 @@ const ChevronDownIcon = () => (
   >
     <path d="m6 9 6 6 6-6" />
   </svg>
-);
+)
 
 const ChevronUpIcon = () => (
   <svg
@@ -50,7 +42,7 @@ const ChevronUpIcon = () => (
   >
     <path d="m18 15-6-6-6 6" />
   </svg>
-);
+)
 
 const CheckIcon = () => (
   <svg
@@ -65,15 +57,15 @@ const CheckIcon = () => (
   >
     <path d="M20 6 9 17l-5-5" />
   </svg>
-);
+)
 
 function SelectTrigger({
   className,
-  size = "default",
+  size = 'default',
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: "sm" | "default"
+  size?: 'sm' | 'default'
 }) {
   return (
     <SelectPrimitive.Trigger
@@ -96,7 +88,7 @@ function SelectTrigger({
 function SelectContent({
   className,
   children,
-  position = "popper",
+  position = 'popper',
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
   return (
@@ -104,9 +96,9 @@ function SelectContent({
       <SelectPrimitive.Content
         data-slot="select-content"
         className={clsx(
-          "bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md",
-          position === "popper" &&
-            "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+          'bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 relative z-50 max-h-(--radix-select-content-available-height) min-w-[8rem] origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto rounded-md border shadow-md',
+          position === 'popper' &&
+            'data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1',
           className
         )}
         position={position}
@@ -114,9 +106,9 @@ function SelectContent({
       >
         <SelectPrimitive.Viewport
           className={clsx(
-            "p-1",
-            position === "popper" &&
-              "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+            'p-1',
+            position === 'popper' &&
+              'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]'
           )}
         >
           {children}
@@ -126,14 +118,11 @@ function SelectContent({
   )
 }
 
-function SelectLabel({
-  className,
-  ...props
-}: React.ComponentProps<typeof SelectPrimitive.Label>) {
+function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
     <SelectPrimitive.Label
       data-slot="select-label"
-      className={clsx("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
+      className={clsx('py-1.5 pl-8 pr-2 text-sm font-semibold', className)}
       {...props}
     />
   )
@@ -171,7 +160,7 @@ function SelectSeparator({
   return (
     <SelectPrimitive.Separator
       data-slot="select-separator"
-      className={clsx("-mx-1 my-1 h-px bg-muted", className)}
+      className={clsx('-mx-1 my-1 h-px bg-muted', className)}
       {...props}
     />
   )
@@ -184,10 +173,7 @@ function SelectScrollUpButton({
   return (
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
-      className={clsx(
-        "flex cursor-default items-center justify-center py-1",
-        className
-      )}
+      className={clsx('flex cursor-default items-center justify-center py-1', className)}
       {...props}
     >
       <ChevronUpIcon />
@@ -202,10 +188,7 @@ function SelectScrollDownButton({
   return (
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
-      className={clsx(
-        "flex cursor-default items-center justify-center py-1",
-        className
-      )}
+      className={clsx('flex cursor-default items-center justify-center py-1', className)}
       {...props}
     >
       <ChevronDownIcon />

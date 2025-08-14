@@ -1,5 +1,5 @@
-import { SpacemanThemeProvider } from '../components/SpacemanThemeProvider';
-import ThemeSection from '@/components/ThemeSection';
+import { SpacemanThemeProvider } from '../components/SpacemanThemeProvider'
+import ThemeSection from '@/components/ThemeSection'
 
 export default function Home() {
   return (
@@ -13,5 +13,5 @@ export default function Home() {
         <ThemeSection />
       </SpacemanThemeProvider>
     </main>
-  );
+  )
 }

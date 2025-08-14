@@ -5,7 +5,7 @@ const DotBackground = () => {
         <div></div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default DotBackground;
+export default DotBackground

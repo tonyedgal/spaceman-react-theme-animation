@@ -1,8 +1,8 @@
-export { useThemeAnimation } from './hooks/use-theme-animation';
+export { useThemeAnimation } from './hooks/use-theme-animation'
 
-export { ThemeSwitcher } from './components/ThemeSwitcher';
-export { ThemeSelector } from './components/ThemeSelector';
-export { SpacemanThemeProvider, useSpacemanTheme } from './components/SpacemanThemeProvider';
+export { ThemeSwitcher } from './components/ThemeSwitcher'
+export { ThemeSelector } from './components/ThemeSelector'
+export { SpacemanThemeProvider, useSpacemanTheme } from './components/SpacemanThemeProvider'
 
 export type {
   UseThemeAnimationProps,
@@ -11,9 +11,9 @@ export type {
   ThemeSelectorProps,
   Theme,
   ColorTheme,
-} from './types';
+} from './types'
 
-export { ThemeAnimationType } from './types';
+export { ThemeAnimationType } from './types'
 
 export {
   injectBaseStyles,
@@ -21,4 +21,4 @@ export {
   resolveTheme,
   supportsViewTransitions,
   prefersReducedMotion,
-} from './utils/animations';
+} from './utils/animations'

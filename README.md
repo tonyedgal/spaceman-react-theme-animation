@@ -43,16 +43,16 @@ Perfect for custom theme toggle buttons and complete control over animated theme
 ### Basic Theme Toggle
 
 ```tsx
-import { useThemeAnimation } from '@space-man/react-theme-animation';
+import { useThemeAnimation } from '@space-man/react-theme-animation'
 
 function ThemeToggle() {
-  const { theme, toggleTheme, ref } = useThemeAnimation();
+  const { theme, toggleTheme, ref } = useThemeAnimation()
 
   return (
     <button ref={ref} onClick={toggleTheme} className="theme-toggle-btn">
       {theme === 'light' ? '🌙' : '🌞'} {theme}
     </button>
-  );
+  )
 }
 ```
 
@@ -69,7 +69,7 @@ import {
   SpacemanThemeProvider,
   ThemeSwitcher,
   ThemeSelector,
-} from '@space-man/react-theme-animation';
+} from '@space-man/react-theme-animation'
 
 function App() {
   return (
@@ -88,7 +88,7 @@ function App() {
         </main>
       </div>
     </SpacemanThemeProvider>
-  );
+  )
 }
 ```
 
@@ -135,7 +135,7 @@ Hook to access theme state from SpacemanThemeProvider context.
 
 ```tsx
 const { theme, colorTheme, switchTheme, setColorTheme, switchThemeFromElement, ref } =
-  useSpacemanTheme();
+  useSpacemanTheme()
 ```
 
 #### Returns
@@ -161,7 +161,7 @@ const { theme, colorTheme, switchTheme, setColorTheme, toggleTheme, ref } = useT
   duration: 800,
   onThemeChange: theme => console.log('Theme changed:', theme),
   onColorThemeChange: colorTheme => console.log('Color changed:', colorTheme),
-});
+})
 ```
 
 #### Options
@@ -258,59 +258,59 @@ enum ThemeAnimationType {
 ### Types
 
 ```tsx
-type Theme = 'light' | 'dark' | 'system';
-type ColorTheme = string; // e.g., 'default', 'blue', 'green', etc.
+type Theme = 'light' | 'dark' | 'system'
+type ColorTheme = string // e.g., 'default', 'blue', 'green', etc.
 
 interface SpacemanThemeProviderProps {
-  children: React.ReactNode;
-  defaultTheme?: Theme;
-  defaultColorTheme?: ColorTheme;
-  themes?: Theme[];
-  colorThemes?: ColorTheme[];
-  animationType?: ThemeAnimationType;
-  duration?: number;
-  blurAmount?: number;
-  onThemeChange?: (theme: Theme) => void;
-  onColorThemeChange?: (colorTheme: ColorTheme) => void;
+  children: React.ReactNode
+  defaultTheme?: Theme
+  defaultColorTheme?: ColorTheme
+  themes?: Theme[]
+  colorThemes?: ColorTheme[]
+  animationType?: ThemeAnimationType
+  duration?: number
+  blurAmount?: number
+  onThemeChange?: (theme: Theme) => void
+  onColorThemeChange?: (colorTheme: ColorTheme) => void
 }
 
 interface UseThemeAnimationProps {
-  themes?: Theme[];
-  colorThemes?: ColorTheme[];
-  theme?: Theme;
-  colorTheme?: ColorTheme;
-  animationType?: ThemeAnimationType;
-  duration?: number;
-  blurAmount?: number;
-  onThemeChange?: (theme: Theme) => void;
-  onColorThemeChange?: (colorTheme: ColorTheme) => void;
+  themes?: Theme[]
+  colorThemes?: ColorTheme[]
+  theme?: Theme
+  colorTheme?: ColorTheme
+  animationType?: ThemeAnimationType
+  duration?: number
+  blurAmount?: number
+  onThemeChange?: (theme: Theme) => void
+  onColorThemeChange?: (colorTheme: ColorTheme) => void
 }
 
 interface UseThemeAnimationReturn {
-  theme: Theme;
-  colorTheme: ColorTheme;
-  switchTheme: (theme: Theme) => Promise<void>;
-  setColorTheme: (colorTheme: ColorTheme) => void;
-  toggleTheme: () => Promise<void>;
-  ref: RefObject<HTMLElement>;
+  theme: Theme
+  colorTheme: ColorTheme
+  switchTheme: (theme: Theme) => Promise<void>
+  setColorTheme: (colorTheme: ColorTheme) => void
+  toggleTheme: () => Promise<void>
+  ref: RefObject<HTMLElement>
 }
 
 interface ThemeSwitcherProps {
-  themes?: Theme[];
-  currentTheme?: Theme;
-  onThemeChange?: (theme: Theme) => void;
-  animationType?: ThemeAnimationType;
-  duration?: number;
-  className?: string;
+  themes?: Theme[]
+  currentTheme?: Theme
+  onThemeChange?: (theme: Theme) => void
+  animationType?: ThemeAnimationType
+  duration?: number
+  className?: string
 }
 
 interface ThemeSelectorProps {
-  themes?: Theme[];
-  colorThemes?: ColorTheme[];
-  currentColorTheme?: ColorTheme;
-  onColorThemeChange?: (colorTheme: ColorTheme) => void;
-  animationType?: ThemeAnimationType;
-  duration?: number;
+  themes?: Theme[]
+  colorThemes?: ColorTheme[]
+  currentColorTheme?: ColorTheme
+  onColorThemeChange?: (colorTheme: ColorTheme) => void
+  animationType?: ThemeAnimationType
+  duration?: number
 }
 ```
 

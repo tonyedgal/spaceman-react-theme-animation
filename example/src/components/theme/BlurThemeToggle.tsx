@@ -1,16 +1,16 @@
-'use client';
+'use client'
 
-import * as React from 'react';
-import { Moon, Sun } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useThemeAnimation } from '../../hooks/useThemeAnimation';
-import { ThemeAnimationType } from '@/types';
+import * as React from 'react'
+import { Moon, Sun } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { useThemeAnimation } from '../../hooks/useThemeAnimation'
+import { ThemeAnimationType } from '@/types'
 
 export function BlurThemeToggle() {
   const { ref, toggleTheme } = useThemeAnimation({
     duration: 2000,
     animationType: ThemeAnimationType.BLUR_CIRCLE,
-  });
+  })
 
   return (
     <div className="z-50 h-12 w-12 flex justify-center items-center cursor-pointer">
@@ -20,5 +20,5 @@ export function BlurThemeToggle() {
         <span className="sr-only">Toggle theme</span>
       </Button>
     </div>
-  );
+  )
 }
