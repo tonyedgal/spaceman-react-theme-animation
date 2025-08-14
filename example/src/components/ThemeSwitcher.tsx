@@ -74,7 +74,7 @@ const ThemeOption = ({
   return (
     <button
       className={clsx(
-        'relative flex h-9 w-12 cursor-pointer items-center justify-center transition-all duration-200 ease-in-out',
+        'relative flex h-9 w-12 cursor-pointer items-center justify-center',
         'text-muted-foreground hover:text-foreground',
         isActive && 'text-foreground font-medium'
       )}
@@ -88,11 +88,10 @@ const ThemeOption = ({
         borderRadius: 'var(--radius)',
       }}
     >
-      {/* Hover background */}
       {isHovered && (
         <motion.div
-          layoutId="theme-hover-bg"
-          className="absolute inset-0 bg-muted backdrop-blur-sm"
+          layoutId="theme-hover"
+          className="absolute inset-0 bg-muted"
           style={{
             borderRadius: 'var(--radius)',
           }}
@@ -106,33 +105,15 @@ const ThemeOption = ({
         />
       )}
 
-      {/* Icon with scaling animation */}
-      <motion.div
-        className="relative z-10 flex items-center justify-center"
-        animate={{
-          scale: isActive ? 1.1 : 1,
-        }}
-        transition={{
-          type: 'spring',
-          bounce: 0.2,
-          duration: 0.4,
-        }}
-      >
+      <div className="relative z-10 flex items-center justify-center">
         <div className="[&_svg]:size-4">{icon}</div>
-      </motion.div>
+      </div>
 
-      {/* Active indicator */}
       {isActive && (
-        <motion.div
-          layoutId="theme-active-indicator"
+        <div
           className="absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2 rounded-full"
           style={{
             backgroundColor: 'hsl(var(--primary))',
-          }}
-          transition={{
-            type: 'spring',
-            bounce: 0.3,
-            duration: 0.6,
           }}
         />
       )}
@@ -161,11 +142,11 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   onThemeChange,
   className,
 }) => {
-  // Use controlled props and master hook's switchThemeFromElement for animations
   const { switchThemeFromElement } = useSpacemanTheme()
   const theme = currentTheme || 'system'
 
   const [isMounted, setIsMounted] = useState(false)
+  const [hoveredTheme, setHoveredTheme] = useState<string | null>(null)
 
   useEffect(() => {
     setIsMounted(true)
@@ -175,29 +156,19 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
     newTheme: string,
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
-    // Use switchThemeFromElement for animated transitions from the clicked button
     await switchThemeFromElement(newTheme as Theme, event.currentTarget)
-    // Also call the callback if provided
     if (onThemeChange) {
       onThemeChange(newTheme as Theme)
     }
   }
 
-  if (!isMounted) {
-    return <div className="flex h-9 w-fit" />
-  }
-
   const filteredOptions = THEME_OPTIONS.filter(option => themes.includes(option.value as Theme))
 
   return (
-    <motion.div
-      key={String(isMounted)}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
+    <div
       className={clsx(
-        'inline-flex items-center overflow-hidden bg-background shadow-sm border border-border',
-        'transition-all duration-200 ease-in-out',
+        'inline-flex h-9 items-center overflow-hidden bg-background shadow-sm border border-border',
+        isMounted ? 'opacity-100' : 'opacity-0',
         className
       )}
       style={{
@@ -205,6 +176,7 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
         backgroundColor: 'hsl(var(--background))',
       }}
       role="radiogroup"
+      onMouseLeave={() => setHoveredTheme(null)}
     >
       {filteredOptions.map(option => (
         <ThemeOption
@@ -212,12 +184,12 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
           icon={option.icon}
           value={option.value}
           isActive={theme === option.value}
-          isHovered={false}
+          isHovered={hoveredTheme === option.value}
           onClick={handleThemeChange}
-          onMouseEnter={() => {}}
+          onMouseEnter={() => setHoveredTheme(option.value)}
           onMouseLeave={() => {}}
         />
       ))}
-    </motion.div>
+    </div>
   )
 }
