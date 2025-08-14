@@ -1,5 +1,12 @@
 # @space-man/react-theme-animation
 
+## 1.0.3
+
+### Patch Changes
+
+- daf14b0: Setup Prettier formatter in the project
+  - This commit adds Prettier configuration and a GitHub Action to check formatting.
+
 ## 1.0.2
 
 ### Patch Changes
