@@ -2,6 +2,14 @@
 
 React theme switching with smooth view transition animations, multi-theme support, and synchronized state management.
 
+## Demo
+
+<video src="https://tonyedgal.github.io/spaceman-react-theme-animation/Demo.mov" controls width="600" loop autoplay muted></video>
+
+## Live Demo
+
+[Live Demo Link](https://spaceman-rta-vite.netlify.app/)
+
 ## Features
 
 - 🎨 **Smooth Animations**: Beautiful view transition animations for theme switching with customizable origins
@@ -25,14 +33,17 @@ npm install @space-man/react-theme-animation
 
 ## Usage Patterns
 
-This library supports two main usage patterns:
+This library supports multiple usage patterns:
 
 1. **Hook-Only Usage**: Direct hook usage for custom implementations
 2. **Provider Pattern**: Centralized state management (recommended)
+3. **ViteThemeProvider**: Specialized provider for Vite React SPAs
 
 📚 **[See the complete Getting Started Guide](./getting-started.md)** for detailed examples, advanced configurations, and best practices.
 
-🚀 **[View the Code Example](./example/)** to see this package in action with a complete implementation of both hook and provider pattern.
+🚀 **[View the Next.js Code Example](./example/)** to see this package in action with a complete implementation of both hook and provider pattern.
+
+⚡ **[View the Vite React SPA Demo](https://github.com/tonyedgal/spaceman-rta-framework-guides/tree/main/example-vite)** for a complete Vite implementation using ViteThemeProvider.
 
 ---
 
@@ -80,7 +91,7 @@ function App() {
         </header>
 
         <aside>
-          <ThemeSelector colorThemes={['default', 'blue', 'green', 'purple']} />
+          <ThemeSelector colorThemes={['default', 'supabase', 'mono']} />
         </aside>
 
         <main>
@@ -94,11 +105,121 @@ function App() {
 
 ---
 
+## 3. ViteThemeProvider (Vite React SPAs)
+
+Specialized theme provider optimized for Vite React single-page applications. Provides essential theme management without animation features.
+
+### Basic Vite Setup
+
+```tsx
+import { ViteThemeProvider, useViteTheme } from '@space-man/react-theme-animation'
+
+function App() {
+  return (
+    <ViteThemeProvider defaultTheme="system" storageKey="my-app-theme" attribute="class">
+      <div className="app">
+        <header>
+          <ThemeToggle />
+        </header>
+        <main>
+          <ThemeSection />
+        </main>
+      </div>
+    </ViteThemeProvider>
+  )
+}
+
+function ThemeSection() {
+  return (
+    <SpacemanThemeProvider>
+      <div className="app">
+        <header>
+          <ThemeSwitcher />
+        </header>
+
+        <aside>
+          <ThemeSelector colorThemes={['default', 'supabase', 'mono']} />
+        </aside>
+
+        <main>
+          <YourAppContent />
+        </main>
+      </div>
+    </SpacemanThemeProvider>
+  )
+}
+
+function ThemeToggle() {
+  const { theme, setTheme, resolvedTheme } = useViteTheme()
+
+  return (
+    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+      {resolvedTheme === 'dark' ? '🌞' : '🌙'} {theme}
+    </button>
+  )
+}
+```
+
+### ViteThemeProvider Props
+
+| Prop                        | Type                            | Default        | Description                                 |
+| --------------------------- | ------------------------------- | -------------- | ------------------------------------------- |
+| `children`                  | `ReactNode`                     | -              | React children                              |
+| `attribute`                 | `'class' \| 'data-theme'`       | `'class'`      | How to apply theme to DOM                   |
+| `defaultTheme`              | `'light' \| 'dark' \| 'system'` | `'system'`     | Default theme                               |
+| `enableSystem`              | `boolean`                       | `true`         | Enable system theme detection               |
+| `disableTransitionOnChange` | `boolean`                       | `false`        | Disable CSS transitions during theme change |
+| `storageKey`                | `string`                        | `'vite-theme'` | localStorage key for persistence            |
+
+---
+
+## Defining Application color theme as CSS Variables
+
+The library uses CSS custom properties for theming. Define these in your **MAIN** CSS file. _Note_: do not define the other theme variables in a separate CSS file and import it, as the `:root` variables for light mode will override the light mode variables for the other themes. Keep everything in the same file.
+
+```css
+/* Base theme variables */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+}
+
+/* Dark theme */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+}
+
+/* Add other theme variants from design system or tweakcn */
+
+.theme-supabase {
+  --background: oklch(0.9911 0 0);
+  --foreground: oklch(0.2046 0 0);
+}
+
+.theme-supabase.dark {
+  --background: oklch(0.1822 0 0);
+  --foreground: oklch(0.9288 0.0126 255.5078);
+}
+
+.theme-mono {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.1448 0 0);
+}
+
+.theme-mono.dark {
+  --background: oklch(0.1448 0 0);
+  --foreground: oklch(1 0 0);
+}
+```
+
+---
+
 ## API Reference
 
 ### SpacemanThemeProvider
 
-Context provider for centralized theme state management.
+Context provider for centralized theme state management for the ThemeSelector and ThemeSwitcher components. The SpacemanThemeProvider allows you to manage themes and color themes in your application with smooth animations and synchronized state and provide a state reference for the ThemeSelector and ThemeSwitcher components.
 
 ```tsx
 <SpacemanThemeProvider
@@ -111,7 +232,7 @@ Context provider for centralized theme state management.
   onThemeChange={theme => console.log('Theme:', theme)}
   onColorThemeChange={colorTheme => console.log('Color:', colorTheme)}
 >
-  <App />
+  {children}
 </SpacemanThemeProvider>
 ```
 
@@ -315,46 +436,6 @@ interface ThemeSelectorProps {
 ```
 
 ---
-
-## CSS Variables
-
-The library uses CSS custom properties for theming. Define these in your CSS:
-
-```css
-/* Base theme variables */
-:root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-}
-
-/* Dark theme */
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-}
-
-/* Add other theme variants from design system or tweakcn */
-
-.theme-supabase {
-  --background: oklch(0.9911 0 0);
-  --foreground: oklch(0.2046 0 0);
-}
-
-.theme-supabase.dark {
-  --background: oklch(0.1822 0 0);
-  --foreground: oklch(0.9288 0.0126 255.5078);
-}
-
-.theme-mono {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.1448 0 0);
-}
-
-.theme-mono.dark {
-  --background: oklch(0.1448 0 0);
-  --foreground: oklch(1 0 0);
-}
-```
 
 ---
 
