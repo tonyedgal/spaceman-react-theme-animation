@@ -69,6 +69,8 @@ export const prefersReducedMotion = (): boolean => {
 }
 
 export interface AnimationConfig {
+  a?: number
+  b?: number
   x: number
   y: number
   duration: number
@@ -100,6 +102,43 @@ export const createCircleAnimation = (config: AnimationConfig): void => {
       pseudoElement: '::view-transition-new(root)',
     }
   )
+}
+
+export const createSlideAnimation = (config: AnimationConfig): void => {
+  const { a = -100, b = 0, x = 0, y = 0, duration, styleId } = config
+
+  const styleElement = document.createElement('style')
+  styleElement.id = styleId
+
+  styleElement.textContent = `
+    ::view-transition-old(root) {
+      animation-delay: ${duration}ms;
+    }
+    
+    ::view-transition-new(root) {
+      animation: move-in ${duration}ms;
+      animation-timing-function: cubic-bezier(0.66, 0, 0.34, 1);
+    }
+    
+    @keyframes move-in {
+      from {
+        translate: ${a}% ${b}%;
+      }
+      to {
+        translate: ${x}% ${y}%;
+      }
+    }
+  `
+
+  document.head.appendChild(styleElement)
+
+  // Clean up after animation
+  setTimeout(() => {
+    const styleElement = document.getElementById(styleId)
+    if (styleElement) {
+      styleElement.remove()
+    }
+  }, duration)
 }
 
 export const createBlurCircleAnimation = (config: AnimationConfig): void => {
