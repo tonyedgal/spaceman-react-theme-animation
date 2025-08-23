@@ -1,10 +1,13 @@
 # @space-man/react-theme-animation
 
+https://github.com/user-attachments/assets/2819cf70-c474-478e-b821-6b26457c8d4a
+
 React theme switching with smooth view transition animations, multi-theme support, and synchronized state management.
 
-## Demo
-
-<video src="https://tonyedgal.github.io/spaceman-react-theme-animation/Demo.mov" controls width="600" loop autoplay muted></video>
+<p align="center">
+<img width="50%" src="https://github.com/user-attachments/assets/98b7f5cc-705c-4d32-a2f6-47f79b298707" />
+<img width="50%" src="https://github.com/user-attachments/assets/128cc7b0-5708-4b4c-884f-a8310d4e494f" />
+</p>
 
 ## Live Demo
 
@@ -278,7 +281,7 @@ Standalone hook for theme management and animations.
 const { theme, colorTheme, switchTheme, setColorTheme, toggleTheme, ref } = useThemeAnimation({
   themes: ['light', 'dark', 'system'],
   colorThemes: ['default', 'blue', 'green', 'purple'],
-  animationType: ThemeAnimationType.SCALE,
+  animationType: ThemeAnimationType.SLIDE,
   duration: 800,
   onThemeChange: theme => console.log('Theme changed:', theme),
   onColorThemeChange: colorTheme => console.log('Color changed:', colorTheme),
@@ -287,17 +290,18 @@ const { theme, colorTheme, switchTheme, setColorTheme, toggleTheme, ref } = useT
 
 #### Options
 
-| Property             | Type                               | Default                       | Description                           |
-| -------------------- | ---------------------------------- | ----------------------------- | ------------------------------------- |
-| `themes`             | `Theme[]`                          | `['light', 'dark', 'system']` | Available themes                      |
-| `colorThemes`        | `ColorTheme[]`                     | `['default']`                 | Available color themes                |
-| `theme`              | `Theme`                            | `'system'`                    | Initial theme                         |
-| `colorTheme`         | `ColorTheme`                       | `'default'`                   | Initial color theme                   |
-| `animationType`      | `ThemeAnimationType`               | `ThemeAnimationType.CIRCLE`   | Animation type                        |
-| `duration`           | `number`                           | `500`                         | Animation duration in ms              |
-| `blurAmount`         | `number`                           | `2`                           | Blur amount for blur-circle animation |
-| `onThemeChange`      | `(theme: Theme) => void`           | -                             | Theme change callback                 |
-| `onColorThemeChange` | `(colorTheme: ColorTheme) => void` | -                             | Color theme change callback           |
+| Property             | Type                               | Default                       | Description                                         |
+| -------------------- | ---------------------------------- | ----------------------------- | --------------------------------------------------- |
+| `themes`             | `Theme[]`                          | `['light', 'dark', 'system']` | Available themes                                    |
+| `colorThemes`        | `ColorTheme[]`                     | `['default']`                 | Available color themes                              |
+| `theme`              | `Theme`                            | `'system'`                    | Initial theme                                       |
+| `colorTheme`         | `ColorTheme`                       | `'default'`                   | Initial color theme                                 |
+| `animationType`      | `ThemeAnimationType`               | `ThemeAnimationType.CIRCLE`   | Animation type. Options: CIRCLE, BLUR_CIRCLE, SLIDE |
+| `duration`           | `number`                           | `500`                         | Animation duration in ms                            |
+| `blurAmount`         | `number`                           | `2`                           | Blur amount for blur-circle animation               |
+| `onThemeChange`      | `(theme: Theme) => void`           | -                             | Theme change callback                               |
+| `onColorThemeChange` | `(colorTheme: ColorTheme) => void` | -                             | Color theme change callback                         |
+| `slideDirection`     | `SlideDirection`                   | `left`                        | Animation slide direction                           |
 
 #### Return
 
