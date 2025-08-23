@@ -14,6 +14,7 @@ import {
   prefersReducedMotion,
   createCircleAnimation,
   createBlurCircleAnimation,
+  createSlideAnimation,
 } from '../utils/animations'
 
 const isBrowser = typeof window !== 'undefined'
@@ -42,6 +43,13 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
 
     onThemeChange,
     onColorThemeChange,
+
+    // Slide animation options
+    slideDirection = 'left',
+    slideFromX,
+    slideFromY,
+    slideToX = 0,
+    slideToY = 0,
   } = props
 
   const isHighResolution = isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
@@ -162,23 +170,76 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
         return
       }
 
-      const { top, left, width, height } = ref.current.getBoundingClientRect()
-      const x = left + width / 2
-      const y = top + height / 2
+      // Helper function to convert direction to from coordinates
+      const getSlideFromCoords = (direction: string) => {
+        switch (direction) {
+          case 'left':
+            return { a: -100, b: 0 }
+          case 'right':
+            return { a: 100, b: 0 }
+          case 'top':
+            return { a: 0, b: -100 }
+          case 'bottom':
+            return { a: 0, b: 100 }
+          case 'top-left':
+            return { a: -100, b: -100 }
+          case 'top-right':
+            return { a: 100, b: -100 }
+          case 'bottom-left':
+            return { a: -100, b: 100 }
+          case 'bottom-right':
+            return { a: 100, b: 100 }
+          default:
+            return { a: -100, b: 0 }
+        }
+      }
 
-      const animationConfig = {
-        x,
-        y,
-        duration,
-        easing,
-        animationType,
-        blurAmount,
-        styleId,
+      let animationConfig
+
+      if (animationType === ThemeAnimationType.SLIDE) {
+        // Use custom coordinates if provided, otherwise use direction
+        const fromCoords =
+          slideFromX !== undefined && slideFromY !== undefined
+            ? { a: slideFromX, b: slideFromY }
+            : getSlideFromCoords(slideDirection)
+
+        animationConfig = {
+          a: fromCoords.a,
+          b: fromCoords.b,
+          x: slideToX,
+          y: slideToY,
+          duration,
+          easing,
+          animationType,
+          blurAmount,
+          styleId,
+        }
+      } else {
+        // For circle and blur circle animations, use button center
+        const { top, left, width, height } = ref.current.getBoundingClientRect()
+        const x = left + width / 2
+        const y = top + height / 2
+
+        animationConfig = {
+          x,
+          y,
+          duration,
+          easing,
+          animationType,
+          blurAmount,
+          styleId,
+        }
       }
 
       if (animationType === ThemeAnimationType.BLUR_CIRCLE) {
         createBlurCircleAnimation(animationConfig)
       }
+
+      if (animationType === ThemeAnimationType.SLIDE) {
+        createSlideAnimation(animationConfig)
+      }
+
+      // Start the view transition
 
       await (document as Document).startViewTransition(() => {
         flushSync(() => {
@@ -190,7 +251,19 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
         createCircleAnimation(animationConfig)
       }
     },
-    [setTheme, duration, easing, animationType, blurAmount, styleId]
+    [
+      setTheme,
+      duration,
+      easing,
+      animationType,
+      blurAmount,
+      styleId,
+      slideDirection,
+      slideFromX,
+      slideFromY,
+      slideToX,
+      slideToY,
+    ]
   )
 
   const toggleTheme = useCallback(async () => {

@@ -3,7 +3,18 @@ import { RefObject } from 'react'
 export enum ThemeAnimationType {
   CIRCLE = 'circle',
   BLUR_CIRCLE = 'blur-circle',
+  SLIDE = 'slide',
 }
+
+export type SlideDirection =
+  | 'left'
+  | 'right'
+  | 'top'
+  | 'bottom'
+  | 'top-left'
+  | 'top-right'
+  | 'bottom-left'
+  | 'bottom-right'
 
 export type Theme = 'light' | 'dark' | 'system'
 export type ColorTheme = string
@@ -31,6 +42,13 @@ export interface UseThemeAnimationProps {
 
   onThemeChange?: (theme: Theme) => void
   onColorThemeChange?: (colorTheme: ColorTheme) => void
+
+  // Slide animation options (only valid when animationType is SLIDE)
+  slideDirection?: SlideDirection
+  slideFromX?: number // custom from translate X (%)
+  slideFromY?: number // custom from translate Y (%)
+  slideToX?: number // custom to translate X (%)
+  slideToY?: number // custom to translate Y (%)
 }
 
 export interface UseThemeAnimationReturn {
