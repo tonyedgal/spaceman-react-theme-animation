@@ -1,5 +1,14 @@
 # @space-man/react-theme-animation
 
+## 1.1.0
+
+### Minor Changes
+
+- fe43109: Add slide animation to theme animation hook
+  - Add slide animation options to the theme animation hook.
+  - Add SlideDirection prop to the theme animation hook.
+  - Update documentation to reflect new slide animation features.
+
 ## 1.0.4
 
 ### Patch Changes
