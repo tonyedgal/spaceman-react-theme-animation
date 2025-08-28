@@ -1,5 +1,13 @@
 # @space-man/react-theme-animation
 
+## 1.1.1
+
+### Patch Changes
+
+- 61afead: Fix `SlideDirection` not being exported in `src/index.ts`
+  - Added `SlideDirection` to the export list in `src/index.ts` to ensure it is available for external use.
+  - Optimized GIFs in the README for better performance and visual quality.
+
 ## 1.1.0
 
 ### Minor Changes
