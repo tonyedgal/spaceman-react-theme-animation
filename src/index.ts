@@ -12,6 +12,7 @@ export type {
   ThemeSelectorProps,
   Theme,
   ColorTheme,
+  SlideDirection,
 } from './types'
 
 export type { ViteThemeContextType } from './components/ViteThemeProvider'
