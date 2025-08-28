@@ -5,8 +5,8 @@ https://github.com/user-attachments/assets/2819cf70-c474-478e-b821-6b26457c8d4a
 React theme switching with smooth view transition animations, multi-theme support, and synchronized state management.
 
 <p align="center">
-<img width="50%" src="https://github.com/user-attachments/assets/98b7f5cc-705c-4d32-a2f6-47f79b298707" />
-<img width="50%" src="https://github.com/user-attachments/assets/128cc7b0-5708-4b4c-884f-a8310d4e494f" />
+<img width="48%" src="https://github.com/user-attachments/assets/67e51f74-57fe-4f26-b9e3-200375effcc9" />
+<img width="48%" src="https://github.com/user-attachments/assets/24c30513-8acd-4299-98d5-ee2158c020e9" />
 </p>
 
 ## Live Demo
