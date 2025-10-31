@@ -271,24 +271,6 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     await switchTheme(newTheme)
   }, [resolvedTheme, switchTheme])
 
-  useEffect(() => {
-    if (!isBrowser || !mounted) return
-
-    if (resolvedTheme === 'dark') {
-      document.documentElement.classList.add(globalClassName)
-    } else {
-      document.documentElement.classList.remove(globalClassName)
-    }
-
-    colorThemes.forEach(theme => {
-      document.documentElement.classList.remove(`${colorThemePrefix}${theme}`)
-    })
-
-    if (currentColorTheme !== 'default') {
-      document.documentElement.classList.add(`${colorThemePrefix}${currentColorTheme}`)
-    }
-  }, [resolvedTheme, currentColorTheme, globalClassName, colorThemePrefix, colorThemes, mounted])
-
   return {
     ref,
     theme: currentTheme,
@@ -296,7 +278,7 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     resolvedTheme,
     setTheme,
     setColorTheme,
-    toggleTheme,
     switchTheme,
+    toggleTheme,
   }
 }
