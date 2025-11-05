@@ -269,6 +269,18 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     await switchTheme(newTheme)
   }, [resolvedTheme, switchTheme])
 
+  const toggleLightTheme = useCallback(async () => {
+    if (resolvedTheme === 'light') return
+
+    await switchTheme('light')
+  }, [resolvedTheme, switchTheme])
+
+  const toggleDarkTheme = useCallback(async () => {
+    if (resolvedTheme === 'dark') return
+
+    await switchTheme('dark')
+  }, [resolvedTheme, switchTheme])
+
   return {
     ref,
     theme: currentTheme,
@@ -276,7 +288,9 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     resolvedTheme,
     setTheme,
     setColorTheme,
-    toggleTheme,
     switchTheme,
+    toggleTheme,
+    toggleLightTheme,
+    toggleDarkTheme,
   }
 }
