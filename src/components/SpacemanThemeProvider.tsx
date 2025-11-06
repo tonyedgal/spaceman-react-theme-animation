@@ -6,15 +6,25 @@ import { Theme, ColorTheme, ThemeAnimationType } from '../types'
  * Context type for the Spaceman Theme Provider
  */
 interface SpacemanThemeContextType {
+  ref: React.RefObject<HTMLButtonElement | null>
   theme: Theme
   colorTheme: ColorTheme
   resolvedTheme: 'light' | 'dark'
   setTheme: (theme: Theme) => void
   setColorTheme: (colorTheme: ColorTheme) => void
-  toggleTheme: () => Promise<void>
+
   switchTheme: (theme: Theme) => Promise<void>
+  switchColorTheme: (colorTheme: string) => void
+
+  toggleTheme: () => Promise<void>
+  toggleLightTheme: () => Promise<void>
+  toggleDarkTheme: () => Promise<void>
+  toggleColorTheme: () => void
+
+  createColorThemeToggle: (targetColorTheme: string) => () => void
+  isColorThemeActive: (targetColorTheme: string) => boolean
+
   switchThemeFromElement: (theme: Theme, element: HTMLButtonElement) => Promise<void>
-  ref: React.RefObject<HTMLButtonElement | null>
 }
 
 const SpacemanThemeContext = createContext<SpacemanThemeContextType | undefined>(undefined)
@@ -96,15 +106,24 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
 
   if (!mounted) {
     const loadingContextValue: SpacemanThemeContextType = {
+      ref: { current: null },
       theme: defaultTheme,
       colorTheme: defaultColorTheme,
       resolvedTheme: defaultTheme === 'dark' ? 'dark' : 'light',
       setTheme: () => {},
       setColorTheme: () => {},
-      toggleTheme: async () => {},
+
       switchTheme: async () => {},
       switchThemeFromElement: async () => {},
-      ref: { current: null },
+      switchColorTheme: () => {},
+
+      toggleTheme: async () => {},
+      toggleLightTheme: async () => {},
+      toggleDarkTheme: async () => {},
+      toggleColorTheme: () => {},
+
+      createColorThemeToggle: () => () => {},
+      isColorThemeActive: () => false,
     }
 
     return (
@@ -115,15 +134,24 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
   }
 
   const contextValue: SpacemanThemeContextType = {
+    ref: themeState.ref,
     theme: themeState.theme,
     colorTheme: themeState.colorTheme,
     resolvedTheme: themeState.resolvedTheme,
     setTheme: themeState.setTheme,
     setColorTheme: themeState.setColorTheme,
-    toggleTheme: themeState.toggleTheme,
+
     switchTheme: themeState.switchTheme,
     switchThemeFromElement,
-    ref: themeState.ref,
+    switchColorTheme: themeState.switchColorTheme,
+
+    toggleTheme: themeState.toggleTheme,
+    toggleLightTheme: themeState.toggleLightTheme,
+    toggleDarkTheme: themeState.toggleDarkTheme,
+    toggleColorTheme: themeState.toggleColorTheme,
+
+    createColorThemeToggle: themeState.createColorThemeToggle,
+    isColorThemeActive: themeState.isColorThemeActive,
   }
 
   return (
