@@ -15,8 +15,6 @@ export type {
   SlideDirection,
 } from './types'
 
-export type { ViteThemeContextType } from './components/ViteThemeProvider'
-
 export { ThemeAnimationType } from './types'
 
 export {
