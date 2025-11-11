@@ -57,37 +57,23 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
 
   const [mounted, setMounted] = useState(false)
 
+  // Inject base styles once on mount
   useEffect(() => {
     injectBaseStyles()
+    setMounted(true)
   }, [])
 
   const [internalTheme, setInternalTheme] = useState<Theme>(() => {
     if (!isBrowser) return defaultTheme
-    return defaultTheme
+    const saved = localStorage.getItem(storageKey) as Theme | null
+    return saved && themes.indexOf(saved) !== -1 ? saved : defaultTheme
   })
 
   const [internalColorTheme, setInternalColorTheme] = useState(() => {
     if (!isBrowser) return defaultColorTheme
-    return defaultColorTheme
+    const saved = localStorage.getItem(colorStorageKey)
+    return saved && colorThemes.indexOf(saved) !== -1 ? saved : defaultColorTheme
   })
-
-  useEffect(() => {
-    setMounted(true)
-
-    if (isBrowser && !externalTheme) {
-      const saved = localStorage.getItem(storageKey) as Theme | null
-      if (saved && themes.indexOf(saved) !== -1) {
-        setInternalTheme(saved)
-      }
-    }
-
-    if (isBrowser && !externalColorTheme) {
-      const saved = localStorage.getItem(colorStorageKey)
-      if (saved && colorThemes.indexOf(saved) !== -1) {
-        setInternalColorTheme(saved)
-      }
-    }
-  }, [])
 
   const currentTheme = externalTheme ?? internalTheme
   const currentColorTheme = externalColorTheme ?? internalColorTheme
@@ -239,6 +225,8 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
         createSlideAnimation(animationConfig)
       }
 
+      // Start the view transition
+
       await (document as Document).startViewTransition(() => {
         flushSync(() => {
           setTheme(newTheme)
@@ -264,6 +252,17 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     ]
   )
 
+  const switchColorTheme = useCallback(
+    (newColorTheme: string) => {
+      if (colorThemes.indexOf(newColorTheme) === -1) {
+        console.warn(`Color theme "${newColorTheme}" not found in available themes`)
+        return
+      }
+      setColorTheme(newColorTheme)
+    },
+    [colorThemes, setColorTheme]
+  )
+
   const toggleTheme = useCallback(async () => {
     const newTheme: Theme = resolvedTheme === 'dark' ? 'light' : 'dark'
     await switchTheme(newTheme)
@@ -281,6 +280,33 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     await switchTheme('dark')
   }, [resolvedTheme, switchTheme])
 
+  const toggleColorTheme = useCallback(() => {
+    const currentIndex = colorThemes.indexOf(currentColorTheme)
+    const nextIndex = (currentIndex + 1) % colorThemes.length
+    const nextColorTheme = colorThemes[nextIndex]
+    setColorTheme(nextColorTheme)
+  }, [currentColorTheme, colorThemes, setColorTheme])
+
+  const createColorThemeToggle = useCallback(
+    (targetColorTheme: string) => {
+      return () => {
+        if (colorThemes.indexOf(targetColorTheme) === -1) {
+          console.warn(`Color theme "${targetColorTheme}" not found in available themes`)
+          return
+        }
+        setColorTheme(targetColorTheme)
+      }
+    },
+    [colorThemes, setColorTheme]
+  )
+
+  const isColorThemeActive = useCallback(
+    (targetColorTheme: string) => {
+      return currentColorTheme === targetColorTheme
+    },
+    [currentColorTheme]
+  )
+
   return {
     ref,
     theme: currentTheme,
@@ -289,8 +315,12 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     setTheme,
     setColorTheme,
     switchTheme,
+    switchColorTheme,
     toggleTheme,
     toggleLightTheme,
     toggleDarkTheme,
+    toggleColorTheme,
+    createColorThemeToggle,
+    isColorThemeActive,
   }
 }
