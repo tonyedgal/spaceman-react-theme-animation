@@ -9,6 +9,7 @@ import Image from 'next/image'
 const navItems = [
   { name: 'With-Components', path: '/' },
   { name: 'With-Hook', path: '/hook' },
+  { name: 'With-Cards', path: '/cards' },
 ]
 
 export default function NavBar() {
