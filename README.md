@@ -4,11 +4,6 @@ https://github.com/user-attachments/assets/2819cf70-c474-478e-b821-6b26457c8d4a
 
 React theme switching with smooth view transition animations, multi-theme support, and synchronized state management.
 
-<p align="center">
-<img width="48%" src="https://github.com/user-attachments/assets/67e51f74-57fe-4f26-b9e3-200375effcc9" />
-<img width="48%" src="https://github.com/user-attachments/assets/24c30513-8acd-4299-98d5-ee2158c020e9" />
-</p>
-
 ## Live Demo
 
 [Live Demo Link](https://spaceman-rta-vite.netlify.app/)
