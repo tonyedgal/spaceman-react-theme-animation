@@ -1,5 +1,15 @@
 # @space-man/react-theme-animation
 
+## 2.0.0
+
+### Major Changes
+
+- 33abc9f: ## Spaceman React Theme Animation v2
+  - Add a functions to direct toggle between different color themes
+  - Update Vite Theme Provider to handle theme toggling and persistence
+  - Add function to manage and check active themes
+  - Add functions to toggle light and dark themes directly
+
 ## 1.1.1
 
 ### Patch Changes
