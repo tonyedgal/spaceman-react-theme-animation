@@ -4,24 +4,82 @@ https://github.com/user-attachments/assets/2819cf70-c474-478e-b821-6b26457c8d4a
 
 React theme switching with smooth view transition animations, multi-theme support, and synchronized state management.
 
+## Spaceman React Theme Animation version 2
+
+Version 2 introduces new features for enhanced color theme management and improved Vite integration.
+
+- New functions to directly toggle between different color themes, without using the ThemeSelector component
+- Vite theme provider now supports theme toggling and persistence
+- Functions to manage and check active themes
+- Functions to toggle light and dark themes directly
+
+```tsx
+import { useThemeAnimation } from '@space-man/react-theme-animation'
+
+function ColorThemeDemo() {
+  const { createColorThemeToggle, isColorThemeActive, toggleDarkTheme, toggleLightTheme } =
+    useThemeAnimation({
+      colorThemes: ['supabase'],
+    })
+
+  return (
+    <>
+      <button onClick={createColorThemeToggle('supabase')} className="theme-toggle-btn">
+        Supabase Theme {isColorThemeActive('supabase') ? '✅' : '❌'}
+      </button>
+      <button ref={ref} onClick={toggleDarkTheme} className="theme-toggle-btn">
+        Dark Theme
+      </button>
+      <button ref={ref} onClick={toggleLightTheme} className="theme-toggle-btn">
+        Light Theme
+      </button>
+    </>
+  )
+}
+
+// Vite Theme Provider Example
+function App() {
+  return (
+    <ViteThemeProvider
+      themes={['light', 'dark', 'system']}
+      colorThemes={['default', 'supabase']}
+      defaultTheme="system"
+      defaultColorTheme="default"
+    >
+      <ThemeToggle />
+    </ViteThemeProvider>
+  )
+}
+
+function ThemeToggle() {
+  const { createColorThemeToggle, isColorThemeActive } = useViteTheme()
+
+  return (
+    <button onClick={createColorThemeToggle('supabase')} className="theme-toggle-btn">
+      Supabase Theme {isColorThemeActive('supabase') ? '✅' : '❌'}
+    </button>
+  )
+}
+```
+
 ## Live Demo
 
 [Live Demo Link](https://spaceman-rta-vite.netlify.app/)
 
 ## Features
 
-- 🎨 **Smooth Animations**: Beautiful view transition animations for theme switching with customizable origins
-- 🌓 **Multi-Theme Support**: Support for light, dark, and system themes
-- 🎯 **Color Themes**: Additional color theme variants (brand colors, etc.)
-- 🪝 **Powerful Hook**: `useThemeAnimation` hook with full control
-- 🧩 **Ready Components**: `ThemeSwitcher` and `ThemeSelector` components
-- 🎛️ **Provider Pattern**: Centralized theme state management with `SpacemanThemeProvider`
-- 🔄 **State Synchronization**: Prevents state drift between multiple components
-- 📱 **Responsive**: Works on all screen sizes including high-resolution displays
-- ⚡ **Performance**: Optimized animations with reduced motion support
-- 🔧 **TypeScript**: Full TypeScript support with comprehensive types
-- 🎛️ **Customizable**: Extensive configuration options
-- 🔙 **Backward Compatible**: Works with existing implementations
+- **Smooth Animations**: Beautiful view transition animations for theme switching with customizable origins
+- **Multi-Theme Support**: Support for light, dark, and system themes
+- **Color Themes**: Additional color theme variants (brand colors, etc.)
+- **Powerful Hook**: `useThemeAnimation` hook with full control
+- **Ready Components**: `ThemeSwitcher` and `ThemeSelector` components
+- **Provider Pattern**: Centralized theme state management with `SpacemanThemeProvider`
+- **State Synchronization**: Prevents state drift between multiple components
+- **Responsive**: Works on all screen sizes including high-resolution displays
+- **Performance**: Optimized animations with reduced motion support
+- **TypeScript**: Full TypeScript support with comprehensive types
+- **Customizable**: Extensive configuration options
+- **Backward Compatible**: Works with existing implementations
 
 ## Installation
 
@@ -37,11 +95,11 @@ This library supports multiple usage patterns:
 2. **Provider Pattern**: Centralized state management (recommended)
 3. **ViteThemeProvider**: Specialized provider for Vite React SPAs
 
-📚 **[See the complete Getting Started Guide](./getting-started.md)** for detailed examples, advanced configurations, and best practices.
+**[See the complete Getting Started Guide](./getting-started.md)** for detailed examples, advanced configurations, and best practices.
 
-🚀 **[View the Next.js Code Example](./example/)** to see this package in action with a complete implementation of both hook and provider pattern.
+**[View the Next.js Code Example](./example/)** to see this package in action with a complete implementation of both hook and provider pattern.
 
-⚡ **[View the Vite React SPA Demo](https://github.com/tonyedgal/spaceman-rta-framework-guides/tree/main/example-vite)** for a complete Vite implementation using ViteThemeProvider.
+**[View the Vite React SPA Demo](https://github.com/tonyedgal/spaceman-rta-framework-guides/tree/main/example-vite)** for a complete Vite implementation using ViteThemeProvider.
 
 ---
 
