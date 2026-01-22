@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { ThemeAnimationType } from '@/types'
-import { useSpacemanTheme } from './SpacemanThemeProvider'
 import { ThemeSelector } from './ThemeSelector'
 import { ThemeSwitcher } from './ThemeSwitcher'
+import { useNextTheme } from './NextThemeProvider'
 
 export const ThemeSection = () => {
   const [animationType, setAnimationType] = useState<ThemeAnimationType>(ThemeAnimationType.CIRCLE)
@@ -13,7 +13,7 @@ export const ThemeSection = () => {
     colorTheme: currentColorTheme,
     setTheme,
     setColorTheme,
-  } = useSpacemanTheme()
+  } = useNextTheme()
 
   return (
     <div className="container mx-auto px-4 py-8">
