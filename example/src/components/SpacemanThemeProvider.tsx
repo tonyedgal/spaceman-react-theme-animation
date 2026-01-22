@@ -9,13 +9,14 @@ interface SpacemanThemeContextType {
   theme: Theme
   colorTheme: ColorTheme
   resolvedTheme: 'light' | 'dark'
+  systemTheme: 'light' | 'dark'
   setTheme: (theme: Theme) => void
   setColorTheme: (colorTheme: ColorTheme) => void
-  switchTheme: (theme: Theme) => Promise<void>
+  switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
   switchColorTheme: (colorTheme: string) => void
-  toggleTheme: () => Promise<void>
-  toggleLightTheme: () => Promise<void>
-  toggleDarkTheme: () => Promise<void>
+  toggleTheme: (animationOff?: boolean) => Promise<void>
+  toggleLightTheme: (animationOff?: boolean) => Promise<void>
+  toggleDarkTheme: (animationOff?: boolean) => Promise<void>
   toggleColorTheme: () => void
   createColorThemeToggle: (targetColorTheme: string) => () => void
   isColorThemeActive: (targetColorTheme: string) => boolean
@@ -58,6 +59,11 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
     setMounted(true)
   }, [])
 
+  const systemTheme =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light'
+
   const switchThemeFromElement = async (theme: Theme, element: HTMLButtonElement) => {
     if (themeState.ref.current) {
       const originalRef = themeState.ref.current
@@ -88,6 +94,7 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
       theme: defaultTheme,
       colorTheme: defaultColorTheme,
       resolvedTheme: defaultTheme === 'dark' ? 'dark' : 'light',
+      systemTheme: 'light',
       setTheme: () => {},
       setColorTheme: () => {},
       switchTheme: async () => {},
@@ -113,6 +120,7 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
     theme: themeState.theme,
     colorTheme: themeState.colorTheme,
     resolvedTheme: themeState.resolvedTheme,
+    systemTheme,
     setTheme: themeState.setTheme,
     setColorTheme: themeState.setColorTheme,
     switchTheme: themeState.switchTheme,

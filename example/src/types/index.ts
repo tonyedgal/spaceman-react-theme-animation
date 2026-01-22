@@ -61,12 +61,12 @@ export interface UseThemeAnimationReturn {
   setTheme: (theme: Theme) => void
   setColorTheme: (colorTheme: ColorTheme) => void
 
-  switchTheme: (theme: Theme) => Promise<void>
+  switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
   switchColorTheme: (colorTheme: string) => void
 
-  toggleTheme: () => Promise<void>
-  toggleLightTheme: () => Promise<void>
-  toggleDarkTheme: () => Promise<void>
+  toggleTheme: (animationOff?: boolean) => Promise<void>
+  toggleLightTheme: (animationOff?: boolean) => Promise<void>
+  toggleDarkTheme: (animationOff?: boolean) => Promise<void>
   toggleColorTheme: () => void
 
   createColorThemeToggle: (targetColorTheme: string) => () => void

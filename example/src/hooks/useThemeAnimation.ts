@@ -150,8 +150,8 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
   )
 
   const switchTheme = useCallback(
-    async (newTheme: Theme) => {
-      if (!ref.current || !supportsViewTransitions() || prefersReducedMotion()) {
+    async (newTheme: Theme, animationOff: boolean = false) => {
+      if (!ref.current || !supportsViewTransitions() || prefersReducedMotion() || animationOff) {
         setTheme(newTheme)
         return
       }
@@ -263,22 +263,31 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     [colorThemes, setColorTheme]
   )
 
-  const toggleTheme = useCallback(async () => {
-    const newTheme: Theme = resolvedTheme === 'dark' ? 'light' : 'dark'
-    await switchTheme(newTheme)
-  }, [resolvedTheme, switchTheme])
+  const toggleTheme = useCallback(
+    async (animationOff: boolean = false) => {
+      const newTheme: Theme = resolvedTheme === 'dark' ? 'light' : 'dark'
+      await switchTheme(newTheme, animationOff)
+    },
+    [resolvedTheme, switchTheme]
+  )
 
-  const toggleLightTheme = useCallback(async () => {
-    if (resolvedTheme === 'light') return
+  const toggleLightTheme = useCallback(
+    async (animationOff: boolean = false) => {
+      if (resolvedTheme === 'light') return
 
-    await switchTheme('light')
-  }, [resolvedTheme, switchTheme])
+      await switchTheme('light', animationOff)
+    },
+    [resolvedTheme, switchTheme]
+  )
 
-  const toggleDarkTheme = useCallback(async () => {
-    if (resolvedTheme === 'dark') return
+  const toggleDarkTheme = useCallback(
+    async (animationOff: boolean = false) => {
+      if (resolvedTheme === 'dark') return
 
-    await switchTheme('dark')
-  }, [resolvedTheme, switchTheme])
+      await switchTheme('dark', animationOff)
+    },
+    [resolvedTheme, switchTheme]
+  )
 
   const toggleColorTheme = useCallback(() => {
     const currentIndex = colorThemes.indexOf(currentColorTheme)

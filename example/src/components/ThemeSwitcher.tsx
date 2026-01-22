@@ -5,6 +5,7 @@ import { motion } from 'motion/react'
 import { clsx } from 'clsx'
 import { ThemeSwitcherProps, Theme } from '../types'
 import { useSpacemanTheme } from './SpacemanThemeProvider'
+import { useNextTheme } from './NextThemeProvider'
 
 const SunIcon = () => (
   <svg
@@ -142,7 +143,7 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
   onThemeChange,
   className,
 }) => {
-  const { switchThemeFromElement } = useSpacemanTheme()
+  const { switchThemeFromElement } = useNextTheme()
   const theme = currentTheme || 'system'
 
   const [isMounted, setIsMounted] = useState(false)
