@@ -85,7 +85,6 @@ export default App
 
 ```tsx
 import { ViteThemeProvider, ThemeAnimationType } from '@space-man/react-theme-animation'
-
 ;<ViteThemeProvider
   defaultTheme="system"
   defaultColorTheme="blue"

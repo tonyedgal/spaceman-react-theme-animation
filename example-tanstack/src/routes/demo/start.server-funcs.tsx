@@ -26,9 +26,9 @@ async function readTodos() {
           { id: 2, name: 'Buy a new phone' },
         ],
         null,
-        2,
-      ),
-    ),
+        2
+      )
+    )
   )
 }
 
@@ -73,7 +73,7 @@ function Home() {
       <div className="w-full max-w-2xl p-8 rounded-xl backdrop-blur-md bg-black/50 shadow-xl border-8 border-black/10">
         <h1 className="text-2xl mb-4">Start Server Functions - Todo Example</h1>
         <ul className="mb-4 space-y-2">
-          {todos?.map((t) => (
+          {todos?.map(t => (
             <li
               key={t.id}
               className="bg-white/10 border border-white/20 rounded-lg p-3 backdrop-blur-sm shadow-md"
@@ -86,8 +86,8 @@ function Home() {
           <input
             type="text"
             value={todo}
-            onChange={(e) => setTodo(e.target.value)}
-            onKeyDown={(e) => {
+            onChange={e => setTodo(e.target.value)}
+            onKeyDown={e => {
               if (e.key === 'Enter') {
                 submitTodo()
               }

@@ -92,7 +92,6 @@ function RootComponent() {
 
 ```tsx
 import { TanStackThemeProvider, ThemeAnimationType } from '@space-man/react-theme-animation'
-
 ;<TanStackThemeProvider
   defaultTheme="system"
   defaultColorTheme="blue"
