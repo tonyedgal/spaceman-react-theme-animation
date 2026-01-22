@@ -10,11 +10,11 @@ interface ViteThemeContextType {
   systemTheme: 'light' | 'dark'
   setTheme: (theme: Theme) => void
   setColorTheme: (colorTheme: ColorTheme) => void
-  switchTheme: (theme: Theme) => Promise<void>
+  switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
   switchColorTheme: (colorTheme: string) => void
-  toggleTheme: () => Promise<void>
-  toggleLightTheme: () => Promise<void>
-  toggleDarkTheme: () => Promise<void>
+  toggleTheme: (animationOff?: boolean) => Promise<void>
+  toggleLightTheme: (animationOff?: boolean) => Promise<void>
+  toggleDarkTheme: (animationOff?: boolean) => Promise<void>
   toggleColorTheme: () => void
   createColorThemeToggle: (targetColorTheme: string) => () => void
   isColorThemeActive: (targetColorTheme: string) => boolean
@@ -39,6 +39,29 @@ interface ViteThemeProviderProps {
   colorThemePrefix?: string
 }
 
+/**
+ * Vite Theme Provider - Optimized for Vite SPA applications
+ *
+ * This provider is designed for Vite-based single-page applications with optional
+ * transition disabling to prevent flash during theme switches.
+ *
+ * Note: For flash prevention on initial load, add a script to your index.html
+ * or inject it via Vite plugin to apply theme before React loads.
+ *
+ * @param children - React children to wrap with theme context
+ * @param themes - Available theme options
+ * @param colorThemes - Available color theme options
+ * @param defaultTheme - Default theme to use
+ * @param defaultColorTheme - Default color theme to use
+ * @param animationType - Animation type for theme transitions
+ * @param duration - Animation duration in milliseconds
+ * @param attribute - HTML attribute to use for theme ('class' or 'data-theme')
+ * @param disableTransitionOnChange - Temporarily disable CSS transitions during theme switch
+ * @param storageKey - LocalStorage key for theme preference
+ * @param colorStorageKey - LocalStorage key for color theme preference
+ * @param globalClassName - Class name for dark theme (when using 'class' attribute)
+ * @param colorThemePrefix - Prefix for color theme classes
+ */
 export const ViteThemeProvider: React.FC<ViteThemeProviderProps> = ({
   children,
   themes = ['light', 'dark', 'system'],
@@ -93,31 +116,40 @@ export const ViteThemeProvider: React.FC<ViteThemeProviderProps> = ({
   )
 
   const wrappedSwitchTheme = useCallback(
-    async (theme: Theme) => {
+    async (theme: Theme, animationOff: boolean = false) => {
       const cleanup = applyTransitionDisable()
-      await themeState.switchTheme(theme)
+      await themeState.switchTheme(theme, animationOff)
       cleanup()
     },
     [themeState.switchTheme, applyTransitionDisable]
   )
 
-  const wrappedToggleTheme = useCallback(async () => {
-    const cleanup = applyTransitionDisable()
-    await themeState.toggleTheme()
-    cleanup()
-  }, [themeState.toggleTheme, applyTransitionDisable])
+  const wrappedToggleTheme = useCallback(
+    async (animationOff: boolean = false) => {
+      const cleanup = applyTransitionDisable()
+      await themeState.toggleTheme(animationOff)
+      cleanup()
+    },
+    [themeState.toggleTheme, applyTransitionDisable]
+  )
 
-  const wrappedToggleLightTheme = useCallback(async () => {
-    const cleanup = applyTransitionDisable()
-    await themeState.toggleLightTheme()
-    cleanup()
-  }, [themeState.toggleLightTheme, applyTransitionDisable])
+  const wrappedToggleLightTheme = useCallback(
+    async (animationOff: boolean = false) => {
+      const cleanup = applyTransitionDisable()
+      await themeState.toggleLightTheme(animationOff)
+      cleanup()
+    },
+    [themeState.toggleLightTheme, applyTransitionDisable]
+  )
 
-  const wrappedToggleDarkTheme = useCallback(async () => {
-    const cleanup = applyTransitionDisable()
-    await themeState.toggleDarkTheme()
-    cleanup()
-  }, [themeState.toggleDarkTheme, applyTransitionDisable])
+  const wrappedToggleDarkTheme = useCallback(
+    async (animationOff: boolean = false) => {
+      const cleanup = applyTransitionDisable()
+      await themeState.toggleDarkTheme(animationOff)
+      cleanup()
+    },
+    [themeState.toggleDarkTheme, applyTransitionDisable]
+  )
 
   const switchThemeFromElement = async (theme: Theme, element: HTMLButtonElement) => {
     const cleanup = applyTransitionDisable()
