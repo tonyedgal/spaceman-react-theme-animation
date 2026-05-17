@@ -7,17 +7,14 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
-permissions:
-  contents: write
-  pull-requests: write
-  packages: write
-  id-token: write
-  actions: read
-
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -25,11 +22,16 @@ jobs:
           # This makes Actions able to push to protected branches
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js 18.x
+      - name: Setup Node.js 24.x
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup npm 11.x
+        run: |
+          npm install -g npm@11
+          npm --version
 
       - name: Install Dependencies
         run: npm ci
@@ -48,5 +50,3 @@ jobs:
           publish: npm run release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
