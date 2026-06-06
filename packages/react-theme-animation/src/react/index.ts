@@ -3,10 +3,16 @@ export { useThemeAnimation } from './hooks/use-theme-animation'
 export { ThemeSwitcher } from './components/ThemeSwitcher'
 export { ThemeSelector } from './components/ThemeSelector'
 
-export { SpacemanThemeProvider, useSpacemanTheme } from './components/SpacemanThemeProvider'
-
-// Framework-specific optimized providers
-export { NextThemeProvider, useNextTheme } from './components/NextThemeProvider'
+export {
+  SpacemanThemeProvider,
+  useSpacemanTheme,
+} from './components/SpacemanThemeProvider'
+export {
+  NextThemeProvider,
+  ThemeProvider,
+  useNextTheme,
+  useTheme,
+} from './components/NextThemeProvider'
 export {
   TanStackThemeProvider,
   TanStackStartThemeScript,
@@ -23,9 +29,9 @@ export type {
   ColorTheme,
   SystemThemeMode,
   SlideDirection,
-} from './types'
+} from '../core/types'
 
-export { ThemeAnimationType } from './types'
+export { ThemeAnimationType } from '../core/types'
 
 export {
   injectBaseStyles,
@@ -34,14 +40,4 @@ export {
   resolveThemeForServer,
   supportsViewTransitions,
   prefersReducedMotion,
-} from './utils/animations'
-
-export {
-  buildServerThemeData,
-  STORAGE_KEY,
-  COLOR_STORAGE_KEY,
-  GLOBAL_CLASS_NAME,
-  COLOR_THEME_PREFIX,
-} from './tanstack'
-
-export type { ServerResolvedTheme, ServerThemeData } from './tanstack'
+} from '../core/utils/animations'

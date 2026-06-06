@@ -7,8 +7,24 @@ import React, {
 } from 'react'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
 import { useSyncServerThemeStorage } from '../hooks/use-sync-server-theme-storage'
-import { ColorTheme, SystemThemeMode, Theme, ThemeAnimationType } from '../types'
-import { COLOR_STORAGE_KEY, COLOR_THEME_PREFIX, GLOBAL_CLASS_NAME, STORAGE_KEY } from '../tanstack'
+import {
+  ColorTheme,
+  SystemThemeMode,
+  Theme,
+  ThemeAnimationType,
+} from '../../core/types'
+import {
+  COLOR_STORAGE_KEY,
+  COLOR_THEME_PREFIX,
+  GLOBAL_CLASS_NAME,
+  STORAGE_KEY,
+} from '../../tanstack/helpers'
+import { SharedThemeContext } from './shared-theme-context'
+import {
+  getBrowserSystemTheme,
+  getNextResolvedTheme,
+  withElementAsRef,
+} from './provider-helpers'
 
 export interface TanStackThemeContextType {
   ref: React.RefObject<HTMLButtonElement | null>
@@ -31,10 +47,15 @@ export interface TanStackThemeContextType {
   createColorThemeToggle: (targetColorTheme: string) => () => void
   isColorThemeActive: (targetColorTheme: string) => boolean
 
-  switchThemeFromElement: (theme: Theme, element: HTMLButtonElement) => Promise<void>
+  switchThemeFromElement: (
+    theme: Theme,
+    element: HTMLButtonElement
+  ) => Promise<void>
 }
 
-const TanStackThemeContext = createContext<TanStackThemeContextType | undefined>(undefined)
+const TanStackThemeContext = createContext<
+  TanStackThemeContextType | undefined
+>(undefined)
 
 export interface TanStackThemeProviderProps {
   children: ReactNode
@@ -121,36 +142,37 @@ const generateTanStackPreHydrationScript = (
 `
 }
 
-export const TanStackStartThemeScript: React.FC<TanStackStartThemeScriptProps> = React.memo(
-  ({
-    storageKey = STORAGE_KEY,
-    colorStorageKey = COLOR_STORAGE_KEY,
-    defaultTheme = 'system',
-    defaultColorTheme = 'default',
-    globalClassName = GLOBAL_CLASS_NAME,
-    colorThemePrefix = COLOR_THEME_PREFIX,
-    nonce,
-    systemThemeMode = 'js',
-  }) => {
-    const scriptContent = generateTanStackPreHydrationScript(
-      storageKey,
-      colorStorageKey,
-      defaultTheme,
-      defaultColorTheme,
-      globalClassName,
-      colorThemePrefix,
-      systemThemeMode
-    )
+export const TanStackStartThemeScript: React.FC<TanStackStartThemeScriptProps> =
+  React.memo(
+    ({
+      storageKey = STORAGE_KEY,
+      colorStorageKey = COLOR_STORAGE_KEY,
+      defaultTheme = 'system',
+      defaultColorTheme = 'default',
+      globalClassName = GLOBAL_CLASS_NAME,
+      colorThemePrefix = COLOR_THEME_PREFIX,
+      nonce,
+      systemThemeMode = 'js',
+    }) => {
+      const scriptContent = generateTanStackPreHydrationScript(
+        storageKey,
+        colorStorageKey,
+        defaultTheme,
+        defaultColorTheme,
+        globalClassName,
+        colorThemePrefix,
+        systemThemeMode
+      )
 
-    return (
-      <script
-        nonce={nonce}
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: scriptContent }}
-      />
-    )
-  }
-)
+      return (
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: scriptContent }}
+        />
+      )
+    }
+  )
 
 TanStackStartThemeScript.displayName = 'TanStackStartThemeScript'
 
@@ -168,7 +190,8 @@ const getNextColorTheme = (
 ): ColorTheme => {
   if (colorThemes.length === 0) return currentColorTheme
   const currentIndex = colorThemes.indexOf(currentColorTheme)
-  const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % colorThemes.length
+  const nextIndex =
+    currentIndex === -1 ? 0 : (currentIndex + 1) % colorThemes.length
   return colorThemes[nextIndex]
 }
 
@@ -249,7 +272,7 @@ export const TanStackThemeProvider: React.FC<TanStackThemeProviderProps> = ({
 
   const toggleThemeWithHydrationAwareness = useCallback(
     async (animationOff: boolean = false) => {
-      const nextTheme = themeState.resolvedTheme === 'dark' ? 'light' : 'dark'
+      const nextTheme = getNextResolvedTheme(themeState.resolvedTheme)
 
       if (!isHydrated) {
         setThemeWithServer(nextTheme)
@@ -317,37 +340,16 @@ export const TanStackThemeProvider: React.FC<TanStackThemeProviderProps> = ({
         return
       }
 
-      if (themeState.ref.current) {
-        const originalRef = themeState.ref.current
-        Object.defineProperty(themeState.ref, 'current', {
-          value: element,
-          writable: true,
-          configurable: true,
-        })
+      await withElementAsRef(themeState.ref, element, async () => {
         await themeState.switchTheme(theme)
-        Object.defineProperty(themeState.ref, 'current', {
-          value: originalRef,
-          writable: true,
-          configurable: true,
-        })
-      } else {
-        Object.defineProperty(themeState.ref, 'current', {
-          value: element,
-          writable: true,
-          configurable: true,
-        })
-        await themeState.switchTheme(theme)
-      }
+      })
 
       onServerThemeChange?.(theme)
     },
     [isHydrated, themeState, setThemeWithServer, onServerThemeChange]
   )
 
-  const systemTheme =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light'
+  const systemTheme = getBrowserSystemTheme()
 
   const serverResolvedTheme: 'light' | 'dark' = (() => {
     if (hasServerTheme) {
@@ -384,7 +386,9 @@ export const TanStackThemeProvider: React.FC<TanStackThemeProviderProps> = ({
 
     return (
       <TanStackThemeContext.Provider value={loadingContextValue}>
-        {children}
+        <SharedThemeContext.Provider value={loadingContextValue}>
+          {children}
+        </SharedThemeContext.Provider>
       </TanStackThemeContext.Provider>
     )
   }
@@ -410,14 +414,20 @@ export const TanStackThemeProvider: React.FC<TanStackThemeProviderProps> = ({
   }
 
   return (
-    <TanStackThemeContext.Provider value={contextValue}>{children}</TanStackThemeContext.Provider>
+    <TanStackThemeContext.Provider value={contextValue}>
+      <SharedThemeContext.Provider value={contextValue}>
+        {children}
+      </SharedThemeContext.Provider>
+    </TanStackThemeContext.Provider>
   )
 }
 
 export const useTanStackTheme = (): TanStackThemeContextType => {
   const context = useContext(TanStackThemeContext)
   if (context === undefined) {
-    throw new Error('useTanStackTheme must be used within a TanStackThemeProvider')
+    throw new Error(
+      'useTanStackTheme must be used within a TanStackThemeProvider'
+    )
   }
   return context
 }
