@@ -44,10 +44,6 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     onThemeChange,
     onColorThemeChange,
 
-    initialTheme,
-    initialColorTheme,
-    systemThemeMode = 'js',
-
     // Slide animation options
     slideDirection = 'left',
     slideFromX,
@@ -68,14 +64,12 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
   }, [])
 
   const [internalTheme, setInternalTheme] = useState<Theme>(() => {
-    if (initialTheme !== undefined) return initialTheme
     if (!isBrowser) return defaultTheme
     const saved = localStorage.getItem(storageKey) as Theme | null
     return saved && themes.indexOf(saved) !== -1 ? saved : defaultTheme
   })
 
   const [internalColorTheme, setInternalColorTheme] = useState(() => {
-    if (initialColorTheme !== undefined) return initialColorTheme
     if (!isBrowser) return defaultColorTheme
     const saved = localStorage.getItem(colorStorageKey)
     return saved && colorThemes.indexOf(saved) !== -1 ? saved : defaultColorTheme
@@ -101,39 +95,17 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
   useEffect(() => {
     if (!isBrowser || !mounted) return
 
-    const element = document.documentElement
-
-    if (systemThemeMode === 'css' && currentTheme === 'system') {
-      element.classList.remove(globalClassName)
-      element.classList.remove('auto')
-      element.classList.remove('system')
-      element.classList.add('system')
-      element.style.colorScheme = ''
+    if (resolvedTheme === 'dark') {
+      document.documentElement.classList.add(globalClassName)
     } else {
-      element.classList.remove('system')
-      element.classList.remove('auto')
-      if (resolvedTheme === 'dark') {
-        element.classList.add(globalClassName)
-      } else {
-        element.classList.remove(globalClassName)
-      }
-      element.style.colorScheme = resolvedTheme
+      document.documentElement.classList.remove(globalClassName)
     }
 
     colorThemes.forEach(theme => {
-      element.classList.remove(`${colorThemePrefix}${theme}`)
+      document.documentElement.classList.remove(`${colorThemePrefix}${theme}`)
     })
-    element.classList.add(`${colorThemePrefix}${currentColorTheme}`)
-  }, [
-    resolvedTheme,
-    currentTheme,
-    currentColorTheme,
-    globalClassName,
-    colorThemePrefix,
-    colorThemes,
-    mounted,
-    systemThemeMode,
-  ])
+    document.documentElement.classList.add(`${colorThemePrefix}${currentColorTheme}`)
+  }, [resolvedTheme, currentColorTheme, globalClassName, colorThemePrefix, colorThemes, mounted])
 
   const ref = useRef<HTMLButtonElement>(null)
 

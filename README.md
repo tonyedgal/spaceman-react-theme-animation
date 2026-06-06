@@ -8,7 +8,7 @@ React theme switching with smooth view transition animations, multi-theme suppor
 
 - **animationOff Parameter**: Instantly switch themes without animation via optional parameter on all toggle functions
 - **Universal SSR Support**: Pre-hydration script prevents flash in Next.js, Remix, and SSR frameworks
-- **Three Framework-Specific Providers**: NextThemeProvider (SSR/Next.js), TanStackThemeProvider (TanStack Start), ViteThemeProvider (Vite SPAs)
+- **Three Framework-Specific Providers**: NextThemeProvider (SSR/Next.js), TanStackThemeProvider (TanStack Start SSR + pre-hydration support), ViteThemeProvider (Vite SPAs)
 - **Consistent Hook API**: All providers expose identical hook interface with 15+ methods
 - **Enhanced Theme Control**: Direct functions for toggleLightTheme(), toggleDarkTheme(), createColorThemeToggle()
 
@@ -38,11 +38,11 @@ npm install @space-man/react-theme-animation
 
 Choose the right provider for your framework:
 
-| Provider              | Best For                       | Key Features                                     |
-| --------------------- | ------------------------------ | ------------------------------------------------ |
-| NextThemeProvider     | Next.js, Remix, SSR frameworks | Pre-hydration script, CSP support, animations    |
-| TanStackThemeProvider | TanStack Start apps            | Isomorphic rendering, useHydrated() integration  |
-| ViteThemeProvider     | Vite React SPAs                | Lightweight, transition control, no SSR overhead |
+| Provider              | Best For                       | Key Features                                      |
+| --------------------- | ------------------------------ | ------------------------------------------------- |
+| NextThemeProvider     | Next.js, Remix, SSR frameworks | Pre-hydration script, CSP support, animations     |
+| TanStackThemeProvider | TanStack Start apps            | Cookie SSR, pre-hydration script, system CSS mode |
+| ViteThemeProvider     | Vite React SPAs                | Lightweight, transition control, no SSR overhead  |
 
 ## Quick Start
 
@@ -73,7 +73,7 @@ function ThemeToggle() {
 **Choose your framework setup guide:**
 
 - **[Next.js / SSR Setup Guide](./docs/nextjs-setup.md)** - Complete guide with App Router, Pages Router, CSP support
-- **[TanStack Start Setup Guide](./docs/tanstack-start-setup.md)** - Isomorphic rendering, hydration-safe patterns
+- **[TanStack Start Setup Guide](./docs/tanstack-start-setup.md)** - Cookie SSR, pre-hydration script, system CSS mode
 - **[Vite React SPA Setup Guide](./docs/vite-setup.md)** - Client-side setup, flash prevention, routing
 
 **[View Complete Examples](./example/)** - Next.js implementation with both hook and provider patterns
@@ -118,6 +118,11 @@ All providers expose the same hook interface:
 | nonce                     | ✗        | ✓         | ✗        | ✗    | string             | -                           |
 | disablePreHydrationScript | ✗        | ✓         | ✗        | ✗    | boolean            | false                       |
 | disableTransitionOnChange | ✗        | ✗         | ✗        | ✓    | boolean            | false                       |
+| serverTheme               | ✗        | ✗         | ✓        | ✗    | Theme              | -                           |
+| serverColorTheme          | ✗        | ✗         | ✓        | ✗    | ColorTheme         | -                           |
+| systemThemeMode           | ✗        | ✗         | ✓        | ✗    | 'css' \| 'js'      | 'css'                       |
+| onServerThemeChange       | ✗        | ✗         | ✓        | ✗    | function           | -                           |
+| onServerColorThemeChange  | ✗        | ✗         | ✓        | ✗    | function           | -                           |
 | onThemeChange             | ✓        | ✓         | ✓        | ✓    | function           | -                           |
 | onColorThemeChange        | ✓        | ✓         | ✓        | ✓    | function           | -                           |
 
