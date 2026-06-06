@@ -27,26 +27,27 @@ jobs:
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
 
-      - name: Setup npm 11.x
-        run: |
-          npm install -g npm@11
-          npm --version
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
 
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Prettier Check
-        run: npm run prettier:check
+        run: pnpm run format:check
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
         uses: changesets/action@v1
         with:
-          # This expects you to have a script called release which does a build for your packages and calls changeset publish
-          publish: npm run release
+          publish: pnpm --filter @space-man/react-theme-animation exec changeset publish
+          version: pnpm exec changeset version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
