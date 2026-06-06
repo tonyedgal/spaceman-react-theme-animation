@@ -18,7 +18,6 @@ export type SlideDirection =
 
 export type Theme = 'light' | 'dark' | 'system'
 export type ColorTheme = string
-export type SystemThemeMode = 'css' | 'js'
 
 export interface UseThemeAnimationProps {
   duration?: number
@@ -43,10 +42,6 @@ export interface UseThemeAnimationProps {
 
   onThemeChange?: (theme: Theme) => void
   onColorThemeChange?: (colorTheme: ColorTheme) => void
-
-  initialTheme?: Theme
-  initialColorTheme?: ColorTheme
-  systemThemeMode?: SystemThemeMode
 
   // Slide animation options (only valid when animationType is SLIDE)
   slideDirection?: SlideDirection

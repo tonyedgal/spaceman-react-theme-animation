@@ -2,6 +2,7 @@ import { ThemeAnimationType } from '../types'
 
 const isBrowser = typeof window !== 'undefined'
 
+// Inject base CSS for view transitions
 export const injectBaseStyles = (): void => {
   if (isBrowser) {
     const styleId = 'spaceman-theme-base-style'
@@ -55,13 +56,6 @@ export const getSystemTheme = (): 'light' | 'dark' => {
 export const resolveTheme = (theme: string): 'light' | 'dark' => {
   if (theme === 'system') {
     return getSystemTheme()
-  }
-  return theme === 'dark' ? 'dark' : 'light'
-}
-
-export const resolveThemeForServer = (theme: string): 'light' | 'dark' | 'system' => {
-  if (theme === 'system') {
-    return 'system'
   }
   return theme === 'dark' ? 'dark' : 'light'
 }
@@ -150,6 +144,7 @@ export const createSlideAnimation = (config: AnimationConfig): void => {
 export const createBlurCircleAnimation = (config: AnimationConfig): void => {
   const { x, y, duration, easing, blurAmount, styleId } = config
 
+  // Remove existing style if present
   const existingStyle = document.getElementById(styleId)
   if (existingStyle) {
     existingStyle.remove()
@@ -162,6 +157,7 @@ export const createBlurCircleAnimation = (config: AnimationConfig): void => {
     ? Math.min(viewportSize * scaleFactor, 5000)
     : viewportSize * scaleFactor
 
+  // Calculate maximum radius for corner positions
   const topLeft = Math.hypot(x, y)
   const topRight = Math.hypot(window.innerWidth - x, y)
   const bottomLeft = Math.hypot(x, window.innerHeight - y)
@@ -222,6 +218,7 @@ export const createBlurCircleAnimation = (config: AnimationConfig): void => {
 
   document.head.appendChild(styleElement)
 
+  // Clean up after animation
   setTimeout(() => {
     const styleElement = document.getElementById(styleId)
     if (styleElement) {
