@@ -5,7 +5,7 @@ import {
   UseThemeAnimationReturn,
   ThemeAnimationType,
   Theme,
-} from '../types'
+} from '../../core/types'
 import {
   injectBaseStyles,
   resolveTheme,
@@ -15,11 +15,13 @@ import {
   createCircleAnimation,
   createBlurCircleAnimation,
   createSlideAnimation,
-} from '../utils/animations'
+} from '../../core/utils/animations'
 
 const isBrowser = typeof window !== 'undefined'
 
-export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeAnimationReturn => {
+export const useThemeAnimation = (
+  props: UseThemeAnimationProps = {}
+): UseThemeAnimationReturn => {
   const {
     duration: propsDuration = 750,
     easing = 'ease-in-out',
@@ -34,6 +36,9 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
 
     globalClassName = 'dark',
     colorThemePrefix = 'theme-',
+    attribute = 'class',
+    value,
+    enableColorScheme = true,
 
     storageKey = 'theme',
     colorStorageKey = 'color-theme',
@@ -56,8 +61,11 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     slideToY = 0,
   } = props
 
-  const isHighResolution = isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
-  const duration = isHighResolution ? Math.max(propsDuration * 0.8, 500) : propsDuration
+  const isHighResolution =
+    isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
+  const duration = isHighResolution
+    ? Math.max(propsDuration * 0.8, 500)
+    : propsDuration
 
   const [mounted, setMounted] = useState(false)
 
@@ -78,13 +86,16 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     if (initialColorTheme !== undefined) return initialColorTheme
     if (!isBrowser) return defaultColorTheme
     const saved = localStorage.getItem(colorStorageKey)
-    return saved && colorThemes.indexOf(saved) !== -1 ? saved : defaultColorTheme
+    return saved && colorThemes.indexOf(saved) !== -1
+      ? saved
+      : defaultColorTheme
   })
 
   const currentTheme = externalTheme ?? internalTheme
   const currentColorTheme = externalColorTheme ?? internalColorTheme
 
   const [, setSystemTheme] = useState<'light' | 'dark'>(() => getSystemTheme())
+  const systemTheme = getSystemTheme()
   const resolvedTheme = resolveTheme(currentTheme)
 
   useEffect(() => {
@@ -103,21 +114,43 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
 
     const element = document.documentElement
 
-    if (systemThemeMode === 'css' && currentTheme === 'system') {
-      element.classList.remove(globalClassName)
-      element.classList.remove('auto')
-      element.classList.remove('system')
-      element.classList.add('system')
-      element.style.colorScheme = ''
-    } else {
-      element.classList.remove('system')
-      element.classList.remove('auto')
-      if (resolvedTheme === 'dark') {
-        element.classList.add(globalClassName)
+    const lightValue = value?.light
+    const darkValue = value?.dark ?? globalClassName
+    const systemValue = value?.system ?? 'system'
+
+    if (attribute === 'data-theme') {
+      if (systemThemeMode === 'css' && currentTheme === 'system') {
+        element.setAttribute('data-theme', systemValue)
       } else {
-        element.classList.remove(globalClassName)
+        element.setAttribute(
+          'data-theme',
+          resolvedTheme === 'dark' ? darkValue : (lightValue ?? 'light')
+        )
       }
-      element.style.colorScheme = resolvedTheme
+    } else {
+      if (lightValue) {
+        element.classList.remove(lightValue)
+      }
+      element.classList.remove(darkValue, systemValue, 'auto')
+
+      if (systemThemeMode === 'css' && currentTheme === 'system') {
+        element.classList.add(systemValue)
+      } else if (resolvedTheme === 'dark') {
+        element.classList.add(darkValue)
+      } else if (lightValue) {
+        element.classList.add(lightValue)
+      } else {
+        element.classList.remove(darkValue)
+      }
+    }
+
+    if (enableColorScheme) {
+      element.style.colorScheme =
+        systemThemeMode === 'css' && currentTheme === 'system'
+          ? ''
+          : resolvedTheme
+    } else {
+      element.style.removeProperty('color-scheme')
     }
 
     colorThemes.forEach(theme => {
@@ -131,6 +164,9 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     globalClassName,
     colorThemePrefix,
     colorThemes,
+    attribute,
+    value,
+    enableColorScheme,
     mounted,
     systemThemeMode,
   ])
@@ -179,7 +215,12 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
 
   const switchTheme = useCallback(
     async (newTheme: Theme, animationOff: boolean = false) => {
-      if (!ref.current || !supportsViewTransitions() || prefersReducedMotion() || animationOff) {
+      if (
+        !ref.current ||
+        !supportsViewTransitions() ||
+        prefersReducedMotion() ||
+        animationOff
+      ) {
         setTheme(newTheme)
         return
       }
@@ -283,7 +324,9 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
   const switchColorTheme = useCallback(
     (newColorTheme: string) => {
       if (colorThemes.indexOf(newColorTheme) === -1) {
-        console.warn(`Color theme "${newColorTheme}" not found in available themes`)
+        console.warn(
+          `Color theme "${newColorTheme}" not found in available themes`
+        )
         return
       }
       setColorTheme(newColorTheme)
@@ -328,7 +371,9 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     (targetColorTheme: string) => {
       return () => {
         if (colorThemes.indexOf(targetColorTheme) === -1) {
-          console.warn(`Color theme "${targetColorTheme}" not found in available themes`)
+          console.warn(
+            `Color theme "${targetColorTheme}" not found in available themes`
+          )
           return
         }
         setColorTheme(targetColorTheme)
@@ -349,6 +394,7 @@ export const useThemeAnimation = (props: UseThemeAnimationProps = {}): UseThemeA
     theme: currentTheme,
     colorTheme: currentColorTheme,
     resolvedTheme,
+    systemTheme,
     setTheme,
     setColorTheme,
     switchTheme,

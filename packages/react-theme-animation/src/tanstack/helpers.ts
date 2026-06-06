@@ -1,5 +1,5 @@
-import { resolveThemeForServer } from './utils/animations'
-import { ColorTheme, Theme } from './types'
+import { resolveThemeForServer } from '../core/utils/animations'
+import { ColorTheme, Theme } from '../core/types'
 
 export const STORAGE_KEY = 'theme'
 export const COLOR_STORAGE_KEY = 'color-theme'

@@ -1,6 +1,14 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react'
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from 'react'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
-import { Theme, ColorTheme, ThemeAnimationType } from '../types'
+import { Theme, ColorTheme, ThemeAnimationType } from '../../core/types'
+import { SharedThemeContext } from './shared-theme-context'
+import { withElementAsRef } from './provider-helpers'
 
 /**
  * Context type for the Spaceman Theme Provider
@@ -24,10 +32,15 @@ interface SpacemanThemeContextType {
   createColorThemeToggle: (targetColorTheme: string) => () => void
   isColorThemeActive: (targetColorTheme: string) => boolean
 
-  switchThemeFromElement: (theme: Theme, element: HTMLButtonElement) => Promise<void>
+  switchThemeFromElement: (
+    theme: Theme,
+    element: HTMLButtonElement
+  ) => Promise<void>
 }
 
-const SpacemanThemeContext = createContext<SpacemanThemeContextType | undefined>(undefined)
+const SpacemanThemeContext = createContext<
+  SpacemanThemeContextType | undefined
+>(undefined)
 
 /**
  * Props for the Spaceman Theme Provider
@@ -80,28 +93,13 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
     setMounted(true)
   }, [])
 
-  const switchThemeFromElement = async (theme: Theme, element: HTMLButtonElement) => {
-    if (themeState.ref.current) {
-      const originalRef = themeState.ref.current
-      Object.defineProperty(themeState.ref, 'current', {
-        value: element,
-        writable: true,
-        configurable: true,
-      })
+  const switchThemeFromElement = async (
+    theme: Theme,
+    element: HTMLButtonElement
+  ) => {
+    await withElementAsRef(themeState.ref, element, async () => {
       await themeState.switchTheme(theme)
-      Object.defineProperty(themeState.ref, 'current', {
-        value: originalRef,
-        writable: true,
-        configurable: true,
-      })
-    } else {
-      Object.defineProperty(themeState.ref, 'current', {
-        value: element,
-        writable: true,
-        configurable: true,
-      })
-      await themeState.switchTheme(theme)
-    }
+    })
   }
 
   if (!mounted) {
@@ -128,7 +126,9 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
 
     return (
       <SpacemanThemeContext.Provider value={loadingContextValue}>
-        {children}
+        <SharedThemeContext.Provider value={loadingContextValue}>
+          {children}
+        </SharedThemeContext.Provider>
       </SpacemanThemeContext.Provider>
     )
   }
@@ -155,7 +155,11 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
   }
 
   return (
-    <SpacemanThemeContext.Provider value={contextValue}>{children}</SpacemanThemeContext.Provider>
+    <SpacemanThemeContext.Provider value={contextValue}>
+      <SharedThemeContext.Provider value={contextValue}>
+        {children}
+      </SharedThemeContext.Provider>
+    </SpacemanThemeContext.Provider>
   )
 }
 
@@ -168,7 +172,9 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
 export const useSpacemanTheme = (): SpacemanThemeContextType => {
   const context = useContext(SpacemanThemeContext)
   if (context === undefined) {
-    throw new Error('useSpacemanTheme must be used within a SpacemanThemeProvider')
+    throw new Error(
+      'useSpacemanTheme must be used within a SpacemanThemeProvider'
+    )
   }
   return context
 }

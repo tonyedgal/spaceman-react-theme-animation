@@ -8,7 +8,8 @@ export const injectBaseStyles = (): void => {
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style')
       style.id = styleId
-      const isHighResolution = window.innerWidth >= 3000 || window.innerHeight >= 2000
+      const isHighResolution =
+        window.innerWidth >= 3000 || window.innerHeight >= 2000
 
       style.textContent = `
         ::view-transition-old(root),
@@ -39,7 +40,8 @@ export const injectBaseStyles = (): void => {
 }
 
 export const createBlurCircleMask = (blur: number): string => {
-  const isHighResolution = isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
+  const isHighResolution =
+    isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
 
   const blurFilter = `<filter id="blur"><feGaussianBlur stdDeviation="${blur}" /></filter>`
   const circleRadius = isHighResolution ? 20 : 25
@@ -49,7 +51,9 @@ export const createBlurCircleMask = (blur: number): string => {
 
 export const getSystemTheme = (): 'light' | 'dark' => {
   if (!isBrowser) return 'light'
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light'
 }
 
 export const resolveTheme = (theme: string): 'light' | 'dark' => {
@@ -59,7 +63,9 @@ export const resolveTheme = (theme: string): 'light' | 'dark' => {
   return theme === 'dark' ? 'dark' : 'light'
 }
 
-export const resolveThemeForServer = (theme: string): 'light' | 'dark' | 'system' => {
+export const resolveThemeForServer = (
+  theme: string
+): 'light' | 'dark' | 'system' => {
   if (theme === 'system') {
     return 'system'
   }
@@ -71,7 +77,9 @@ export const supportsViewTransitions = (): boolean => {
 }
 
 export const prefersReducedMotion = (): boolean => {
-  return isBrowser && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  return (
+    isBrowser && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
 }
 
 export interface AnimationConfig {
@@ -100,7 +108,10 @@ export const createCircleAnimation = (config: AnimationConfig): void => {
 
   document.documentElement.animate(
     {
-      clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${maxRadius}px at ${x}px ${y}px)`],
+      clipPath: [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${maxRadius}px at ${x}px ${y}px)`,
+      ],
     },
     {
       duration,
@@ -156,7 +167,8 @@ export const createBlurCircleAnimation = (config: AnimationConfig): void => {
   }
 
   const viewportSize = Math.max(window.innerWidth, window.innerHeight) + 200
-  const isHighResolution = window.innerWidth >= 3000 || window.innerHeight >= 2000
+  const isHighResolution =
+    window.innerWidth >= 3000 || window.innerHeight >= 2000
   const scaleFactor = isHighResolution ? 2.5 : 4
   const optimalMaskSize = isHighResolution
     ? Math.min(viewportSize * scaleFactor, 5000)

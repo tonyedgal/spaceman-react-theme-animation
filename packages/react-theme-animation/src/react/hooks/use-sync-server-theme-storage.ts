@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { ColorTheme, Theme } from '../types'
+import { ColorTheme, Theme } from '../../core/types'
 
 const isBrowser = typeof window !== 'undefined'
 

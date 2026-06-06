@@ -1,6 +1,8 @@
 import React, { createContext, useContext, ReactNode, useCallback } from 'react'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
-import { Theme, ColorTheme, ThemeAnimationType } from '../types'
+import { Theme, ColorTheme, ThemeAnimationType } from '../../core/types'
+import { SharedThemeContext } from './shared-theme-context'
+import { getBrowserSystemTheme, withElementAsRef } from './provider-helpers'
 
 interface ViteThemeContextType {
   ref: React.RefObject<HTMLButtonElement | null>
@@ -18,10 +20,15 @@ interface ViteThemeContextType {
   toggleColorTheme: () => void
   createColorThemeToggle: (targetColorTheme: string) => () => void
   isColorThemeActive: (targetColorTheme: string) => boolean
-  switchThemeFromElement: (theme: Theme, element: HTMLButtonElement) => Promise<void>
+  switchThemeFromElement: (
+    theme: Theme,
+    element: HTMLButtonElement
+  ) => Promise<void>
 }
 
-const ViteThemeContext = createContext<ViteThemeContextType | undefined>(undefined)
+const ViteThemeContext = createContext<ViteThemeContextType | undefined>(
+  undefined
+)
 
 interface ViteThemeProviderProps {
   children: ReactNode
@@ -151,36 +158,18 @@ export const ViteThemeProvider: React.FC<ViteThemeProviderProps> = ({
     [themeState.toggleDarkTheme, applyTransitionDisable]
   )
 
-  const switchThemeFromElement = async (theme: Theme, element: HTMLButtonElement) => {
+  const switchThemeFromElement = async (
+    theme: Theme,
+    element: HTMLButtonElement
+  ) => {
     const cleanup = applyTransitionDisable()
-    if (themeState.ref.current) {
-      const originalRef = themeState.ref.current
-      Object.defineProperty(themeState.ref, 'current', {
-        value: element,
-        writable: true,
-        configurable: true,
-      })
+    await withElementAsRef(themeState.ref, element, async () => {
       await themeState.switchTheme(theme)
-      Object.defineProperty(themeState.ref, 'current', {
-        value: originalRef,
-        writable: true,
-        configurable: true,
-      })
-    } else {
-      Object.defineProperty(themeState.ref, 'current', {
-        value: element,
-        writable: true,
-        configurable: true,
-      })
-      await themeState.switchTheme(theme)
-    }
+    })
     cleanup()
   }
 
-  const systemTheme =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches
-      ? 'dark'
-      : 'light'
+  const systemTheme = getBrowserSystemTheme()
 
   const contextValue: ViteThemeContextType = {
     ref: themeState.ref,
@@ -201,7 +190,13 @@ export const ViteThemeProvider: React.FC<ViteThemeProviderProps> = ({
     isColorThemeActive: themeState.isColorThemeActive,
   }
 
-  return <ViteThemeContext.Provider value={contextValue}>{children}</ViteThemeContext.Provider>
+  return (
+    <ViteThemeContext.Provider value={contextValue}>
+      <SharedThemeContext.Provider value={contextValue}>
+        {children}
+      </SharedThemeContext.Provider>
+    </ViteThemeContext.Provider>
+  )
 }
 
 export const useViteTheme = (): ViteThemeContextType => {
