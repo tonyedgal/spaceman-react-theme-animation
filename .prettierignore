@@ -1,0 +1,15 @@
+node_modules/
+dist/
+build/
+.turbo/
+.next/
+.netlify/
+out/
+coverage/
+
+apps/examples/*/dist/
+apps/examples/*/.next/
+apps/examples/*/.netlify/
+packages/*/dist/
+
+package-lock.json
