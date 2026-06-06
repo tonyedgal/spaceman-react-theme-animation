@@ -1,9 +1,12 @@
 import React, { type JSX, useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import { clsx } from 'clsx'
-import { ThemeSwitcherProps, Theme } from '../types'
+import { ThemeSwitcherProps, Theme } from '../../core/types'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
-import { useSpacemanTheme } from './SpacemanThemeProvider'
+import {
+  SharedThemeContextValue,
+  useSharedThemeContext,
+} from './shared-theme-context'
 
 const SunIcon = () => (
   <svg
@@ -74,7 +77,9 @@ const ThemeOption = ({
 }) => {
   return (
     <button
-      ref={isActive ? (buttonRef as React.RefObject<HTMLButtonElement>) : undefined}
+      ref={
+        isActive ? (buttonRef as React.RefObject<HTMLButtonElement>) : undefined
+      }
       className={clsx(
         'relative flex h-9 w-12 cursor-pointer items-center justify-center',
         'text-muted-foreground hover:text-foreground',
@@ -138,32 +143,24 @@ const THEME_OPTIONS = [
   },
 ]
 
-export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
-  themes = ['light', 'dark', 'system'],
-  currentTheme,
-  onThemeChange,
-  animationType,
-  duration,
+interface ThemeSwitcherViewProps {
+  className?: string
+  onSwitchTheme: (
+    theme: Theme,
+    event?: React.MouseEvent<HTMLButtonElement>
+  ) => Promise<void>
+  theme: Theme
+  themes: Theme[]
+  themeRef?: React.RefObject<HTMLButtonElement | null>
+}
+
+const ThemeSwitcherView: React.FC<ThemeSwitcherViewProps> = ({
   className,
+  onSwitchTheme,
+  theme,
+  themes,
+  themeRef,
 }) => {
-  let contextTheme: any = null
-  try {
-    contextTheme = useSpacemanTheme()
-  } catch {}
-
-  const standaloneHook = useThemeAnimation({
-    animationType,
-    duration,
-    themes,
-    ...(currentTheme !== undefined && { theme: currentTheme }),
-    onThemeChange,
-  })
-
-  const isControlled = contextTheme !== null
-  const { ref, theme, switchTheme } = isControlled
-    ? { ref: contextTheme.ref, theme: contextTheme.theme, switchTheme: contextTheme.switchTheme }
-    : standaloneHook
-
   const [isMounted, setIsMounted] = useState(false)
   const [hoveredTheme, setHoveredTheme] = useState<string | null>(null)
 
@@ -175,17 +172,12 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
     newTheme: string,
     event?: React.MouseEvent<HTMLButtonElement>
   ) => {
-    if (isControlled && contextTheme.switchThemeFromElement && event) {
-      await contextTheme.switchThemeFromElement(newTheme as Theme, event.currentTarget)
-      if (onThemeChange) {
-        onThemeChange(newTheme as Theme)
-      }
-    } else {
-      await switchTheme(newTheme as Theme)
-    }
+    await onSwitchTheme(newTheme as Theme, event)
   }
 
-  const filteredOptions = THEME_OPTIONS.filter(option => themes.includes(option.value as Theme))
+  const filteredOptions = THEME_OPTIONS.filter(option =>
+    themes.includes(option.value as Theme)
+  )
 
   return (
     <div
@@ -211,9 +203,78 @@ export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = ({
           onClick={handleThemeChange}
           onMouseEnter={() => setHoveredTheme(option.value)}
           onMouseLeave={() => {}}
-          buttonRef={theme === option.value ? ref : undefined}
+          buttonRef={theme === option.value ? themeRef : undefined}
         />
       ))}
     </div>
   )
+}
+
+const ThemeSwitcherWithContext: React.FC<
+  Pick<ThemeSwitcherProps, 'className' | 'themes'> & {
+    contextTheme: SharedThemeContextValue
+  }
+> = ({ className, contextTheme, themes = ['light', 'dark', 'system'] }) => {
+  const handleSwitchTheme = async (
+    theme: Theme,
+    event?: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    if (contextTheme.switchThemeFromElement && event) {
+      await contextTheme.switchThemeFromElement(theme, event.currentTarget)
+      return
+    }
+
+    await contextTheme.switchTheme(theme)
+  }
+
+  return (
+    <ThemeSwitcherView
+      className={className}
+      onSwitchTheme={handleSwitchTheme}
+      theme={contextTheme.theme}
+      themes={themes}
+      themeRef={contextTheme.ref}
+    />
+  )
+}
+
+const ThemeSwitcherStandalone: React.FC<ThemeSwitcherProps> = ({
+  themes = ['light', 'dark', 'system'],
+  currentTheme,
+  onThemeChange,
+  animationType,
+  duration,
+  className,
+}) => {
+  const standaloneHook = useThemeAnimation({
+    animationType,
+    duration,
+    themes,
+    ...(currentTheme !== undefined && { theme: currentTheme }),
+    onThemeChange,
+  })
+
+  const handleSwitchTheme = async (theme: Theme) => {
+    await standaloneHook.switchTheme(theme)
+  }
+
+  return (
+    <ThemeSwitcherView
+      className={className}
+      onSwitchTheme={handleSwitchTheme}
+      theme={standaloneHook.theme}
+      themes={themes}
+      themeRef={standaloneHook.ref}
+    />
+  )
+}
+
+export const ThemeSwitcher: React.FC<ThemeSwitcherProps> = props => {
+  const contextTheme = useSharedThemeContext()
+
+  if (contextTheme) {
+    return <ThemeSwitcherWithContext {...props} contextTheme={contextTheme} />
+  }
+
+  return <ThemeSwitcherStandalone {...props} />
 }

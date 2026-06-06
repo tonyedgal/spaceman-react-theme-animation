@@ -34,6 +34,9 @@ export interface UseThemeAnimationProps {
 
   globalClassName?: string
   colorThemePrefix?: string
+  attribute?: 'class' | 'data-theme'
+  value?: Record<string, string>
+  enableColorScheme?: boolean
 
   storageKey?: string
   colorStorageKey?: string
@@ -62,6 +65,7 @@ export interface UseThemeAnimationReturn {
   theme: Theme
   colorTheme: ColorTheme
   resolvedTheme: 'light' | 'dark'
+  systemTheme: 'light' | 'dark'
 
   setTheme: (theme: Theme) => void
   setColorTheme: (colorTheme: ColorTheme) => void
