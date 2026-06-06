@@ -37,7 +37,7 @@
 - Add Next.js / SSR Setup Guide with App Router, Pages Router, and CSP examples
 - Add TanStack Start Setup Guide with isomorphic rendering patterns
 - Add Vite React SPA Setup Guide with client-side setup and routing examples
-- Restructure README to highlight v2.1 features with 66% reduction in verbosity
+- Restructure README to highlight the v2 release with 66% reduction in verbosity
 - Add Provider Selection Table comparing all framework-specific providers
 - Consolidate API Reference with shared hook interface table
 
