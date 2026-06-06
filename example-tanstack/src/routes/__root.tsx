@@ -1,8 +1,11 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import { TanStackThemeProvider } from '../components/TanStackThemeProvider'
-import { ThemeAnimationType } from '../types'
+import {
+  TanStackStartThemeScript,
+  TanStackThemeProvider,
+  ThemeAnimationType,
+} from '@space-man/react-theme-animation'
 
 import NavBar from '../components/NavBar'
 import BackgroundPattern from '../components/BackgroundPattern'
@@ -38,6 +41,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <TanStackStartThemeScript defaultTheme="system" systemThemeMode="css" />
         <HeadContent />
       </head>
       <body className="antialiased">
@@ -48,6 +52,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           defaultColorTheme="default"
           animationType={ThemeAnimationType.CIRCLE}
           duration={750}
+          systemThemeMode="css"
         >
           <NavBar />
           <main className="relative min-h-screen w-full">
