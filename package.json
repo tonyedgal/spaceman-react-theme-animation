@@ -8,7 +8,13 @@
     "typecheck": "turbo typecheck",
     "format": "prettier --write . --config ./.prettierrc",
     "format:check": "prettier --check . --config ./.prettierrc",
-    "clean": "turbo clean"
+    "clean": "turbo clean",
+    "changeset": "changeset",
+    "changeset:patch": "changeset add --type patch",
+    "changeset:feature": "changeset add --type minor",
+    "changeset:breaking": "changeset add --type major",
+    "changeset:version": "changeset version",
+    "changeset:publish": "pnpm build && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.1",
