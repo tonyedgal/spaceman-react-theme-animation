@@ -59,3 +59,19 @@ export {
 } from './tanstack/helpers'
 
 export type { ServerResolvedTheme, ServerThemeData } from './tanstack/helpers'
+
+export type {
+  AnimationPosition,
+  ColorThemeToggle,
+  ThemeAnimationOptions,
+  ThemeLogoOptions,
+  ThemeTransitionInput,
+  ThemeTransitionOptions,
+  TransitionDirection,
+} from './core/types'
+
+export { TRANSITION_DIRECTIONS } from './core/types'
+
+export { preloadThemeLogo } from './core/logo'
+
+export { useHydrated } from './react/hooks/use-hydrated'

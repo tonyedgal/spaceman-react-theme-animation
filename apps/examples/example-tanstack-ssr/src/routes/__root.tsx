@@ -63,7 +63,7 @@ export function RootComponent(): React.JSX.Element {
       defaultTheme='system'
       defaultColorTheme='default'
       animationType={ThemeAnimationType.CIRCLE}
-      duration={750}
+      duration={400}
       serverTheme={themeData.theme}
       serverColorTheme={themeData.colorTheme}
       systemThemeMode='css'

@@ -46,4 +46,18 @@ export {
   supportsViewTransitions,
 } from '../core/utils/animations'
 
+export type {
+  AnimationPosition,
+  ColorThemeToggle,
+  ThemeAnimationOptions,
+  ThemeLogoOptions,
+  ThemeTransitionInput,
+  ThemeTransitionOptions,
+  TransitionDirection,
+} from '../core/types'
+
+export { TRANSITION_DIRECTIONS } from '../core/types'
+
+export { preloadThemeLogo } from '../core/logo'
+
 export { useHydrated } from './hooks/use-hydrated'

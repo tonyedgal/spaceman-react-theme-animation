@@ -1,10 +1,16 @@
 import type { ReactNode } from 'react'
 import React, { createContext, useCallback, useContext, useMemo } from 'react'
 
-import type { ColorTheme, Theme } from '../../core/types'
+import type {
+  ColorTheme,
+  ColorThemeToggle,
+  Theme,
+  ThemeTransitionInput,
+  UseThemeAnimationProps,
+} from '../../core/types'
 import { ThemeAnimationType } from '../../core/types'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
-import { getBrowserSystemTheme, withElementAsRef } from './provider-helpers'
+import { getBrowserSystemTheme } from './provider-helpers'
 import { SharedThemeContext } from './shared-theme-context'
 
 const defaultThemes = ['light', 'dark', 'system'] as const
@@ -19,13 +25,21 @@ interface ViteThemeContextType {
   readonly systemTheme: 'light' | 'dark'
   readonly setTheme: (theme: Theme) => void
   readonly setColorTheme: (colorTheme: ColorTheme) => void
-  readonly switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
-  readonly switchColorTheme: (colorTheme: string) => void
-  readonly toggleTheme: (animationOff?: boolean) => Promise<void>
-  readonly toggleLightTheme: (animationOff?: boolean) => Promise<void>
-  readonly toggleDarkTheme: (animationOff?: boolean) => Promise<void>
-  readonly toggleColorTheme: () => void
-  readonly createColorThemeToggle: (targetColorTheme: string) => () => void
+  readonly switchTheme: (
+    theme: Theme,
+    options?: ThemeTransitionInput,
+  ) => Promise<void>
+  readonly switchColorTheme: (
+    colorTheme: string,
+    options?: ThemeTransitionInput,
+  ) => Promise<void>
+  readonly toggleTheme: (options?: ThemeTransitionInput) => Promise<void>
+  readonly toggleLightTheme: (options?: ThemeTransitionInput) => Promise<void>
+  readonly toggleDarkTheme: (options?: ThemeTransitionInput) => Promise<void>
+  readonly toggleColorTheme: ColorThemeToggle
+  readonly createColorThemeToggle: (
+    targetColorTheme: string,
+  ) => ColorThemeToggle
   readonly isColorThemeActive: (targetColorTheme: string) => boolean
   readonly switchThemeFromElement: (
     theme: Theme,
@@ -37,7 +51,7 @@ const ViteThemeContext = createContext<ViteThemeContextType | undefined>(
   undefined,
 )
 
-interface ViteThemeProviderProps {
+export type ViteThemeProviderProps = UseThemeAnimationProps & {
   readonly children: ReactNode
   readonly themes?: readonly Theme[]
   readonly colorThemes?: readonly ColorTheme[]
@@ -83,15 +97,17 @@ export function ViteThemeProvider({
   defaultTheme = 'system',
   defaultColorTheme = 'default',
   animationType = ThemeAnimationType.CIRCLE,
-  duration = 750,
+  duration = 400,
   attribute = 'class',
   disableTransitionOnChange = false,
   storageKey = 'vite-theme',
   colorStorageKey = 'vite-color-theme',
   globalClassName = 'dark',
   colorThemePrefix = 'theme-',
-}: ViteThemeProviderProps): React.JSX.Element {
+  ...animationOptions
+}: Readonly<ViteThemeProviderProps>): React.JSX.Element {
   const themeState = useThemeAnimation({
+    ...animationOptions,
     themes,
     colorThemes,
     defaultTheme,
@@ -130,7 +146,7 @@ export function ViteThemeProvider({
   )
 
   const wrappedSwitchTheme = useCallback(
-    async (theme: Theme, animationOff = false) => {
+    async (theme: Theme, animationOff: ThemeTransitionInput = false) => {
       const cleanup = applyTransitionDisable()
       await themeState.switchTheme(theme, animationOff)
       cleanup()
@@ -139,7 +155,7 @@ export function ViteThemeProvider({
   )
 
   const wrappedToggleTheme = useCallback(
-    async (animationOff = false): Promise<void> => {
+    async (animationOff: ThemeTransitionInput = false): Promise<void> => {
       const cleanup = applyTransitionDisable()
       await themeState.toggleTheme(animationOff)
       cleanup()
@@ -148,7 +164,7 @@ export function ViteThemeProvider({
   )
 
   const wrappedToggleLightTheme = useCallback(
-    async (animationOff = false): Promise<void> => {
+    async (animationOff: ThemeTransitionInput = false): Promise<void> => {
       const cleanup = applyTransitionDisable()
       await themeState.toggleLightTheme(animationOff)
       cleanup()
@@ -157,7 +173,7 @@ export function ViteThemeProvider({
   )
 
   const wrappedToggleDarkTheme = useCallback(
-    async (animationOff = false): Promise<void> => {
+    async (animationOff: ThemeTransitionInput = false): Promise<void> => {
       const cleanup = applyTransitionDisable()
       await themeState.toggleDarkTheme(animationOff)
       cleanup()
@@ -170,9 +186,7 @@ export function ViteThemeProvider({
       const cleanup = applyTransitionDisable()
 
       try {
-        await withElementAsRef(themeState.ref, element, async () => {
-          await themeState.switchTheme(theme)
-        })
+        await themeState.switchTheme(theme, { element })
         cleanup()
       } catch (error) {
         cleanup()

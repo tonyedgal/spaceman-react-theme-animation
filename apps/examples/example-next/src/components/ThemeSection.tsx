@@ -119,13 +119,13 @@ export function ThemeSection(): React.JSX.Element {
   <ThemeSwitcher
    themes={['light', 'dark', 'system']}
    animationType={animationType}
-   duration={750}
+   duration={400}
   />
 
   <ThemeSwitcher
    themes={['light', 'dark']}
    animationType={animationType}
-   duration={750}
+   duration={400}
   />
 
   <ThemeSelector

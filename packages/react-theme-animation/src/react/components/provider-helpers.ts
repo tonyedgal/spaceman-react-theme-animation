@@ -1,35 +1,5 @@
 import type { Theme } from '../../core/types'
 
-export const withElementAsRef = async (
-  ref: React.RefObject<HTMLButtonElement | null>,
-  element: HTMLButtonElement,
-  run: () => Promise<void>,
-): Promise<void> => {
-  if (ref.current) {
-    const originalRef = ref.current
-    Object.defineProperty(ref, 'current', {
-      value: element,
-      writable: true,
-      configurable: true,
-    })
-    await run()
-    Object.defineProperty(ref, 'current', {
-      value: originalRef,
-      writable: true,
-      configurable: true,
-    })
-
-    return
-  }
-
-  Object.defineProperty(ref, 'current', {
-    value: element,
-    writable: true,
-    configurable: true,
-  })
-  await run()
-}
-
 export const getBrowserSystemTheme = (): 'light' | 'dark' => {
   return 'window' in globalThis &&
     window.matchMedia('(prefers-color-scheme: dark)').matches

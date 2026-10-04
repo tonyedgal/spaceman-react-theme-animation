@@ -6,18 +6,20 @@ import * as React from 'react'
 
 import { ChevronDownIcon } from './ChevronDownIcon'
 
-export function SelectTrigger({
-  className,
-  size = 'default',
-  children,
-  ...props
-}: Readonly<
-  React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-    readonly size?: 'sm' | 'default'
-  }
->): React.JSX.Element {
+export const SelectTrigger = React.forwardRef<
+  HTMLButtonElement,
+  Readonly<
+    React.ComponentProps<typeof SelectPrimitive.Trigger> & {
+      readonly size?: 'sm' | 'default'
+    }
+  >
+>(function (
+  { className, size = 'default', children, ...props },
+  ref,
+): React.JSX.Element {
   return (
     <SelectPrimitive.Trigger
+      ref={ref}
       data-slot='select-trigger'
       data-size={size}
       className={clsx(
@@ -32,4 +34,6 @@ export function SelectTrigger({
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   )
-}
+})
+
+SelectTrigger.displayName = 'SelectTrigger'

@@ -8,10 +8,12 @@ import { ThemeSelectorView } from './ThemeSelector.ThemeSelectorView'
 export function ThemeSelectorWithContext({
   colorThemes = defaultColorThemes,
   contextTheme,
-}: Pick<ThemeSelectorProps, 'colorThemes'> & {
-  readonly contextTheme: SharedThemeContextValue
-}): React.JSX.Element {
-  const handleColorThemeChange = contextTheme.setColorTheme
+}: Readonly<
+  Pick<ThemeSelectorProps, 'colorThemes'> & {
+    readonly contextTheme: SharedThemeContextValue
+  }
+>): React.JSX.Element {
+  const handleColorThemeChange = contextTheme.switchColorTheme
 
   return (
     <ThemeSelectorView
