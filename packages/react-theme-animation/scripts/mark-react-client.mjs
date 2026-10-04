@@ -15,7 +15,4 @@ async function markClientEntry(relativePath) {
   await writeFile(filePath, `${directive}${source}`)
 }
 
-await Promise.all([
-  markClientEntry('dist/react/index.js'),
-  markClientEntry('dist/react/index.cjs'),
-])
+await markClientEntry('dist/react/index.js')

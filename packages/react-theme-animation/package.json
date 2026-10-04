@@ -41,7 +41,7 @@
   ],
   "type": "module",
   "sideEffects": false,
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -49,40 +49,24 @@
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
-      },
-      "require": {
-        "types": "./dist/index.d.cts",
-        "default": "./dist/index.cjs"
       }
     },
     "./core": {
       "import": {
         "types": "./dist/core/index.d.ts",
         "default": "./dist/core/index.js"
-      },
-      "require": {
-        "types": "./dist/core/index.d.cts",
-        "default": "./dist/core/index.cjs"
       }
     },
     "./react": {
       "import": {
         "types": "./dist/react/index.d.ts",
         "default": "./dist/react/index.js"
-      },
-      "require": {
-        "types": "./dist/react/index.d.cts",
-        "default": "./dist/react/index.cjs"
       }
     },
     "./tanstack": {
       "import": {
         "types": "./dist/tanstack/index.d.ts",
         "default": "./dist/tanstack/index.js"
-      },
-      "require": {
-        "types": "./dist/tanstack/index.d.cts",
-        "default": "./dist/tanstack/index.cjs"
       }
     },
     "./package.json": "./package.json"
