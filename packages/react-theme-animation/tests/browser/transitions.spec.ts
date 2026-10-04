@@ -1062,8 +1062,17 @@ test('selector uses keyboard input after a pointer opens the popup', async ({
 }) => {
   await open(page, 'widgets')
   await page.getByRole('combobox').click()
+  await expect(
+    page.getByRole('option', { name: 'default', exact: true }),
+  ).toBeFocused()
   await page.keyboard.press('Home')
+  await expect(
+    page.getByRole('option', { name: 'default', exact: true }),
+  ).toBeFocused()
   await page.keyboard.press('ArrowDown')
+  await expect(
+    page.getByRole('option', { name: 'ocean', exact: true }),
+  ).toBeFocused()
   await page.keyboard.press('Enter')
   await expect(page.locator('html')).toHaveClass(/theme-ocean/)
   expect(
