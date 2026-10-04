@@ -104,6 +104,7 @@
   },
   "devDependencies": {
     "@radix-ui/react-select": "^2.2.6",
+    "@types/node": "^22.10.2",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "motion": "^12.27.1",

@@ -159,6 +159,9 @@ importers:
       vite-tsconfig-paths:
         specifier: ^6.0.2
         version: 6.1.1(typescript@5.8.3)(vite@7.3.3(@types/node@22.19.19)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))
+      zod:
+        specifier: ^4.3.6
+        version: 4.4.3
     devDependencies:
       '@netlify/vite-plugin-tanstack-start':
         specifier: ^1.2.3
@@ -263,7 +266,7 @@ importers:
         specifier: ^6.0.2
         version: 6.1.1(typescript@5.8.3)(vite@7.3.3(@types/node@22.19.19)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))
       zod:
-        specifier: ^4.3.5
+        specifier: ^4.3.6
         version: 4.4.3
     devDependencies:
       '@netlify/vite-plugin-tanstack-start':
@@ -318,6 +321,9 @@ importers:
       '@radix-ui/react-select':
         specifier: ^2.2.6
         version: 2.2.6(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.19.19
       '@types/react':
         specifier: ^19.2.0
         version: 19.2.15
