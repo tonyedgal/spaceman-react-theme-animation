@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && oxfmt src/routeTree.gen.ts",
     "dev": "vite dev --port 3000",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
