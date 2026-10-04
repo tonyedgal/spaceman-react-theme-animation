@@ -14,13 +14,13 @@ export const getThemeServerFn = createServerFn().handler((): ServerThemeData =>
 )
 
 export const setThemeServerFn = createServerFn()
-  .inputValidator(z.string())
+  .validator(z.string())
   .handler(({ data }) => {
     setCookie(STORAGE_KEY, data)
   })
 
 export const setColorThemeServerFn = createServerFn()
-  .inputValidator(z.string())
+  .validator(z.string())
   .handler(({ data }) => {
     setCookie(COLOR_STORAGE_KEY, data)
   })
