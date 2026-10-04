@@ -1,6 +1,11 @@
 import React from 'react'
 
-import { preloadThemeLogo, ThemeSelector, ThemeSwitcher } from '../../src/react'
+import {
+  preloadThemeLogo,
+  ThemeSelector,
+  ThemeSwitcher,
+} from '@space-man/react-theme-animation/react'
+
 import { colorThemes, config, copy, inspection, params } from './fixture-config'
 import type { FixtureThemeState } from './fixture-types'
 import { required, withoutPseudoOptions } from './fixture-types'

@@ -1,4 +1,4 @@
-import type { ThemeAnimationOptions } from '../../src/core/types'
+import type { ThemeAnimationOptions } from '@space-man/react-theme-animation'
 
 export const sizedLogo = {
   logo: '/logo.svg',

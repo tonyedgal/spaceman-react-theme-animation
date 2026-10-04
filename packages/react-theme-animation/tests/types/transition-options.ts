@@ -1,13 +1,13 @@
 import type {
   UseThemeAnimationReturn,
   ThemeTransitionInput,
-} from '../../src/core/types'
+} from '@space-man/react-theme-animation'
 import type {
   useSpacemanTheme,
   useNextTheme,
   useViteTheme,
   useTanStackTheme,
-} from '../../src/react'
+} from '@space-man/react-theme-animation/react'
 
 export function checkOptions(
   input: ThemeTransitionInput,

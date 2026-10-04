@@ -1,7 +1,11 @@
 import { z } from 'zod'
 
+import {
+  ThemeAnimationType,
+  TRANSITION_DIRECTIONS,
+} from '@space-man/react-theme-animation/react'
+
 import { getThemeLogoOptions } from '../../src/core/logo'
-import { ThemeAnimationType, TRANSITION_DIRECTIONS } from '../../src/react'
 import type { Inspection } from './fixture-types'
 import { animationFramesSchema, animationOptionsSchema } from './fixture-types'
 
