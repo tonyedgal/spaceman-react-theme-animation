@@ -12,9 +12,18 @@
     "typecheck": {
       "dependsOn": ["^typecheck"]
     },
-    "lint": {},
     "clean": {
       "cache": false
+    },
+    "//#lint": {},
+    "//#lint:fix": {
+      "cache": false
+    },
+    "//#format": {},
+    "//#format:check": {},
+    "//#format:fix": {
+      "cache": false,
+      "dependsOn": ["//#lint:fix"]
     }
   }
 }

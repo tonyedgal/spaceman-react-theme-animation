@@ -3,10 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port 3000",
     "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint ."
+    "dev": "vite dev --port 3000",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.2.6",
