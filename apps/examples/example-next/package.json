@@ -3,10 +3,9 @@
   "version": "0.1.2",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "next dev --turbopack",
+    "start": "next start"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.2.5",
@@ -27,13 +26,9 @@
     "typescript": "5.8.3"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "9.30.1",
-    "eslint-config-next": "15.3.5",
-    "eslint-import-resolver-typescript": "^4.4.5",
     "tw-animate-css": "^1.3.6"
   }
 }

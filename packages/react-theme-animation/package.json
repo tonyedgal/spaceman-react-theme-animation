@@ -2,45 +2,48 @@
   "name": "@space-man/react-theme-animation",
   "version": "2.3.0",
   "description": "React theme switching with smooth view transition animations and multi-theme support",
-  "type": "module",
-  "sideEffects": false,
   "keywords": [
-    "react",
-    "theme",
-    "dark mode",
-    "light mode",
-    "theme switching",
-    "view transitions",
-    "hooks",
     "animation",
-    "switch",
-    "typescript",
     "dark",
+    "dark mode",
+    "hooks",
     "light",
-    "view-transition",
-    "view-transition-api",
+    "light mode",
+    "nextjs",
+    "react",
+    "reactjs",
+    "shadcn",
+    "switch",
     "tailwind",
     "tailwindcss",
-    "shadcn",
-    "reactjs",
-    "nextjs",
+    "theme",
+    "theme switching",
+    "typescript",
+    "view transitions",
+    "view-transition",
+    "view-transition-api",
     "vite"
   ],
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public",
-    "provenance": true
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tonyedgal/spaceman-react-theme-animation.git"
-  },
   "homepage": "https://github.com/tonyedgal/spaceman-react-theme-animation#readme",
   "bugs": {
     "url": "https://github.com/tonyedgal/spaceman-react-theme-animation/issues"
   },
   "license": "MIT",
   "author": "tonyedgal",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tonyedgal/spaceman-react-theme-animation.git"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
@@ -84,27 +87,20 @@
     },
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "dist",
-    "LICENSE",
-    "README.md"
-  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsup && node scripts/mark-react-client.mjs",
+    "clean": "rm -rf dist",
     "dev": "tsup --watch",
-    "lint": "eslint .",
     "test": "node scripts/smoke-subpath-imports.mjs",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "typecheck": "tsc --noEmit"
   },
-  "peerDependencies": {
-    "react": ">=17",
-    "react-dom": ">=17",
-    "motion": ">=11",
-    "@radix-ui/react-select": ">=2"
+  "dependencies": {
+    "clsx": "^2.1.1"
   },
   "devDependencies": {
     "@radix-ui/react-select": "^2.2.6",
@@ -114,7 +110,10 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
-  "dependencies": {
-    "clsx": "^2.1.1"
+  "peerDependencies": {
+    "@radix-ui/react-select": ">=2",
+    "motion": ">=11",
+    "react": ">=17",
+    "react-dom": ">=17"
   }
 }
