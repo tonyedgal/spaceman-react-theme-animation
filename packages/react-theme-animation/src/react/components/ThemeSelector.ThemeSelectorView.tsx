@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useId, useRef } from 'react'
 
 import type { ThemeSelectorViewProps } from './ThemeSelector.shared'
 import {
@@ -10,15 +10,24 @@ import {
 } from './ui/select'
 
 export function ThemeSelectorView({
+  className,
+  placeholder = 'Choose a color theme',
+  colorThemeLabel,
   colorTheme,
   colorThemes,
   onSelectColorTheme,
 }: ThemeSelectorViewProps): React.JSX.Element | null {
+  const triggerId = useId()
   const triggerRef = useRef<HTMLButtonElement>(null)
   const inputMethod = useRef<'keyboard' | 'pointer'>('keyboard')
 
   return colorThemes.length > 1 ? (
-    <div className='flex flex-col gap-2'>
+    <div
+      className={['flex flex-col gap-2', className].filter(Boolean).join(' ')}
+    >
+      {colorThemeLabel !== undefined && colorThemeLabel !== '' ? (
+        <label htmlFor={triggerId}>{colorThemeLabel}</label>
+      ) : null}
       <Select
         value={colorTheme}
         onValueChange={(value) => {
@@ -29,6 +38,7 @@ export function ThemeSelectorView({
         }}
       >
         <SelectTrigger
+          id={triggerId}
           ref={triggerRef}
           onPointerDownCapture={() => {
             inputMethod.current = 'pointer'
@@ -38,7 +48,7 @@ export function ThemeSelectorView({
           }}
           className='capitalize'
         >
-          <SelectValue placeholder='Choose a color theme' />
+          <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent
           onPointerDownCapture={() => {

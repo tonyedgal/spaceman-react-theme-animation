@@ -207,6 +207,7 @@ export type ThemeSelectorProps = ThemeAnimationOptions & {
   readonly className?: string
   readonly placeholder?: string
 
+  /** @deprecated This selector changes palettes only. Use ThemeSwitcher for mode controls. */
   readonly themeLabel?: string
   readonly colorThemeLabel?: string
 }
