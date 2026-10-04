@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 const navItems = [
   { name: 'With-Components', path: '/' },
@@ -12,7 +12,7 @@ const navItems = [
   { name: 'With-Cards', path: '/cards' },
 ]
 
-export default function NavBar() {
+export default function NavBar(): React.JSX.Element {
   const pathName = usePathname() || '/'
 
   const [hoveredPath, setHoveredPath] = useState<string | null>(pathName)
@@ -22,10 +22,10 @@ export default function NavBar() {
       <nav className='relative z-100 mx-auto flex items-center justify-between rounded-lg'>
         <Link href='/' className='px-1'>
           <Image
-            src={'/Spaceman.webp'}
+            src='/Spaceman.webp'
             alt='Portrait'
-            height={'32'}
-            width={'32'}
+            height='32'
+            width='32'
             className='mr-1 rounded-full'
           />
         </Link>
@@ -40,8 +40,12 @@ export default function NavBar() {
               }`}
               href={item.path}
               data-active={active}
-              onMouseOver={() => setHoveredPath(item.path)}
-              onMouseLeave={() => setHoveredPath(pathName)}
+              onMouseOver={() => {
+                setHoveredPath(item.path)
+              }}
+              onMouseLeave={() => {
+                setHoveredPath(pathName)
+              }}
             >
               <span>{item.name}</span>
               {item.path === hoveredPath && (
@@ -67,7 +71,7 @@ export default function NavBar() {
                   transition={{ duration: 0.5 }}
                   layoutId='pill'
                 >
-                  <div className='border-accent bg-accent h-[2px] w-full border'></div>
+                  <div className='border-accent bg-accent h-[2px] w-full border' />
                 </motion.div>
               )}
             </Link>

@@ -1,6 +1,6 @@
 import { Link, useLocation } from '@tanstack/react-router'
 import { motion } from 'motion/react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 const navItems = [
   { name: 'With-Components', path: '/' },
@@ -8,7 +8,7 @@ const navItems = [
   { name: 'With-Cards', path: '/cards' },
 ]
 
-export default function NavBar() {
+export default function NavBar(): React.JSX.Element {
   const location = useLocation()
   const pathName = location.pathname || '/'
 
@@ -37,8 +37,12 @@ export default function NavBar() {
               }`}
               to={item.path}
               data-active={active}
-              onMouseOver={() => setHoveredPath(item.path)}
-              onMouseLeave={() => setHoveredPath(pathName)}
+              onMouseOver={() => {
+                setHoveredPath(item.path)
+              }}
+              onMouseLeave={() => {
+                setHoveredPath(pathName)
+              }}
             >
               <span>{item.name}</span>
               {item.path === hoveredPath && (
@@ -64,7 +68,7 @@ export default function NavBar() {
                   transition={{ duration: 0.5 }}
                   layoutId='pill'
                 >
-                  <div className='border-accent bg-accent h-[2px] w-full border'></div>
+                  <div className='border-accent bg-accent h-[2px] w-full border' />
                 </motion.div>
               )}
             </Link>

@@ -9,10 +9,22 @@ import {
   StickyNote,
   X,
 } from 'lucide-react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
-export default function Header() {
+const copy = {
+  navigation: 'Navigation',
+  home: 'Home',
+  startServerFunctions: 'Start - Server Functions',
+  startApiRequest: 'Start - API Request',
+  startSsrDemos: 'Start - SSR Demos',
+  spaMode: 'SPA Mode',
+  fullSsr: 'Full SSR',
+  dataOnly: 'Data Only',
+}
+
+export default function Header(): React.JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
+
   const [groupedExpanded, setGroupedExpanded] = useState<
     Record<string, boolean>
   >({})
@@ -21,7 +33,10 @@ export default function Header() {
     <>
       <header className='flex items-center bg-gray-800 p-4 text-white shadow-lg'>
         <button
-          onClick={() => setIsOpen(true)}
+          type='button'
+          onClick={() => {
+            setIsOpen(true)
+          }}
           className='rounded-lg p-2 transition-colors hover:bg-gray-700'
           aria-label='Open menu'
         >
@@ -44,9 +59,12 @@ export default function Header() {
         }`}
       >
         <div className='flex items-center justify-between border-b border-gray-700 p-4'>
-          <h2 className='text-xl font-bold'>Navigation</h2>
+          <h2 className='text-xl font-bold'>{copy.navigation}</h2>
           <button
-            onClick={() => setIsOpen(false)}
+            type='button'
+            onClick={() => {
+              setIsOpen(false)
+            }}
             className='rounded-lg p-2 transition-colors hover:bg-gray-800'
             aria-label='Close menu'
           >
@@ -57,7 +75,9 @@ export default function Header() {
         <nav className='flex-1 overflow-y-auto p-4'>
           <Link
             to='/'
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false)
+            }}
             className='mb-2 flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-gray-800'
             activeProps={{
               className:
@@ -65,14 +85,16 @@ export default function Header() {
             }}
           >
             <Home size={20} />
-            <span className='font-medium'>Home</span>
+            <span className='font-medium'>{copy.home}</span>
           </Link>
 
           {/* Demo Links Start */}
 
           <Link
             to='/demo/start/server-funcs'
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false)
+            }}
             className='mb-2 flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-gray-800'
             activeProps={{
               className:
@@ -80,12 +102,14 @@ export default function Header() {
             }}
           >
             <SquareFunction size={20} />
-            <span className='font-medium'>Start - Server Functions</span>
+            <span className='font-medium'>{copy.startServerFunctions}</span>
           </Link>
 
           <Link
             to='/demo/start/api-request'
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false)
+            }}
             className='mb-2 flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-gray-800'
             activeProps={{
               className:
@@ -93,13 +117,15 @@ export default function Header() {
             }}
           >
             <Network size={20} />
-            <span className='font-medium'>Start - API Request</span>
+            <span className='font-medium'>{copy.startApiRequest}</span>
           </Link>
 
           <div className='flex flex-row justify-between'>
             <Link
               to='/demo/start/ssr'
-              onClick={() => setIsOpen(false)}
+              onClick={() => {
+                setIsOpen(false)
+              }}
               className='mb-2 flex flex-1 items-center gap-3 rounded-lg p-3 transition-colors hover:bg-gray-800'
               activeProps={{
                 className:
@@ -107,16 +133,17 @@ export default function Header() {
               }}
             >
               <StickyNote size={20} />
-              <span className='font-medium'>Start - SSR Demos</span>
+              <span className='font-medium'>{copy.startSsrDemos}</span>
             </Link>
             <button
+              type='button'
               className='rounded-lg p-2 transition-colors hover:bg-gray-800'
-              onClick={() =>
+              onClick={() => {
                 setGroupedExpanded((prev) => ({
                   ...prev,
                   StartSSRDemo: !prev.StartSSRDemo,
                 }))
-              }
+              }}
             >
               {groupedExpanded.StartSSRDemo ? (
                 <ChevronDown size={20} />
@@ -129,7 +156,9 @@ export default function Header() {
             <div className='ml-4 flex flex-col'>
               <Link
                 to='/demo/start/ssr/spa-mode'
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false)
+                }}
                 className='mb-2 flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-gray-800'
                 activeProps={{
                   className:
@@ -137,12 +166,14 @@ export default function Header() {
                 }}
               >
                 <StickyNote size={20} />
-                <span className='font-medium'>SPA Mode</span>
+                <span className='font-medium'>{copy.spaMode}</span>
               </Link>
 
               <Link
                 to='/demo/start/ssr/full-ssr'
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false)
+                }}
                 className='mb-2 flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-gray-800'
                 activeProps={{
                   className:
@@ -150,12 +181,14 @@ export default function Header() {
                 }}
               >
                 <StickyNote size={20} />
-                <span className='font-medium'>Full SSR</span>
+                <span className='font-medium'>{copy.fullSsr}</span>
               </Link>
 
               <Link
                 to='/demo/start/ssr/data-only'
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false)
+                }}
                 className='mb-2 flex items-center gap-3 rounded-lg p-3 transition-colors hover:bg-gray-800'
                 activeProps={{
                   className:
@@ -163,7 +196,7 @@ export default function Header() {
                 }}
               >
                 <StickyNote size={20} />
-                <span className='font-medium'>Data Only</span>
+                <span className='font-medium'>{copy.dataOnly}</span>
               </Link>
             </div>
           )}

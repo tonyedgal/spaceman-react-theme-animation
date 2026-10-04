@@ -6,6 +6,7 @@ import {
   createRootRoute,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import React from 'react'
 
 import {
   TanStackThemeProvider,
@@ -50,8 +51,13 @@ export const Route = createRootRoute({
   component: RootComponent,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({
+  children,
+}: {
+  children: React.ReactNode
+}): React.JSX.Element {
   const { themeData } = Route.useRouteContext()
+
   const htmlClass = [
     themeData.theme,
     themeData.colorTheme !== 'default' ? `theme-${themeData.colorTheme}` : '',
@@ -83,7 +89,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   )
 }
 
-function RootComponent() {
+function RootComponent(): React.JSX.Element {
   const { themeData } = Route.useRouteContext()
 
   return (
@@ -105,8 +111,8 @@ function RootComponent() {
       serverTheme={themeData.theme}
       serverColorTheme={themeData.colorTheme}
       systemThemeMode='css'
-      onServerThemeChange={(theme) => setThemeServerFn({ data: theme })}
-      onServerColorThemeChange={(colorTheme) =>
+      onServerThemeChange={async (theme) => setThemeServerFn({ data: theme })}
+      onServerColorThemeChange={async (colorTheme) =>
         setColorThemeServerFn({ data: colorTheme })
       }
     >
@@ -120,10 +126,10 @@ function RootComponent() {
             </div>
           </div>
 
-          <div className='border-border relative -right-px col-start-1 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]'></div>
-          <div className='border-border relative -left-px col-start-3 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]'></div>
-          <div className='bg-border relative -bottom-px col-span-full col-start-1 row-start-2 h-px'></div>
-          <div className='bg-border relative -top-px col-span-full col-start-1 row-start-4 h-px'></div>
+          <div className='border-border relative -right-px col-start-1 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]' />
+          <div className='border-border relative -left-px col-start-3 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]' />
+          <div className='bg-border relative -bottom-px col-span-full col-start-1 row-start-2 h-px' />
+          <div className='bg-border relative -top-px col-span-full col-start-1 row-start-4 h-px' />
         </div>
       </main>
     </TanStackThemeProvider>

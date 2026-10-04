@@ -7,7 +7,7 @@ import { ThemeProvider as SpacemanThemeProvider } from '@space-man/react-theme-a
 export function ThemeProvider({
   children,
   ...props
-}: React.ComponentProps<typeof SpacemanThemeProvider>) {
+}: React.ComponentProps<typeof SpacemanThemeProvider>): React.JSX.Element {
   return (
     <SpacemanThemeProvider
       {...props}

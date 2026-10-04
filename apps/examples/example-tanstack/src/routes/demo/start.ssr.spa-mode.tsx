@@ -1,20 +1,25 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { getPunkSongs } from '@/data/demo.punk-songs'
+
+const copy = {
+  spaModePunkSongs: 'SPA Mode - Punk Songs',
+  separator: ' - ',
+}
 
 export const Route = createFileRoute('/demo/start/ssr/spa-mode')({
   ssr: false,
   component: RouteComponent,
 })
 
-function RouteComponent() {
+function RouteComponent(): React.JSX.Element {
   const [punkSongs, setPunkSongs] = useState<
-    Awaited<ReturnType<typeof getPunkSongs>>
+    Awaited<ReturnType<typeof getPunkSongs>>[number][]
   >([])
 
   useEffect(() => {
-    getPunkSongs().then(setPunkSongs)
+    void getPunkSongs().then(setPunkSongs).catch(console.error)
   }, [])
 
   return (
@@ -27,7 +32,7 @@ function RouteComponent() {
     >
       <div className='w-full max-w-2xl rounded-xl border-8 border-black/10 bg-black/50 p-8 shadow-xl backdrop-blur-md'>
         <h1 className='mb-6 text-3xl font-bold text-green-400'>
-          SPA Mode - Punk Songs
+          {copy.spaModePunkSongs}
         </h1>
         <ul className='space-y-3'>
           {punkSongs.map((song) => (
@@ -38,7 +43,11 @@ function RouteComponent() {
               <span className='text-lg font-medium text-white'>
                 {song.name}
               </span>
-              <span className='text-white/60'> - {song.artist}</span>
+              <span className='text-white/60'>
+                {' '}
+                {copy.separator}
+                {song.artist}
+              </span>
             </li>
           ))}
         </ul>
