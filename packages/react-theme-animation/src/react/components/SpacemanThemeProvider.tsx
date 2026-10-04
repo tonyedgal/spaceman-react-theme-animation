@@ -6,15 +6,9 @@ import React, {
   useEffect,
 } from 'react'
 
-import type {
-  UseThemeAnimationProps,
-  ThemeTransitionInput,
-  ColorThemeToggle,
-  Theme,
-  ColorTheme,
-} from '../../core/types'
-import { ThemeAnimationType } from '../../core/types'
+import { Theme, ColorTheme, ThemeAnimationType } from '../../core/types'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
+import { withElementAsRef } from './provider-helpers'
 import { SharedThemeContext } from './shared-theme-context'
 
 /**
@@ -28,18 +22,15 @@ interface SpacemanThemeContextType {
   setTheme: (theme: Theme) => void
   setColorTheme: (colorTheme: ColorTheme) => void
 
-  switchTheme: (theme: Theme, options?: ThemeTransitionInput) => Promise<void>
-  switchColorTheme: (
-    colorTheme: string,
-    options?: ThemeTransitionInput,
-  ) => Promise<void>
+  switchTheme: (theme: Theme) => Promise<void>
+  switchColorTheme: (colorTheme: string) => void
 
-  toggleTheme: (options?: ThemeTransitionInput) => Promise<void>
-  toggleLightTheme: (options?: ThemeTransitionInput) => Promise<void>
-  toggleDarkTheme: (options?: ThemeTransitionInput) => Promise<void>
-  toggleColorTheme: ColorThemeToggle
+  toggleTheme: () => Promise<void>
+  toggleLightTheme: () => Promise<void>
+  toggleDarkTheme: () => Promise<void>
+  toggleColorTheme: () => void
 
-  createColorThemeToggle: (targetColorTheme: string) => ColorThemeToggle
+  createColorThemeToggle: (targetColorTheme: string) => () => void
   isColorThemeActive: (targetColorTheme: string) => boolean
 
   switchThemeFromElement: (
@@ -55,7 +46,7 @@ const SpacemanThemeContext = createContext<
 /**
  * Props for the Spaceman Theme Provider
  */
-export type SpacemanThemeProviderProps = UseThemeAnimationProps & {
+interface SpacemanThemeProviderProps {
   children: ReactNode
   themes?: Theme[]
   colorThemes?: ColorTheme[]
@@ -87,12 +78,10 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
   defaultColorTheme = 'default',
   animationType = ThemeAnimationType.CIRCLE,
   duration = 750,
-  ...animationOptions
 }) => {
   const [mounted, setMounted] = useState(false)
 
   const themeState = useThemeAnimation({
-    ...animationOptions,
     themes,
     colorThemes,
     defaultTheme,
@@ -109,7 +98,9 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
     theme: Theme,
     element: HTMLButtonElement,
   ) => {
-    await themeState.switchTheme(theme, { element })
+    await withElementAsRef(themeState.ref, element, async () => {
+      await themeState.switchTheme(theme)
+    })
   }
 
   if (!mounted) {
@@ -123,14 +114,14 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
 
       switchTheme: async () => {},
       switchThemeFromElement: async () => {},
-      switchColorTheme: async () => {},
+      switchColorTheme: () => {},
 
       toggleTheme: async () => {},
       toggleLightTheme: async () => {},
       toggleDarkTheme: async () => {},
-      toggleColorTheme: async () => {},
+      toggleColorTheme: () => {},
 
-      createColorThemeToggle: () => async () => {},
+      createColorThemeToggle: () => () => {},
       isColorThemeActive: () => false,
     }
 
@@ -181,12 +172,10 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
  */
 export const useSpacemanTheme = (): SpacemanThemeContextType => {
   const context = useContext(SpacemanThemeContext)
-
   if (context === undefined) {
     throw new Error(
       'useSpacemanTheme must be used within a SpacemanThemeProvider',
     )
   }
-
   return context
 }

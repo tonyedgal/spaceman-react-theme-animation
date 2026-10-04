@@ -128,9 +128,3 @@ Examples:
 - `feat(next): add root ThemeProvider alias`
 - `fix(tanstack): sync server color theme updates`
 - `docs(readme): rewrite package documentation`
-
-## Oxc quality tools
-
-The root Oxlint and Oxfmt tasks follow the [official Turborepo guide](https://turborepo.dev/docs/guides/tools/oxc). Run `pnpm quality` for lint and formatting checks, `pnpm lint:fix` for lint fixes, and `pnpm format:fix` to format. `pnpm format` and `pnpm format:check` check without writing. Repository VS Code settings select the Oxc formatter.
-
-The configuration copies the source checkout's anti-slop and formatting rules, uses the published `antislop-plugin`, and enables all 217 React, Next, and TypeScript rules available in the pinned Oxlint version, including type-aware rules. This deliberately strict configuration currently reports existing code and API style findings; enabling the rules does not mean the repository has been fully remediated. Run `pnpm lint` to inspect the current diagnostics. Build compiled workspace dependencies first when linting from a fresh checkout.

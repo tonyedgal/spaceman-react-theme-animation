@@ -9,15 +9,9 @@ import React, {
   useState,
 } from 'react'
 
-import type {
-  UseThemeAnimationProps,
-  ThemeTransitionInput,
-  ColorThemeToggle,
-  ColorTheme,
-  Theme,
-} from '../../core/types'
-import { ThemeAnimationType } from '../../core/types'
+import { ColorTheme, Theme, ThemeAnimationType } from '../../core/types'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
+import { getNextResolvedTheme, withElementAsRef } from './provider-helpers'
 import { SharedThemeContext } from './shared-theme-context'
 
 export interface NextThemeContextType {
@@ -28,16 +22,13 @@ export interface NextThemeContextType {
   systemTheme: 'light' | 'dark'
   setTheme: (theme: Theme) => void
   setColorTheme: (colorTheme: ColorTheme) => void
-  switchTheme: (theme: Theme, options?: ThemeTransitionInput) => Promise<void>
-  switchColorTheme: (
-    colorTheme: string,
-    options?: ThemeTransitionInput,
-  ) => Promise<void>
-  toggleTheme: (options?: ThemeTransitionInput) => Promise<void>
-  toggleLightTheme: (options?: ThemeTransitionInput) => Promise<void>
-  toggleDarkTheme: (options?: ThemeTransitionInput) => Promise<void>
-  toggleColorTheme: ColorThemeToggle
-  createColorThemeToggle: (targetColorTheme: string) => ColorThemeToggle
+  switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
+  switchColorTheme: (colorTheme: string) => void
+  toggleTheme: (animationOff?: boolean) => Promise<void>
+  toggleLightTheme: (animationOff?: boolean) => Promise<void>
+  toggleDarkTheme: (animationOff?: boolean) => Promise<void>
+  toggleColorTheme: () => void
+  createColorThemeToggle: (targetColorTheme: string) => () => void
   isColorThemeActive: (targetColorTheme: string) => boolean
   switchThemeFromElement: (
     theme: Theme,
@@ -45,7 +36,7 @@ export interface NextThemeContextType {
   ) => Promise<void>
 }
 
-export type NextThemeProviderProps = UseThemeAnimationProps & {
+export interface NextThemeProviderProps {
   children: React.ReactNode
   themes?: Theme[]
   colorThemes?: ColorTheme[]
@@ -207,7 +198,6 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
   themes,
   value,
   animationType = ThemeAnimationType.CIRCLE,
-  ...animationOptions
 }) => {
   const allowedThemes = useMemo<Theme[]>(() => {
     if (themes && themes.length > 0) {
@@ -228,7 +218,6 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
   const [mounted, setMounted] = useState(false)
 
   const themeState = useThemeAnimation({
-    ...animationOptions,
     animationType,
     attribute,
     colorStorageKey,
@@ -277,11 +266,10 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
   )
 
   const switchTheme = useCallback(
-    async (theme: Theme, animationOff: ThemeTransitionInput = false) => {
+    async (theme: Theme, animationOff: boolean = false) => {
       await withTransitionsDisabled(async () => {
         if (!mounted && disableAnimationOnInit) {
           themeState.setTheme(theme)
-
           return
         }
 
@@ -296,11 +284,12 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
       await withTransitionsDisabled(async () => {
         if (!mounted && disableAnimationOnInit) {
           themeState.setTheme(theme)
-
           return
         }
 
-        await themeState.switchTheme(theme, { element })
+        await withElementAsRef(themeState.ref, element, async () => {
+          await themeState.switchTheme(theme)
+        })
       })
     },
     [disableAnimationOnInit, mounted, themeState, withTransitionsDisabled],
@@ -317,24 +306,25 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
       setColorTheme: themeState.setColorTheme,
       switchTheme,
       switchColorTheme: themeState.switchColorTheme,
-      toggleTheme: async (options = false) =>
-        withTransitionsDisabled(() => themeState.toggleTheme(options)),
-      toggleLightTheme: async (options = false) =>
-        withTransitionsDisabled(() => themeState.toggleLightTheme(options)),
-      toggleDarkTheme: async (options = false) =>
-        withTransitionsDisabled(() => themeState.toggleDarkTheme(options)),
+      toggleTheme: async (animationOff = false) =>
+        switchTheme(
+          getNextResolvedTheme(themeState.resolvedTheme),
+          animationOff,
+        ),
+      toggleLightTheme: async (animationOff = false) => {
+        if (themeState.resolvedTheme === 'light') return
+        await switchTheme('light', animationOff)
+      },
+      toggleDarkTheme: async (animationOff = false) => {
+        if (themeState.resolvedTheme === 'dark') return
+        await switchTheme('dark', animationOff)
+      },
       toggleColorTheme: themeState.toggleColorTheme,
       createColorThemeToggle: themeState.createColorThemeToggle,
       isColorThemeActive: themeState.isColorThemeActive,
       switchThemeFromElement,
     }),
-    [
-      setTheme,
-      switchTheme,
-      switchThemeFromElement,
-      themeState,
-      withTransitionsDisabled,
-    ],
+    [setTheme, switchTheme, switchThemeFromElement, themeState],
   )
 
   return (
@@ -366,11 +356,9 @@ export const ThemeProvider = NextThemeProvider
 
 export const useNextTheme = (): NextThemeContextType => {
   const context = useContext(NextThemeContext)
-
   if (context === undefined) {
     throw new Error('useNextTheme must be used within a NextThemeProvider')
   }
-
   return context
 }
 

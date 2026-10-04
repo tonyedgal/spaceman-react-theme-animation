@@ -2,10 +2,12 @@ import { clsx } from 'clsx'
 import { motion } from 'motion/react'
 import React, { type JSX, useEffect, useState } from 'react'
 
-import type { ThemeSwitcherProps, Theme } from '../../core/types'
+import { ThemeSwitcherProps, Theme } from '../../core/types'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
-import type { SharedThemeContextValue } from './shared-theme-context'
-import { useSharedThemeContext } from './shared-theme-context'
+import {
+  SharedThemeContextValue,
+  useSharedThemeContext,
+} from './shared-theme-context'
 
 const SunIcon = () => (
   <svg
@@ -66,17 +68,19 @@ const ThemeOption = ({
   buttonRef,
 }: {
   icon: JSX.Element
-  value: Theme
+  value: string
   isActive?: boolean
   isHovered?: boolean
-  onClick: (value: Theme, event?: React.MouseEvent<HTMLButtonElement>) => void
+  onClick: (value: string, event?: React.MouseEvent<HTMLButtonElement>) => void
   onMouseEnter: () => void
   onMouseLeave: () => void
   buttonRef?: React.RefObject<HTMLButtonElement | null>
 }) => {
   return (
     <button
-      ref={isActive ? buttonRef : undefined}
+      ref={
+        isActive ? (buttonRef as React.RefObject<HTMLButtonElement>) : undefined
+      }
       className={clsx(
         'relative flex h-9 w-12 cursor-pointer items-center justify-center',
         'text-muted-foreground hover:text-foreground',
@@ -138,7 +142,7 @@ const THEME_OPTIONS = [
     icon: <MoonIcon />,
     value: 'dark',
   },
-] satisfies { icon: JSX.Element; value: Theme }[]
+]
 
 interface ThemeSwitcherViewProps {
   className?: string
@@ -166,14 +170,14 @@ const ThemeSwitcherView: React.FC<ThemeSwitcherViewProps> = ({
   }, [])
 
   const handleThemeChange = async (
-    newTheme: Theme,
+    newTheme: string,
     event?: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    await onSwitchTheme(newTheme, event)
+    await onSwitchTheme(newTheme as Theme, event)
   }
 
   const filteredOptions = THEME_OPTIONS.filter((option) =>
-    themes.includes(option.value),
+    themes.includes(option.value as Theme),
   )
 
   return (
@@ -216,10 +220,12 @@ const ThemeSwitcherWithContext: React.FC<
     theme: Theme,
     event?: React.MouseEvent<HTMLButtonElement>,
   ) => {
-    await contextTheme.switchTheme(theme, {
-      element: event?.currentTarget,
-      animationOff: event?.detail === 0,
-    })
+    if (contextTheme.switchThemeFromElement && event) {
+      await contextTheme.switchThemeFromElement(theme, event.currentTarget)
+      return
+    }
+
+    await contextTheme.switchTheme(theme)
   }
 
   return (
@@ -240,10 +246,8 @@ const ThemeSwitcherStandalone: React.FC<ThemeSwitcherProps> = ({
   animationType,
   duration,
   className,
-  ...animationOptions
 }) => {
   const standaloneHook = useThemeAnimation({
-    ...animationOptions,
     animationType,
     duration,
     themes,
@@ -251,14 +255,8 @@ const ThemeSwitcherStandalone: React.FC<ThemeSwitcherProps> = ({
     onThemeChange,
   })
 
-  const handleSwitchTheme = async (
-    theme: Theme,
-    event?: React.MouseEvent<HTMLButtonElement>,
-  ) => {
-    await standaloneHook.switchTheme(theme, {
-      element: event?.currentTarget,
-      animationOff: event?.detail === 0,
-    })
+  const handleSwitchTheme = async (theme: Theme) => {
+    await standaloneHook.switchTheme(theme)
   }
 
   return (
