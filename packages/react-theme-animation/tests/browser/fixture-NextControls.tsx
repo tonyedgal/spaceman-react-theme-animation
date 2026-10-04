@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { useNextTheme } from '../../src/react'
+import { useNextTheme } from '@space-man/react-theme-animation/react'
+
 import { Controls } from './fixture-Controls'
 
 import './fixture.css'

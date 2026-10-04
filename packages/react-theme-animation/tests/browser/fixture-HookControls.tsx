@@ -5,7 +5,8 @@ import {
   ThemeAnimationType,
   TRANSITION_DIRECTIONS,
   useThemeAnimation,
-} from '../../src/react'
+} from '@space-man/react-theme-animation/react'
+
 import { config, copy, dimension, params } from './fixture-config'
 import { Controls } from './fixture-Controls'
 

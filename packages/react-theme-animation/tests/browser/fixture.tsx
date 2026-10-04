@@ -6,7 +6,8 @@ import {
   SpacemanThemeProvider,
   TanStackThemeProvider,
   ViteThemeProvider,
-} from '../../src/react'
+} from '@space-man/react-theme-animation/react'
+
 import { callbacks, config, provider } from './fixture-config'
 import { HookControls } from './fixture-HookControls'
 import { NextControls } from './fixture-NextControls'
