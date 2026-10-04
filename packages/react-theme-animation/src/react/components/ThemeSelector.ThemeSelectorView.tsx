@@ -40,7 +40,14 @@ export function ThemeSelectorView({
         >
           <SelectValue placeholder='Choose a color theme' />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent
+          onPointerDownCapture={() => {
+            inputMethod.current = 'pointer'
+          }}
+          onKeyDownCapture={() => {
+            inputMethod.current = 'keyboard'
+          }}
+        >
           {colorThemes.map((theme) => (
             <SelectItem key={theme} className='capitalize' value={theme}>
               {theme}
