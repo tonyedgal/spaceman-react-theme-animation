@@ -118,7 +118,7 @@ All providers expose the same core hook interface:
 | colorTheme             | ColorTheme                                                            | Current color theme                |
 | resolvedTheme          | 'light' \| 'dark'                                                     | Resolved theme (system → actual)   |
 | systemTheme            | 'light' \| 'dark'                                                     | OS theme preference                |
-| ref                    | RefObject<HTMLButtonElement                                           | null>                              | Ref for animation origin |
+| ref                    | RefObject<HTMLButtonElement \| null>                                  | Ref for animation origin           |
 | setTheme               | (theme: Theme) => void                                                | Set theme instantly                |
 | setColorTheme          | (colorTheme: ColorTheme) => void                                      | Set color theme                    |
 | switchTheme            | (theme: Theme, options?: ThemeTransitionInput) => Promise<void>       | Switch with animation              |
