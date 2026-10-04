@@ -52,7 +52,7 @@ Dimensions accept positive CSS-pixel numbers or `"auto"`. One numeric dimension 
 
 Transitions are coordinated per document across hooks. A new request skips the previous visual transition while every requested state update still runs once. Reduced motion, hidden documents, unsupported APIs, skipped captures, and unsupported pseudo-element animation preserve the state update and clean up temporary layers. Native CSS pseudo animation supplies a fallback when an engine accepts WAAPI targeting without painting it.
 
-Run `pnpm --filter @space-man/react-theme-animation test:browser` for Chromium at DPR 1–3, WebKit, and Firefox. The inspection gallery supports slowed/frozen playback, explicit origins, SVG upload, dimensions, and direction selection. The browser suite checks rendered snapshot corners, transformed/scrolled triggers, CSS zoom, palette updates, interruption, reduced motion, and asset selection. Firefox screenshot assertions that cannot capture active view transitions are skipped; its behavioral checks still run.
+Build first with `pnpm --filter @space-man/react-theme-animation build`. The browser fixtures import the compiled public entries. Then run `pnpm --filter @space-man/react-theme-animation test:browser` for Chromium at DPR 1–3, WebKit, and Firefox. The inspection gallery supports slowed/frozen playback, explicit origins, SVG upload, dimensions, and direction selection. The browser suite checks rendered snapshot corners, transformed/scrolled triggers, CSS zoom, palette updates, interruption, reduced motion, and asset selection. Firefox screenshot assertions that cannot capture active view transitions are skipped; its behavioral checks still run.
 
 To open the gallery locally, run:
 

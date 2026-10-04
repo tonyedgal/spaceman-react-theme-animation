@@ -6,15 +6,21 @@ This app demonstrates:
 - `TanStackThemeProvider` for client-side state and transitions
 - CSS-driven `system` handling via `systemThemeMode="css"`
 
-# Getting Started
+## Run from the workspace root
 
-```bash
-npm install
-npm run dev
+```sh
+pnpm install
+pnpm --filter @space-man/react-theme-animation build
+pnpm --filter example-tanstack dev
 ```
 
-# Building For Production
+## Build for production
 
-```bash
-npm run build
+```sh
+pnpm --filter example-tanstack... build
 ```
+
+The example uses ESM package imports. It demonstrates animated mode and palette
+changes through the shared library API. Read the [transition guide](../../../packages/react-theme-animation/docs/theme-transitions.md) for origins, directions, logos, and keyboard handling.
+
+This example app is private. npm publishes only the library package.

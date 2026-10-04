@@ -2,6 +2,8 @@
 
 Complete guide for using `@space-man/react-theme-animation` in Vite-based React single-page applications.
 
+This package ships ESM only. Use `import` for library APIs. See the [migration guide](../../../MIGRATION.md) for CommonJS applications.
+
 ## Installation
 
 ```bash
@@ -218,7 +220,7 @@ Define your CSS variables in your global stylesheet:
 
 ### Theme Resets On Reload
 
-Make sure the app can access `localStorage`. If storage is unavailable, preferences will fall back to the defaults.
+Make sure the app can access `localStorage`. The current hook does not recover from storage exceptions. Blocked storage can prevent mounting or theme changes. See the [release readiness audit](../../../docs/release-readiness.md).
 
 ### Animations Not Running
 

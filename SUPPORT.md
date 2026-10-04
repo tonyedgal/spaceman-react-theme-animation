@@ -12,6 +12,10 @@ When opening an issue, include:
 - expected behavior
 - actual behavior
 - screenshots or terminal output if relevant
+- ESM or CommonJS module setup
+- browser name, device pixel ratio, and browser zoom for animation problems
+- animation type, duration, origin/ref settings, and input method
+- whether localStorage reads or writes throw an error
 
 ## Before Opening An Issue
 

@@ -2,6 +2,8 @@
 
 Complete guide for using `@space-man/react-theme-animation` in Next.js and other SSR-style React apps.
 
+This package ships ESM only. Use `import` for library APIs. See the [migration guide](../../../MIGRATION.md) for CommonJS applications.
+
 ## Installation
 
 ```bash

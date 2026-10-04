@@ -21,6 +21,12 @@ Highlights in this release:
 - workspace examples for Next.js, TanStack Start, and TanStack Start SSR
 - build and packaging updates for ESM and declaration output
 
+## Required dependencies
+
+Radix Select, Motion, React, and React DOM remain required peer dependencies. `clsx` remains a direct dependency. Keep compatible peers installed even when the application uses only hooks. The controls remain included in this package.
+
+The planned release still has an unresolved React minimum-version contract. See the [readiness audit](https://github.com/tonyedgal/spaceman-react-theme-animation/blob/main/docs/release-readiness.md) before publishing or claiming React 17 support.
+
 ## Installation
 
 ```bash
@@ -50,7 +56,7 @@ import {
 } from '@space-man/react-theme-animation'
 ```
 
-Compatibility subpath exports still exist for migration safety, but the package root is the documented public API.
+The root is the documented client API. Existing subpath exports remain. Use `/tanstack` for server cookie helpers and `/core` for server utilities. The root entry also imports the React controls and Motion; it is not a server-only entry.
 
 For Next.js App Router, import providers/hooks from the package root inside client components. A
 typical setup is a local `app/providers.tsx` file with `'use client'`, rendered by the server
@@ -156,4 +162,4 @@ MIT
 
 ## Additional transition effects
 
-See [Theme transitions](docs/theme-transitions.md) for animated palettes, explicit origins, directional polygon wipes, triangles, and stationary SVG logos with destination assets and automatic sizing.
+See [Theme transitions](https://github.com/tonyedgal/spaceman-react-theme-animation/blob/main/packages/react-theme-animation/docs/theme-transitions.md) for animated palettes, explicit origins, directional polygon wipes, triangles, and stationary SVG logos with destination assets and automatic sizing.
