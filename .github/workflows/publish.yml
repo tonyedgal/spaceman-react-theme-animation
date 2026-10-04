@@ -17,18 +17,18 @@ jobs:
       id-token: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # This makes Actions able to push to protected branches
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
         with:
           version: 10.18.3
 
       - name: Setup Node.js 24.x
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 24
           registry-url: 'https://registry.npmjs.org'
@@ -54,12 +54,22 @@ jobs:
           pnpm --filter @space-man/react-theme-animation test
           pnpm --filter @space-man/react-theme-animation test:unit
           pnpm --filter @space-man/react-theme-animation test:types
+          pnpm --filter @space-man/react-theme-animation exec node scripts/check-packed-package.mjs
+
+      - name: Production Dependency Audit
+        run: pnpm audit --prod
+
+      - name: Install Browser Engines
+        run: pnpm --filter @space-man/react-theme-animation exec playwright install --with-deps chromium firefox webkit
+
+      - name: Browser Checks
+        run: pnpm --filter @space-man/react-theme-animation test:browser
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
-          publish: pnpm --filter @space-man/react-theme-animation exec changeset publish
-          version: pnpm exec changeset version
+          publish-script: pnpm --filter @space-man/react-theme-animation exec changeset publish
+          version-script: pnpm exec changeset version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
