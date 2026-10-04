@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 
 import type { ColorTheme, Theme } from '../../core/types'
+import { writeThemeStorage } from './theme-storage'
 
 const isBrowser = 'window' in globalThis
 
@@ -21,11 +22,11 @@ export const useSyncServerThemeStorage = ({
     if (!enabled || !isBrowser) return
 
     if (theme) {
-      localStorage.setItem(storageKey, theme)
+      writeThemeStorage(storageKey, theme)
     }
 
     if (colorTheme !== undefined && colorTheme !== '') {
-      localStorage.setItem(colorStorageKey, colorTheme)
+      writeThemeStorage(colorStorageKey, colorTheme)
     }
   }, [enabled, theme, colorTheme, storageKey, colorStorageKey])
 }

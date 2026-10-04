@@ -19,6 +19,7 @@ import {
   injectBaseStyles,
   resolveTheme,
 } from '../../core/utils/animations'
+import { readThemeStorage, writeThemeStorage } from './theme-storage'
 import { getColorTransitionOptions } from './transition-options'
 import { useHydrated } from './use-hydrated'
 
@@ -102,7 +103,7 @@ export const useThemeAnimation = (
     if (initialTheme !== undefined) return initialTheme
 
     if (!isBrowser) return defaultTheme
-    const saved = localStorage.getItem(storageKey)
+    const saved = readThemeStorage(storageKey)
 
     return saved !== null &&
       (saved === 'light' || saved === 'dark' || saved === 'system') &&
@@ -115,19 +116,27 @@ export const useThemeAnimation = (
     if (initialColorTheme !== undefined) return initialColorTheme
 
     if (!isBrowser) return defaultColorTheme
-    const saved = localStorage.getItem(colorStorageKey)
+    const saved = readThemeStorage(colorStorageKey)
 
     return saved !== null && saved !== '' && colorThemes.includes(saved)
       ? saved
       : defaultColorTheme
   })
 
-  const currentTheme = externalTheme ?? internalTheme
-  const currentColorTheme = externalColorTheme ?? internalColorTheme
+  // Match the server snapshot until hydration finishes. Storage becomes visible
+  // on the next render without replacing the saved preferences.
+  const currentTheme =
+    externalTheme ?? (mounted ? internalTheme : (initialTheme ?? defaultTheme))
+
+  const currentColorTheme =
+    externalColorTheme ??
+    (mounted ? internalColorTheme : (initialColorTheme ?? defaultColorTheme))
 
   const [, setSystemTheme] = useState<'light' | 'dark'>(() => getSystemTheme())
-  const systemTheme = getSystemTheme()
-  const resolvedTheme = resolveTheme(currentTheme)
+  const systemTheme = mounted ? getSystemTheme() : 'light'
+
+  const resolvedTheme =
+    currentTheme === 'system' ? systemTheme : resolveTheme(currentTheme)
 
   useEffect(() => {
     if (!isBrowser) return undefined
@@ -222,9 +231,9 @@ export const useThemeAnimation = (
 
   const commitTheme = useCallback(
     (newTheme: Theme) => {
-      // Always save to localStorage
+      // Persist when storage is available
       if (isBrowser) {
-        localStorage.setItem(storageKey, newTheme)
+        writeThemeStorage(storageKey, newTheme)
       }
 
       // Update internal state if no external control
@@ -242,9 +251,9 @@ export const useThemeAnimation = (
 
   const commitColorTheme = useCallback(
     (newColorTheme: string) => {
-      // Always save to localStorage
+      // Persist when storage is available
       if (isBrowser) {
-        localStorage.setItem(colorStorageKey, newColorTheme)
+        writeThemeStorage(colorStorageKey, newColorTheme)
       }
 
       // Update internal state if no external control
