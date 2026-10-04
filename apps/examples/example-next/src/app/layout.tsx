@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+
 import './globals.css'
-import { ThemeProvider } from '../components/theme/theme-provider'
-import BackgroundPattern from '../components/BackgroundPattern'
 import NavBar from '@/components/NavBar'
+
+import BackgroundPattern from '../components/BackgroundPattern'
+import { ThemeProvider } from '../components/theme/theme-provider'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -26,28 +28,28 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning>
       <body
-        className={`${geistSans.className} ${geistMono.variable} antialiased overflow-hidden`}
+        className={`${geistSans.className} ${geistMono.variable} overflow-hidden antialiased`}
       >
         <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
+          attribute='class'
+          defaultTheme='dark'
           enableSystem
           disableTransitionOnChange
         >
           <NavBar />
-          <main className="relative min-h-screen w-full">
-            <div className="relative grid min-h-screen grid-cols-[2.5rem_auto_2.5rem]">
-              <div className="relative col-start-2 h-full w-full">
+          <main className='relative min-h-screen w-full'>
+            <div className='relative grid min-h-screen grid-cols-[2.5rem_auto_2.5rem]'>
+              <div className='relative col-start-2 h-full w-full'>
                 <BackgroundPattern />
-                <div className="gap-6 w-full">{children}</div>
+                <div className='w-full gap-6'>{children}</div>
               </div>
 
-              <div className="relative -right-px col-start-1 row-span-full row-start-1 border-x border-border bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]"></div>
-              <div className="relative -left-px col-start-3 row-span-full row-start-1 border-x border-border bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]"></div>
-              <div className="relative -bottom-px col-span-full col-start-1 row-start-2 h-px bg-border"></div>
-              <div className="relative -top-px col-span-full col-start-1 row-start-4 h-px bg-border"></div>
+              <div className='border-border relative -right-px col-start-1 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]'></div>
+              <div className='border-border relative -left-px col-start-3 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]'></div>
+              <div className='bg-border relative -bottom-px col-span-full col-start-1 row-start-2 h-px'></div>
+              <div className='bg-border relative -top-px col-span-full col-start-1 row-start-4 h-px'></div>
             </div>
           </main>
         </ThemeProvider>

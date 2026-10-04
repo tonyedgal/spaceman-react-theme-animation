@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
-import { usePathname } from 'next/navigation'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 
 const navItems = [
   { name: 'With-Components', path: '/' },
@@ -18,24 +18,24 @@ export default function NavBar() {
   const [hoveredPath, setHoveredPath] = useState<string | null>(pathName)
 
   return (
-    <div className="border rounded-xs shadow-sm flex items-center border-border w-fit mx-auto p-1 fixed top-8 left-1/2 transform -translate-x-1/2 z-50 bg-transparent backdrop-blur-md">
-      <nav className="flex items-center relative justify-between z-100 rounded-lg mx-auto">
-        <Link href="/" className="px-1">
+    <div className='border-border fixed top-8 left-1/2 z-50 mx-auto flex w-fit -translate-x-1/2 transform items-center rounded-xs border bg-transparent p-1 shadow-sm backdrop-blur-md'>
+      <nav className='relative z-100 mx-auto flex items-center justify-between rounded-lg'>
+        <Link href='/' className='px-1'>
           <Image
             src={'/Spaceman.webp'}
-            alt="Portrait"
+            alt='Portrait'
             height={'32'}
             width={'32'}
-            className="rounded-full mr-1"
+            className='mr-1 rounded-full'
           />
         </Link>
-        {navItems.map(item => {
+        {navItems.map((item) => {
           const active = pathName === item.path
 
           return (
             <Link
               key={item.path}
-              className={`px-5 shrink py-3 text-muted-foreground rounded-none leading-[14px] text-xs lg:text-sm relative no-underline duration-300 ease-in-out ${
+              className={`text-muted-foreground relative shrink rounded-none px-5 py-3 text-xs leading-[14px] no-underline duration-300 ease-in-out lg:text-sm ${
                 active ? 'font-semibold' : ''
               }`}
               href={item.path}
@@ -46,9 +46,9 @@ export default function NavBar() {
               <span>{item.name}</span>
               {item.path === hoveredPath && (
                 <motion.div
-                  className="absolute bottom-0 left-0 h-full bg-muted mix-blend-difference rounded-none -z-10"
-                  layoutId="navbar"
-                  aria-hidden="true"
+                  className='bg-muted absolute bottom-0 left-0 -z-10 h-full rounded-none mix-blend-difference'
+                  layoutId='navbar'
+                  aria-hidden='true'
                   style={{
                     width: '100%',
                   }}
@@ -63,11 +63,11 @@ export default function NavBar() {
               )}
               {active && (
                 <motion.div
-                  className="absolute bottom-[-6px] rounded-full left-0 right-0 px-2 flex w-full items-center justify-center"
+                  className='absolute right-0 bottom-[-6px] left-0 flex w-full items-center justify-center rounded-full px-2'
                   transition={{ duration: 0.5 }}
-                  layoutId="pill"
+                  layoutId='pill'
                 >
-                  <div className="h-[2px] w-full border border-accent bg-accent"></div>
+                  <div className='border-accent bg-accent h-[2px] w-full border'></div>
                 </motion.div>
               )}
             </Link>

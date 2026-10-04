@@ -75,9 +75,8 @@ import {
 } from '@space-man/react-theme-animation'
 import { z } from 'zod'
 
-export const getThemeServerFn = createServerFn().handler(
-  (): ServerThemeData =>
-    buildServerThemeData(getCookie(STORAGE_KEY), getCookie(COLOR_STORAGE_KEY))
+export const getThemeServerFn = createServerFn().handler((): ServerThemeData =>
+  buildServerThemeData(getCookie(STORAGE_KEY), getCookie(COLOR_STORAGE_KEY)),
 )
 
 export const setThemeServerFn = createServerFn()
@@ -141,7 +140,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     .join(' ')
 
   return (
-    <html lang="en" className={htmlClass} suppressHydrationWarning>
+    <html lang='en' className={htmlClass} suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
@@ -158,16 +157,16 @@ function RootComponent() {
 
   return (
     <TanStackThemeProvider
-      defaultTheme="system"
-      defaultColorTheme="default"
+      defaultTheme='system'
+      defaultColorTheme='default'
       themes={['light', 'dark', 'system']}
       colorThemes={['default', 'blue', 'green']}
       animationType={ThemeAnimationType.CIRCLE}
       serverTheme={themeData.theme}
       serverColorTheme={themeData.colorTheme}
-      systemThemeMode="css"
-      onServerThemeChange={theme => setThemeServerFn({ data: theme })}
-      onServerColorThemeChange={colorTheme =>
+      systemThemeMode='css'
+      onServerThemeChange={(theme) => setThemeServerFn({ data: theme })}
+      onServerColorThemeChange={(colorTheme) =>
         setColorThemeServerFn({ data: colorTheme })
       }
     >
@@ -208,18 +207,18 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning>
       <head>
-        <TanStackStartThemeScript defaultTheme="system" systemThemeMode="css" />
+        <TanStackStartThemeScript defaultTheme='system' systemThemeMode='css' />
         <HeadContent />
       </head>
       <body>
         <TanStackThemeProvider
-          defaultTheme="system"
-          defaultColorTheme="default"
+          defaultTheme='system'
+          defaultColorTheme='default'
           themes={['light', 'dark', 'system']}
           colorThemes={['default', 'blue', 'green']}
-          systemThemeMode="css"
+          systemThemeMode='css'
         >
           <Outlet />
         </TanStackThemeProvider>

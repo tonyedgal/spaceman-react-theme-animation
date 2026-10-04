@@ -1,16 +1,16 @@
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie, setCookie } from '@tanstack/react-start/server'
+import { z } from 'zod'
+
 import {
   buildServerThemeData,
   COLOR_STORAGE_KEY,
   STORAGE_KEY,
   type ServerThemeData,
 } from '@space-man/react-theme-animation'
-import { z } from 'zod'
 
-export const getThemeServerFn = createServerFn().handler(
-  (): ServerThemeData =>
-    buildServerThemeData(getCookie(STORAGE_KEY), getCookie(COLOR_STORAGE_KEY))
+export const getThemeServerFn = createServerFn().handler((): ServerThemeData =>
+  buildServerThemeData(getCookie(STORAGE_KEY), getCookie(COLOR_STORAGE_KEY)),
 )
 
 export const setThemeServerFn = createServerFn()

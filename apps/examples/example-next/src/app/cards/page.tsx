@@ -1,9 +1,10 @@
 'use client'
 
 import React from 'react'
-import { useThemeAnimation } from '@space-man/react-theme-animation'
+
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { useThemeAnimation } from '@space-man/react-theme-animation'
 
 const Page = () => {
   const { createColorThemeToggle, isColorThemeActive } = useThemeAnimation({
@@ -11,14 +12,14 @@ const Page = () => {
   })
 
   return (
-    <main className="min-h-screen bg-transparent w-full flex items-center justify-center relative">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 p-8 bg-background/80 border rounded-lg">
+    <main className='relative flex min-h-screen w-full items-center justify-center bg-transparent'>
+      <div className='bg-background/80 grid grid-cols-1 gap-10 rounded-lg border p-8 md:grid-cols-2'>
         <Button
           onClick={createColorThemeToggle('supabase')}
           variant={'default'}
           className={cn(
             'bg-primary text-primary-foreground',
-            `${isColorThemeActive('supabase') ? 'ring-2 ring-offset-2 ring-blue-500' : ''} `
+            `${isColorThemeActive('supabase') ? 'ring-2 ring-blue-500 ring-offset-2' : ''} `,
           )}
         >
           Supabase
@@ -28,7 +29,7 @@ const Page = () => {
           variant={'secondary'}
           className={cn(
             'bg-secondary text-secondary-foreground',
-            `${isColorThemeActive('mono') ? 'ring-2 ring-offset-2 ring-blue-500' : ''} `
+            `${isColorThemeActive('mono') ? 'ring-2 ring-blue-500 ring-offset-2' : ''} `,
           )}
         >
           Mono

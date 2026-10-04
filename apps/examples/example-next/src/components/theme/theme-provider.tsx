@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+
 import { ThemeProvider as SpacemanThemeProvider } from '@space-man/react-theme-animation'
 
 export function ThemeProvider({
@@ -10,7 +11,7 @@ export function ThemeProvider({
   return (
     <SpacemanThemeProvider
       {...props}
-      attribute="class"
+      attribute='class'
       colorThemes={[
         'default',
         'blue',

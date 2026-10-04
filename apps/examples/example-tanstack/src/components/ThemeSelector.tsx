@@ -1,10 +1,12 @@
 'use client'
 
 import React from 'react'
+
 import type {
   ColorTheme,
   ThemeSelectorProps,
 } from '@space-man/react-theme-animation'
+
 import {
   Select,
   SelectContent,
@@ -30,17 +32,17 @@ export const ThemeSelector: React.FC<ThemeSelectorProps> = ({
   return (
     <>
       {colorThemes.length > 1 && (
-        <div className="flex flex-col gap-2">
+        <div className='flex flex-col gap-2'>
           <Select
             value={colorTheme}
             onValueChange={(v: string) => handleColorThemeChange(v)}
           >
-            <SelectTrigger className="capitalize">
-              <SelectValue placeholder="Choose a color theme" />
+            <SelectTrigger className='capitalize'>
+              <SelectValue placeholder='Choose a color theme' />
             </SelectTrigger>
             <SelectContent>
-              {colorThemes.map(theme => (
-                <SelectItem key={theme} className="capitalize" value={theme}>
+              {colorThemes.map((theme) => (
+                <SelectItem key={theme} className='capitalize' value={theme}>
                   {theme}
                 </SelectItem>
               ))}
