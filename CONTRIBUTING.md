@@ -128,3 +128,13 @@ Examples:
 - `feat(next): add root ThemeProvider alias`
 - `fix(tanstack): sync server color theme updates`
 - `docs(readme): rewrite package documentation`
+
+## Oxc quality tools
+
+The root Oxlint and Oxfmt tasks follow the [official Turborepo guide](https://turborepo.dev/docs/guides/tools/oxc). Run `pnpm quality` for lint and formatting checks, `pnpm lint:fix` for lint fixes, and `pnpm format:fix` to format. `pnpm format` and `pnpm format:check` check without writing. Repository VS Code settings select the Oxc formatter.
+
+The configuration preserves the shared anti-slop and formatting rules and uses the published `antislop-plugin`. React and TypeScript rules run across the workspace. Next rules run in the Next app. The configuration uses the recommended rule options for component depth, prop forwarding, and read-only parameters. Browser objects and React refs keep their native types. Props and application data use read-only types. Raw inline bootstrap scripts have a narrow exception in the two script components, with inserted values encoded for safe HTML serialization.
+
+Build workspace dependencies before linting a fresh checkout. Run `pnpm typecheck` for all workspace packages. The library also provides `test`, `test:unit`, `test:types`, and `test:browser` for imports, runtime validation, test fixture types, and browser transitions.
+
+The TanStack builds format the generated route trees after generation. This keeps generated imports consistent with the shared Oxfmt rules.

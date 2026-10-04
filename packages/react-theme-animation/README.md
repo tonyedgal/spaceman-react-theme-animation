@@ -112,24 +112,24 @@ Repository documentation, framework guides, migration notes, and examples are li
 
 All providers expose the same core hook interface:
 
-| Property               | Type                                                    | Description                        |
-| ---------------------- | ------------------------------------------------------- | ---------------------------------- |
-| theme                  | Theme                                                   | Current theme                      |
-| colorTheme             | ColorTheme                                              | Current color theme                |
-| resolvedTheme          | 'light' \| 'dark'                                       | Resolved theme (system → actual)   |
-| systemTheme            | 'light' \| 'dark'                                       | OS theme preference                |
-| ref                    | RefObject<HTMLElement>                                  | Ref for animation origin           |
-| setTheme               | (theme: Theme) => void                                  | Set theme instantly                |
-| setColorTheme          | (colorTheme: ColorTheme) => void                        | Set color theme                    |
-| switchTheme            | (theme: Theme, animationOff?: boolean) => Promise<void> | Switch with animation              |
-| switchColorTheme       | (colorTheme: string) => void                            | Switch color theme with animation  |
-| toggleTheme            | (animationOff?: boolean) => Promise<void>               | Toggle light/dark                  |
-| toggleLightTheme       | (animationOff?: boolean) => Promise<void>               | Toggle to light                    |
-| toggleDarkTheme        | (animationOff?: boolean) => Promise<void>               | Toggle to dark                     |
-| toggleColorTheme       | () => void                                              | Toggle between color themes        |
-| createColorThemeToggle | (colorTheme: string) => () => void                      | Create color theme toggle          |
-| isColorThemeActive     | (colorTheme: string) => boolean                         | Check if color theme active        |
-| switchThemeFromElement | (theme: Theme, element: HTMLElement) => Promise<void>   | Switch with animation from element |
+| Property               | Type                                                                  | Description                        |
+| ---------------------- | --------------------------------------------------------------------- | ---------------------------------- |
+| theme                  | Theme                                                                 | Current theme                      |
+| colorTheme             | ColorTheme                                                            | Current color theme                |
+| resolvedTheme          | 'light' \| 'dark'                                                     | Resolved theme (system → actual)   |
+| systemTheme            | 'light' \| 'dark'                                                     | OS theme preference                |
+| ref                    | RefObject<HTMLButtonElement \| null>                                  | Ref for animation origin           |
+| setTheme               | (theme: Theme) => void                                                | Set theme instantly                |
+| setColorTheme          | (colorTheme: ColorTheme) => void                                      | Set color theme                    |
+| switchTheme            | (theme: Theme, options?: ThemeTransitionInput) => Promise<void>       | Switch with animation              |
+| switchColorTheme       | (colorTheme: string, options?: ThemeTransitionInput) => Promise<void> | Switch color theme with animation  |
+| toggleTheme            | (options?: ThemeTransitionInput) => Promise<void>                     | Toggle light/dark                  |
+| toggleLightTheme       | (options?: ThemeTransitionInput) => Promise<void>                     | Toggle to light                    |
+| toggleDarkTheme        | (options?: ThemeTransitionInput) => Promise<void>                     | Toggle to dark                     |
+| toggleColorTheme       | ColorThemeToggle                                                      | Toggle between color themes        |
+| createColorThemeToggle | (colorTheme: string) => ColorThemeToggle                              | Create color theme toggle          |
+| isColorThemeActive     | (colorTheme: string) => boolean                                       | Check if color theme active        |
+| switchThemeFromElement | (theme: Theme, element: HTMLButtonElement) => Promise<void>           | Switch with animation from element |
 
 ### Root Exports
 
@@ -146,3 +146,7 @@ See the repository docs hub for provider-specific setup guides and examples.
 ## License
 
 MIT
+
+## Additional transition effects
+
+See [Theme transitions](docs/theme-transitions.md) for animated palettes, explicit origins, directional polygon wipes, triangles, and stationary SVG logos with destination assets and automatic sizing.

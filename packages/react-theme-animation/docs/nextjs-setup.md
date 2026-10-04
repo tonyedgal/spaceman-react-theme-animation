@@ -160,7 +160,7 @@ Additional package-specific props:
 | `colorStorageKey`        | `string`                           | `'color-theme'` |
 | `colorThemePrefix`       | `string`                           | `'theme-'`      |
 | `animationType`          | `ThemeAnimationType`               | `CIRCLE`        |
-| `duration`               | `number`                           | `750`           |
+| `duration`               | `number`                           | `400`           |
 | `globalClassName`        | `string`                           | `'dark'`        |
 | `disableAnimationOnInit` | `boolean`                          | `true`          |
 | `onThemeChange`          | `(theme: Theme) => void`           | -               |
@@ -371,3 +371,5 @@ import {
 - [TanStack Start Setup](./tanstack-start-setup.md)
 - [Vite Setup](./vite-setup.md)
 - [Package README](../README.md)
+
+See [Theme transitions](theme-transitions.md) for the shared animation settings and per-call options.

@@ -101,7 +101,7 @@ export function ColorThemeButtons() {
 | `themes`                    | `Theme[]`                 | `['light', 'dark', 'system']` |
 | `colorThemes`               | `ColorTheme[]`            | `['default']`                 |
 | `animationType`             | `ThemeAnimationType`      | `CIRCLE`                      |
-| `duration`                  | `number`                  | `750`                         |
+| `duration`                  | `number`                  | `400`                         |
 | `attribute`                 | `'class' \| 'data-theme'` | `'class'`                     |
 | `disableTransitionOnChange` | `boolean`                 | `false`                       |
 | `storageKey`                | `string`                  | `'vite-theme'`                |
@@ -241,3 +241,5 @@ If your app already has a lot of CSS transitions, try enabling `disableTransitio
 - [Next.js / SSR Setup](./nextjs-setup.md)
 - [TanStack Start Setup](./tanstack-start-setup.md)
 - [Package README](../README.md)
+
+See [Theme transitions](theme-transitions.md) for the shared animation settings and per-call options.
