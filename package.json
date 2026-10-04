@@ -26,6 +26,7 @@
     "antislop-plugin": "0.1.0",
     "oxfmt": "0.71.0",
     "oxlint": "1.86.0",
+    "oxlint-tsgolint": "7.0.2003",
     "tsup": "^8.3.5",
     "turbo": "^2.3.0",
     "typescript": "^5.7.2"

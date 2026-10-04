@@ -20,7 +20,9 @@ build/
 .env.production.local
 
 # IDE
-.vscode/
+**/.vscode/*
+!/.vscode/settings.json
+!/.vscode/extensions.json
 .idea/
 *.swp
 *.swo
@@ -47,3 +49,7 @@ apps/examples/*/node_modules/
 apps/examples/*/.next/
 apps/examples/*/out/
 apps/examples/*/.env.local
+
+# Browser test artifacts
+**/test-results/
+**/playwright-report/
