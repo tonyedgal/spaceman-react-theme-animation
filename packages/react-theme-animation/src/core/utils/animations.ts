@@ -1,13 +1,15 @@
-import { ThemeAnimationType } from '../types'
+import type { ThemeAnimationType } from '../types'
 
-const isBrowser = typeof window !== 'undefined'
+const isBrowser = 'window' in globalThis
 
 export const injectBaseStyles = (): void => {
   if (isBrowser) {
     const styleId = 'spaceman-theme-base-style'
+
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style')
       style.id = styleId
+
       const isHighResolution =
         window.innerWidth >= 3000 || window.innerHeight >= 2000
 
@@ -51,6 +53,7 @@ export const createBlurCircleMask = (blur: number): string => {
 
 export const getSystemTheme = (): 'light' | 'dark' => {
   if (!isBrowser) return 'light'
+
   return window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light'
@@ -60,6 +63,7 @@ export const resolveTheme = (theme: string): 'light' | 'dark' => {
   if (theme === 'system') {
     return getSystemTheme()
   }
+
   return theme === 'dark' ? 'dark' : 'light'
 }
 
@@ -69,6 +73,7 @@ export const resolveThemeForServer = (
   if (theme === 'system') {
     return 'system'
   }
+
   return theme === 'dark' ? 'dark' : 'light'
 }
 
@@ -122,7 +127,7 @@ export const createCircleAnimation = (config: AnimationConfig): void => {
 }
 
 export const createSlideAnimation = (config: AnimationConfig): void => {
-  const { a = -100, b = 0, x = 0, y = 0, duration, styleId } = config
+  const { a = -100, b = 0, x, y, duration, styleId } = config
 
   const styleElement = document.createElement('style')
   styleElement.id = styleId
@@ -152,6 +157,7 @@ export const createSlideAnimation = (config: AnimationConfig): void => {
   // Clean up after animation
   setTimeout(() => {
     const styleElement = document.getElementById(styleId)
+
     if (styleElement) {
       styleElement.remove()
     }
@@ -162,14 +168,18 @@ export const createBlurCircleAnimation = (config: AnimationConfig): void => {
   const { x, y, duration, easing, blurAmount, styleId } = config
 
   const existingStyle = document.getElementById(styleId)
+
   if (existingStyle) {
     existingStyle.remove()
   }
 
   const viewportSize = Math.max(window.innerWidth, window.innerHeight) + 200
+
   const isHighResolution =
     window.innerWidth >= 3000 || window.innerHeight >= 2000
+
   const scaleFactor = isHighResolution ? 2.5 : 4
+
   const optimalMaskSize = isHighResolution
     ? Math.min(viewportSize * scaleFactor, 5000)
     : viewportSize * scaleFactor
@@ -236,6 +246,7 @@ export const createBlurCircleAnimation = (config: AnimationConfig): void => {
 
   setTimeout(() => {
     const styleElement = document.getElementById(styleId)
+
     if (styleElement) {
       styleElement.remove()
     }

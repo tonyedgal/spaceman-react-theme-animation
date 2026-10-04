@@ -1,0 +1,34 @@
+import React from 'react'
+
+import type { ThemeSelectorProps } from '../../core/types'
+import { useThemeAnimation } from '../hooks/use-theme-animation'
+import { defaultColorThemes, defaultThemes } from './ThemeSelector.shared'
+import { ThemeSelectorView } from './ThemeSelector.ThemeSelectorView'
+
+export function ThemeSelectorStandalone({
+  themes = defaultThemes,
+  colorThemes = defaultColorThemes,
+  currentColorTheme,
+  onColorThemeChange,
+  animationType,
+  duration,
+}: ThemeSelectorProps): React.JSX.Element {
+  const standaloneHook = useThemeAnimation({
+    animationType,
+    duration,
+    themes,
+    colorThemes,
+    ...(currentColorTheme !== undefined && { colorTheme: currentColorTheme }),
+    onColorThemeChange,
+  })
+
+  const handleColorThemeChange = standaloneHook.setColorTheme
+
+  return (
+    <ThemeSelectorView
+      colorTheme={standaloneHook.colorTheme}
+      colorThemes={colorThemes}
+      onSelectColorTheme={handleColorThemeChange}
+    />
+  )
+}

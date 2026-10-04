@@ -1,4 +1,4 @@
-import { RefObject } from 'react'
+import type { RefObject } from 'react'
 
 export enum ThemeAnimationType {
   CIRCLE = 'circle',
@@ -17,7 +17,9 @@ export type SlideDirection =
   | 'bottom-right'
 
 export type Theme = 'light' | 'dark' | 'system'
+
 export type ColorTheme = string
+
 export type SystemThemeMode = 'css' | 'js'
 
 export interface UseThemeAnimationProps {
@@ -27,8 +29,8 @@ export interface UseThemeAnimationProps {
   blurAmount?: number
   styleId?: string
 
-  themes?: Theme[]
-  colorThemes?: ColorTheme[]
+  themes?: readonly Theme[]
+  colorThemes?: readonly ColorTheme[]
   defaultTheme?: Theme
   defaultColorTheme?: ColorTheme
 
@@ -83,7 +85,7 @@ export interface UseThemeAnimationReturn {
 }
 
 export interface ThemeSwitcherProps {
-  themes?: Theme[]
+  themes?: readonly Theme[]
   currentTheme?: Theme
   onThemeChange?: (theme: Theme) => void
 
@@ -102,8 +104,8 @@ export interface ThemeSwitcherProps {
 }
 
 export interface ThemeSelectorProps {
-  themes?: Theme[]
-  colorThemes?: ColorTheme[]
+  themes?: readonly Theme[]
+  colorThemes?: readonly ColorTheme[]
   currentTheme?: Theme
   currentColorTheme?: ColorTheme
 

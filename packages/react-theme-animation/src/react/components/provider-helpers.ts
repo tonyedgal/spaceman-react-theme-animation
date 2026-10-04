@@ -1,10 +1,10 @@
-import { Theme } from '../../core/types'
+import type { Theme } from '../../core/types'
 
 export const withElementAsRef = async (
   ref: React.RefObject<HTMLButtonElement | null>,
   element: HTMLButtonElement,
   run: () => Promise<void>,
-) => {
+): Promise<void> => {
   if (ref.current) {
     const originalRef = ref.current
     Object.defineProperty(ref, 'current', {
@@ -18,6 +18,7 @@ export const withElementAsRef = async (
       writable: true,
       configurable: true,
     })
+
     return
   }
 
@@ -30,7 +31,7 @@ export const withElementAsRef = async (
 }
 
 export const getBrowserSystemTheme = (): 'light' | 'dark' => {
-  return typeof window !== 'undefined' &&
+  return 'window' in globalThis &&
     window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light'

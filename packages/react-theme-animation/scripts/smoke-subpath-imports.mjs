@@ -1,24 +1,13 @@
-import { resolve } from 'node:path'
-import { pathToFileURL } from 'node:url'
+import assert from 'node:assert/strict'
 
-const root = resolve(process.cwd(), 'dist')
+import * as core from '../dist/core/index.js'
+import * as react from '../dist/react/index.js'
+import * as tanstack from '../dist/tanstack/index.js'
 
-const tanstack = await import(
-  pathToFileURL(resolve(root, 'tanstack/index.js')).href
-)
-const react = await import(pathToFileURL(resolve(root, 'react/index.js')).href)
-const core = await import(pathToFileURL(resolve(root, 'core/index.js')).href)
+assert.equal(tanstack.buildServerThemeData('dark', 'ocean').theme, 'dark')
 
-if (typeof tanstack.buildServerThemeData !== 'function') {
-  throw new Error('Missing tanstack subpath export: buildServerThemeData')
-}
+assert.equal(react.ThemeProvider, react.NextThemeProvider)
 
-if (typeof react.ThemeProvider !== 'function') {
-  throw new Error('Missing react subpath export: ThemeProvider')
-}
-
-if (!('ThemeAnimationType' in core)) {
-  throw new Error('Missing core subpath export: ThemeAnimationType')
-}
+assert.equal(core.ThemeAnimationType.CIRCLE, 'circle')
 
 console.log('Subpath import smoke test passed')

@@ -1,15 +1,16 @@
-import React, {
-  createContext,
-  useContext,
-  ReactNode,
-  useState,
-  useEffect,
-} from 'react'
+import type { ReactNode } from 'react'
+import React, { createContext, useCallback, useContext, useMemo } from 'react'
 
-import { Theme, ColorTheme, ThemeAnimationType } from '../../core/types'
+import type { ColorTheme, Theme } from '../../core/types'
+import { ThemeAnimationType } from '../../core/types'
+import { useHydrated } from '../hooks/use-hydrated'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
 import { withElementAsRef } from './provider-helpers'
 import { SharedThemeContext } from './shared-theme-context'
+
+const defaultThemes = ['light', 'dark', 'system'] as const
+
+const defaultColorThemes = ['default'] as const
 
 /**
  * Context type for the Spaceman Theme Provider
@@ -48,8 +49,8 @@ const SpacemanThemeContext = createContext<
  */
 interface SpacemanThemeProviderProps {
   children: ReactNode
-  themes?: Theme[]
-  colorThemes?: ColorTheme[]
+  themes?: readonly Theme[]
+  colorThemes?: readonly ColorTheme[]
   defaultTheme?: Theme
   defaultColorTheme?: ColorTheme
   animationType?: ThemeAnimationType
@@ -70,16 +71,16 @@ interface SpacemanThemeProviderProps {
  * @param animationType - Animation type for theme transitions (default: CIRCLE)
  * @param duration - Animation duration in milliseconds (default: 750)
  */
-export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
+export function SpacemanThemeProvider({
   children,
-  themes = ['light', 'dark', 'system'],
-  colorThemes = ['default'],
+  themes = defaultThemes,
+  colorThemes = defaultColorThemes,
   defaultTheme = 'system',
   defaultColorTheme = 'default',
   animationType = ThemeAnimationType.CIRCLE,
   duration = 750,
-}) => {
-  const [mounted, setMounted] = useState(false)
+}: SpacemanThemeProviderProps): React.JSX.Element {
+  const mounted = useHydrated()
 
   const themeState = useThemeAnimation({
     themes,
@@ -90,70 +91,65 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
     duration,
   })
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const switchThemeFromElement = useCallback(
+    async (theme: Theme, element: HTMLButtonElement): Promise<void> => {
+      await withElementAsRef(themeState.ref, element, async () => {
+        await themeState.switchTheme(theme)
+      })
+    },
+    [themeState],
+  )
 
-  const switchThemeFromElement = async (
-    theme: Theme,
-    element: HTMLButtonElement,
-  ) => {
-    await withElementAsRef(themeState.ref, element, async () => {
-      await themeState.switchTheme(theme)
-    })
-  }
+  const contextValue = useMemo<SpacemanThemeContextType>(() => {
+    if (!mounted)
+      return {
+        ref: { current: null },
+        theme: defaultTheme,
+        colorTheme: defaultColorTheme,
+        resolvedTheme: defaultTheme === 'dark' ? 'dark' : 'light',
+        setTheme: (): void => {},
+        setColorTheme: (): void => {},
 
-  if (!mounted) {
-    const loadingContextValue: SpacemanThemeContextType = {
-      ref: { current: null },
-      theme: defaultTheme,
-      colorTheme: defaultColorTheme,
-      resolvedTheme: defaultTheme === 'dark' ? 'dark' : 'light',
-      setTheme: () => {},
-      setColorTheme: () => {},
+        switchTheme: async (): Promise<void> => Promise.resolve(),
+        switchThemeFromElement: async (): Promise<void> => Promise.resolve(),
+        switchColorTheme: (): void => {},
 
-      switchTheme: async () => {},
-      switchThemeFromElement: async () => {},
-      switchColorTheme: () => {},
+        toggleTheme: async (): Promise<void> => Promise.resolve(),
+        toggleLightTheme: async (): Promise<void> => Promise.resolve(),
+        toggleDarkTheme: async (): Promise<void> => Promise.resolve(),
+        toggleColorTheme: (): void => {},
 
-      toggleTheme: async () => {},
-      toggleLightTheme: async () => {},
-      toggleDarkTheme: async () => {},
-      toggleColorTheme: () => {},
+        createColorThemeToggle: (): (() => void) => (): void => {},
+        isColorThemeActive: (): boolean => false,
+      }
 
-      createColorThemeToggle: () => () => {},
-      isColorThemeActive: () => false,
+    return {
+      ref: themeState.ref,
+      theme: themeState.theme,
+      colorTheme: themeState.colorTheme,
+      resolvedTheme: themeState.resolvedTheme,
+      setTheme: themeState.setTheme,
+      setColorTheme: themeState.setColorTheme,
+
+      switchTheme: themeState.switchTheme,
+      switchThemeFromElement,
+      switchColorTheme: themeState.switchColorTheme,
+
+      toggleTheme: themeState.toggleTheme,
+      toggleLightTheme: themeState.toggleLightTheme,
+      toggleDarkTheme: themeState.toggleDarkTheme,
+      toggleColorTheme: themeState.toggleColorTheme,
+
+      createColorThemeToggle: themeState.createColorThemeToggle,
+      isColorThemeActive: themeState.isColorThemeActive,
     }
-
-    return (
-      <SpacemanThemeContext.Provider value={loadingContextValue}>
-        <SharedThemeContext.Provider value={loadingContextValue}>
-          {children}
-        </SharedThemeContext.Provider>
-      </SpacemanThemeContext.Provider>
-    )
-  }
-
-  const contextValue: SpacemanThemeContextType = {
-    ref: themeState.ref,
-    theme: themeState.theme,
-    colorTheme: themeState.colorTheme,
-    resolvedTheme: themeState.resolvedTheme,
-    setTheme: themeState.setTheme,
-    setColorTheme: themeState.setColorTheme,
-
-    switchTheme: themeState.switchTheme,
+  }, [
+    mounted,
+    defaultTheme,
+    defaultColorTheme,
+    themeState,
     switchThemeFromElement,
-    switchColorTheme: themeState.switchColorTheme,
-
-    toggleTheme: themeState.toggleTheme,
-    toggleLightTheme: themeState.toggleLightTheme,
-    toggleDarkTheme: themeState.toggleDarkTheme,
-    toggleColorTheme: themeState.toggleColorTheme,
-
-    createColorThemeToggle: themeState.createColorThemeToggle,
-    isColorThemeActive: themeState.isColorThemeActive,
-  }
+  ])
 
   return (
     <SpacemanThemeContext.Provider value={contextValue}>
@@ -172,10 +168,12 @@ export const SpacemanThemeProvider: React.FC<SpacemanThemeProviderProps> = ({
  */
 export const useSpacemanTheme = (): SpacemanThemeContextType => {
   const context = useContext(SpacemanThemeContext)
+
   if (context === undefined) {
     throw new Error(
       'useSpacemanTheme must be used within a SpacemanThemeProvider',
     )
   }
+
   return context
 }

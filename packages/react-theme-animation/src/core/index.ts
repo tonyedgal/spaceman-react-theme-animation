@@ -1,21 +1,21 @@
 export type {
+  ColorTheme,
+  SlideDirection,
+  SystemThemeMode,
+  Theme,
+  ThemeSelectorProps,
+  ThemeSwitcherProps,
   UseThemeAnimationProps,
   UseThemeAnimationReturn,
-  ThemeSwitcherProps,
-  ThemeSelectorProps,
-  Theme,
-  ColorTheme,
-  SystemThemeMode,
-  SlideDirection,
 } from './types'
 
 export { ThemeAnimationType } from './types'
 
 export {
-  injectBaseStyles,
   getSystemTheme,
+  injectBaseStyles,
+  prefersReducedMotion,
   resolveTheme,
   resolveThemeForServer,
   supportsViewTransitions,
-  prefersReducedMotion,
 } from './utils/animations'

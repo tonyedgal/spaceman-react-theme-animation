@@ -1,24 +1,30 @@
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 
-import {
+import type {
+  Theme,
   UseThemeAnimationProps,
   UseThemeAnimationReturn,
-  ThemeAnimationType,
-  Theme,
 } from '../../core/types'
+import { ThemeAnimationType } from '../../core/types'
 import {
-  injectBaseStyles,
-  resolveTheme,
-  getSystemTheme,
-  supportsViewTransitions,
-  prefersReducedMotion,
-  createCircleAnimation,
   createBlurCircleAnimation,
+  createCircleAnimation,
   createSlideAnimation,
+  getSystemTheme,
+  injectBaseStyles,
+  prefersReducedMotion,
+  resolveTheme,
+  supportsViewTransitions,
 } from '../../core/utils/animations'
+import { useHydrated } from './use-hydrated'
 
-const isBrowser = typeof window !== 'undefined'
+interface SlideCoordinates {
+  readonly a: number
+  readonly b: number
+}
+
+const isBrowser = 'window' in globalThis
 
 export const useThemeAnimation = (
   props: UseThemeAnimationProps = {},
@@ -64,30 +70,38 @@ export const useThemeAnimation = (
 
   const isHighResolution =
     isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
+
   const duration = isHighResolution
     ? Math.max(propsDuration * 0.8, 500)
     : propsDuration
 
-  const [mounted, setMounted] = useState(false)
+  const mounted = useHydrated()
 
   // Inject base styles once on mount
   useEffect(() => {
     injectBaseStyles()
-    setMounted(true)
   }, [])
 
   const [internalTheme, setInternalTheme] = useState<Theme>(() => {
     if (initialTheme !== undefined) return initialTheme
+
     if (!isBrowser) return defaultTheme
-    const saved = localStorage.getItem(storageKey) as Theme | null
-    return saved && themes.indexOf(saved) !== -1 ? saved : defaultTheme
+    const saved = localStorage.getItem(storageKey)
+
+    return saved !== null &&
+      (saved === 'light' || saved === 'dark' || saved === 'system') &&
+      themes.includes(saved)
+      ? saved
+      : defaultTheme
   })
 
   const [internalColorTheme, setInternalColorTheme] = useState(() => {
     if (initialColorTheme !== undefined) return initialColorTheme
+
     if (!isBrowser) return defaultColorTheme
     const saved = localStorage.getItem(colorStorageKey)
-    return saved && colorThemes.indexOf(saved) !== -1
+
+    return saved !== null && saved !== '' && colorThemes.includes(saved)
       ? saved
       : defaultColorTheme
   })
@@ -100,13 +114,19 @@ export const useThemeAnimation = (
   const resolvedTheme = resolveTheme(currentTheme)
 
   useEffect(() => {
-    if (!isBrowser) return
+    if (!isBrowser) return undefined
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = () => setSystemTheme(getSystemTheme())
+
+    const handleChange = (): void => {
+      setSystemTheme(getSystemTheme())
+    }
 
     mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
+
+    return (): void => {
+      mediaQuery.removeEventListener('change', handleChange)
+    }
   }, [])
 
   // Apply theme classes to DOM
@@ -129,16 +149,17 @@ export const useThemeAnimation = (
         )
       }
     } else {
-      if (lightValue) {
+      if (lightValue !== undefined && lightValue !== '') {
         element.classList.remove(lightValue)
       }
+
       element.classList.remove(darkValue, systemValue, 'auto')
 
       if (systemThemeMode === 'css' && currentTheme === 'system') {
         element.classList.add(systemValue)
       } else if (resolvedTheme === 'dark') {
         element.classList.add(darkValue)
-      } else if (lightValue) {
+      } else if (lightValue !== undefined && lightValue !== '') {
         element.classList.add(lightValue)
       } else {
         element.classList.remove(darkValue)
@@ -215,7 +236,7 @@ export const useThemeAnimation = (
   )
 
   const switchTheme = useCallback(
-    async (newTheme: Theme, animationOff: boolean = false) => {
+    async (newTheme: Theme, animationOff = false) => {
       if (
         !ref.current ||
         !supportsViewTransitions() ||
@@ -223,11 +244,12 @@ export const useThemeAnimation = (
         animationOff
       ) {
         setTheme(newTheme)
+
         return
       }
 
       // Helper function to convert direction to from coordinates
-      const getSlideFromCoords = (direction: string) => {
+      const getSlideFromCoords = (direction: string): SlideCoordinates => {
         switch (direction) {
           case 'left':
             return { a: -100, b: 0 }
@@ -297,7 +319,7 @@ export const useThemeAnimation = (
 
       // Start the view transition
 
-      await (document as Document).startViewTransition(() => {
+      await document.startViewTransition(() => {
         flushSync(() => {
           setTheme(newTheme)
         })
@@ -324,19 +346,21 @@ export const useThemeAnimation = (
 
   const switchColorTheme = useCallback(
     (newColorTheme: string) => {
-      if (colorThemes.indexOf(newColorTheme) === -1) {
+      if (!colorThemes.includes(newColorTheme)) {
         console.warn(
           `Color theme "${newColorTheme}" not found in available themes`,
         )
+
         return
       }
+
       setColorTheme(newColorTheme)
     },
     [colorThemes, setColorTheme],
   )
 
   const toggleTheme = useCallback(
-    async (animationOff: boolean = false) => {
+    async (animationOff = false): Promise<void> => {
       const newTheme: Theme = resolvedTheme === 'dark' ? 'light' : 'dark'
       await switchTheme(newTheme, animationOff)
     },
@@ -344,7 +368,7 @@ export const useThemeAnimation = (
   )
 
   const toggleLightTheme = useCallback(
-    async (animationOff: boolean = false) => {
+    async (animationOff = false): Promise<void> => {
       if (resolvedTheme === 'light') return
 
       await switchTheme('light', animationOff)
@@ -353,7 +377,7 @@ export const useThemeAnimation = (
   )
 
   const toggleDarkTheme = useCallback(
-    async (animationOff: boolean = false) => {
+    async (animationOff = false): Promise<void> => {
       if (resolvedTheme === 'dark') return
 
       await switchTheme('dark', animationOff)
@@ -370,13 +394,15 @@ export const useThemeAnimation = (
 
   const createColorThemeToggle = useCallback(
     (targetColorTheme: string) => {
-      return () => {
-        if (colorThemes.indexOf(targetColorTheme) === -1) {
+      return (): void => {
+        if (!colorThemes.includes(targetColorTheme)) {
           console.warn(
             `Color theme "${targetColorTheme}" not found in available themes`,
           )
+
           return
         }
+
         setColorTheme(targetColorTheme)
       }
     },
@@ -390,21 +416,40 @@ export const useThemeAnimation = (
     [currentColorTheme],
   )
 
-  return {
-    ref,
-    theme: currentTheme,
-    colorTheme: currentColorTheme,
-    resolvedTheme,
-    systemTheme,
-    setTheme,
-    setColorTheme,
-    switchTheme,
-    switchColorTheme,
-    toggleTheme,
-    toggleLightTheme,
-    toggleDarkTheme,
-    toggleColorTheme,
-    createColorThemeToggle,
-    isColorThemeActive,
-  }
+  return useMemo(
+    () => ({
+      ref,
+      theme: currentTheme,
+      colorTheme: currentColorTheme,
+      resolvedTheme,
+      systemTheme,
+      setTheme,
+      setColorTheme,
+      switchTheme,
+      switchColorTheme,
+      toggleTheme,
+      toggleLightTheme,
+      toggleDarkTheme,
+      toggleColorTheme,
+      createColorThemeToggle,
+      isColorThemeActive,
+    }),
+    [
+      ref,
+      currentTheme,
+      currentColorTheme,
+      resolvedTheme,
+      systemTheme,
+      setTheme,
+      setColorTheme,
+      switchTheme,
+      switchColorTheme,
+      toggleTheme,
+      toggleLightTheme,
+      toggleDarkTheme,
+      toggleColorTheme,
+      createColorThemeToggle,
+      isColorThemeActive,
+    ],
+  )
 }

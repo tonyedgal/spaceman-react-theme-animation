@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react'
 
-import { ColorTheme, Theme } from '../../core/types'
+import type { ColorTheme, Theme } from '../../core/types'
 
 export interface SharedThemeContextValue {
   ref: React.RefObject<HTMLButtonElement | null>
