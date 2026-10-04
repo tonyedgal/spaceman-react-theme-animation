@@ -1,46 +1,59 @@
 # Releasing
 
-## Release Flow
+## Current status
 
-This repo uses Changesets.
+The planned release is `3.0.0`. It is not ready to publish until the confirmed blockers in [release readiness](docs/release-readiness.md) are resolved. Do not run the publish step as part of a local audit.
 
-The release workflow:
+Changesets combines the pending major and minor entries. Keep the historical v2 note unchanged. Release tooling must generate the version and changelog; do not edit the generated changelog by hand.
 
-1. installs from the workspace root
-2. runs formatting checks
-3. runs the workspace build
-4. versions packages with Changesets
-5. publishes only `@space-man/react-theme-animation`
+## Local checks
 
-GitHub Actions release workflow:
+Run from the workspace root, in this order:
 
-- `.github/workflows/publish.yml`
-
-## Local Verification
-
-Before merging release-related changes, verify the package from the workspace root:
-
-```bash
-pnpm --filter @space-man/react-theme-animation build
-pnpm --filter @space-man/react-theme-animation pack
-pnpm --filter @space-man/react-theme-animation exec npm publish --dry-run --provenance --access public
+```sh
+pnpm install --frozen-lockfile
+pnpm build
+pnpm quality
+pnpm typecheck
+pnpm --filter @space-man/react-theme-animation test
+pnpm --filter @space-man/react-theme-animation test:unit
+pnpm --filter @space-man/react-theme-animation test:types
+pnpm --filter @space-man/react-theme-animation test:browser
+pnpm exec changeset status
+pnpm audit --prod
 ```
 
-What this verifies:
+Build first. Import, type, and browser fixtures now use compiled package entries. Browser checks require installed Playwright browsers. The existing workflow runs the build, quality, workspace types, import, unit, and type-fixture checks. It does not currently run browser checks or an extracted-tarball consumer check.
 
-- the package builds from the monorepo layout
-- the packed artifact is publishable
-- npm accepts the publish command shape used for provenance-enabled publishing
+## Inspect the release artifact
 
-This does not publish anything to npm.
+Pack the package to a temporary directory:
 
-## CI Provenance Requirements
+```sh
+pnpm --filter @space-man/react-theme-animation exec npm pack --json --pack-destination /tmp
+```
 
-Provenance publishing depends on both of these being present:
+Check the exact file list. The archive must contain the ESM entries, shared JavaScript chunks, `.d.ts` declarations, README, license, and manifest. It must not contain CommonJS files, source maps, source files, tests, examples, or workspace tooling.
 
-- `publishConfig.provenance: true` in `packages/react-theme-animation/package.json`
-- `id-token: write` in `.github/workflows/publish.yml`
+Extract the archive into a temporary consumer. Supply compatible versions of the required peers. Verify root, `/react`, `/core`, and `/tanstack` imports and compile TypeScript against the extracted declarations. Confirm the controls share the provider state. Verify the lowest supported React version and an actual Next.js SSR/hydration flow.
 
-## Release Notes
+## Release flow
 
-See `RELEASE_NOTES_v2.md` for the current v2 summary.
+The workflow in `.github/workflows/publish.yml` runs on `main`. Changesets opens or updates a version PR while pending Changesets exist. After that version PR is merged, the publish command can publish the versioned package. Example packages are private and are not published.
+
+Before merging, confirm the resulting package version is `3.0.0`, the generated changelog includes all pending changes, the lockfile is current, and the final archive matches the tested artifact.
+
+## npm authentication and provenance
+
+The workflow supplies `id-token: write`, uses Node 24, and enables provenance in the package manifest. These settings do not prove that npm's external trusted-publisher configuration is correct.
+
+Verify the npm publisher entry matches the GitHub owner, repository, and `.github/workflows/publish.yml`. Verify any configured environment and allowed publish action. Trusted publishing requires npm >=11.5.1 and Node >=22.14.0. See [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/) and [provenance](https://docs.npmjs.com/generating-provenance-statements/).
+
+A local `npm publish --dry-run` is optional. It does not prove registry authorization, OIDC configuration, or successful provenance generation. No package is published during a dry run.
+
+## Release documentation
+
+- [Planned v3 release](RELEASE_NOTES_v3.md)
+- [Migration](MIGRATION.md)
+- [Readiness audit](docs/release-readiness.md)
+- [Historical v2 release](RELEASE_NOTES_v2.md)

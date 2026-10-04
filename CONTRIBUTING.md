@@ -75,7 +75,11 @@ Before opening a pull request, run the relevant checks for the code you changed.
 ```bash
 pnpm build
 pnpm typecheck
-pnpm format:check
+pnpm quality
+pnpm --filter @space-man/react-theme-animation test
+pnpm --filter @space-man/react-theme-animation test:unit
+pnpm --filter @space-man/react-theme-animation test:types
+pnpm --filter @space-man/react-theme-animation test:browser
 ```
 
 ### Common targeted checks
@@ -138,3 +142,7 @@ The configuration preserves the shared anti-slop and formatting rules and uses t
 Build workspace dependencies before linting a fresh checkout. Run `pnpm typecheck` for all workspace packages. The library also provides `test`, `test:unit`, `test:types`, and `test:browser` for imports, runtime validation, test fixture types, and browser transitions.
 
 The TanStack builds format the generated route trees after generation. This keeps generated imports consistent with the shared Oxfmt rules.
+
+## Release artifacts
+
+The package ships ESM only with shared, minified JavaScript and TypeScript declarations. Build before running the import, type, and browser checks. The fixtures use compiled public entries. Review [release readiness](docs/release-readiness.md) and [the releasing guide](RELEASING.md) before changing versions or publishing.

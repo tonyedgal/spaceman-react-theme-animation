@@ -2,6 +2,8 @@
 
 Complete guide for using `@space-man/react-theme-animation` in TanStack Start apps with flash-aware theme support.
 
+This package ships ESM only. Use `import` for library APIs. See the [migration guide](../../../MIGRATION.md) for CommonJS applications.
+
 ## Installation
 
 ```bash
@@ -10,17 +12,19 @@ npm install @space-man/react-theme-animation
 
 ## Recommended Imports
 
-Import everything from the package root:
+Import the provider and hooks from the package root. Import server-only helpers from `/tanstack`:
 
 ```tsx
 import {
   TanStackThemeProvider,
   TanStackStartThemeScript,
   useTanStackTheme,
+} from '@space-man/react-theme-animation'
+import {
   buildServerThemeData,
   STORAGE_KEY,
   COLOR_STORAGE_KEY,
-} from '@space-man/react-theme-animation'
+} from '@space-man/react-theme-animation/tanstack'
 ```
 
 ## Tailwind Setup For Prebuilt Components
@@ -72,7 +76,7 @@ import {
   COLOR_STORAGE_KEY,
   STORAGE_KEY,
   type ServerThemeData,
-} from '@space-man/react-theme-animation'
+} from '@space-man/react-theme-animation/tanstack'
 import { z } from 'zod'
 
 export const getThemeServerFn = createServerFn().handler((): ServerThemeData =>
@@ -353,10 +357,10 @@ TanStack-specific additions:
 ```ts
 import {
   buildServerThemeData,
-  resolveThemeForServer,
   STORAGE_KEY,
   COLOR_STORAGE_KEY,
-} from '@space-man/react-theme-animation'
+} from '@space-man/react-theme-animation/tanstack'
+import { resolveThemeForServer } from '@space-man/react-theme-animation/core'
 ```
 
 - `buildServerThemeData()` converts raw cookie values into `{ theme, themePreference, colorTheme }`

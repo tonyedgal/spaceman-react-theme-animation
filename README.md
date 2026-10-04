@@ -12,7 +12,11 @@ Monorepo for `@space-man/react-theme-animation` and its example apps.
 - [Security Policy](./SECURITY.md) - private vulnerability reporting guidance
 - [Support Guide](./SUPPORT.md) - issue reporting and support expectations
 - [Migration Guide](./MIGRATION.md) - root-import migration notes and compatibility paths
-- [Release Notes v2](./RELEASE_NOTES_v2.md) - user-facing summary of the v2 release
+- [Planned Release Notes v3](./RELEASE_NOTES_v3.md) - ESM migration and transition additions
+- [Release Readiness](./docs/release-readiness.md) - blockers, evidence, and remaining checks
+- [UI-Theme Handoff](./docs/ui-theme-handoff.md) - verified differences for the UI-Theme agent
+- [Theme Transitions](./packages/react-theme-animation/docs/theme-transitions.md) - effects, origins, logos, and lifecycle
+- [Release Notes v2](./RELEASE_NOTES_v2.md) - historical v2 release
 - [Releasing Guide](./RELEASING.md) - release flow and local provenance verification
 
 ## Package
