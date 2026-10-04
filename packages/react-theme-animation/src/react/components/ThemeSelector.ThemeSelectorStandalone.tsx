@@ -6,6 +6,9 @@ import { defaultColorThemes, defaultThemes } from './ThemeSelector.shared'
 import { ThemeSelectorView } from './ThemeSelector.ThemeSelectorView'
 
 export function ThemeSelectorStandalone({
+  className,
+  placeholder,
+  colorThemeLabel,
   themes = defaultThemes,
   colorThemes = defaultColorThemes,
   currentColorTheme,
@@ -28,6 +31,9 @@ export function ThemeSelectorStandalone({
 
   return (
     <ThemeSelectorView
+      className={className}
+      placeholder={placeholder}
+      colorThemeLabel={colorThemeLabel}
       colorTheme={standaloneHook.colorTheme}
       colorThemes={colorThemes}
       onSelectColorTheme={handleColorThemeChange}
