@@ -40,10 +40,10 @@ import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ViteThemeProvider defaultTheme="system" defaultColorTheme="default">
+    <ViteThemeProvider defaultTheme='system' defaultColorTheme='default'>
       <App />
     </ViteThemeProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 )
 ```
 
@@ -114,7 +114,7 @@ export function ColorThemeButtons() {
 `disableTransitionOnChange` temporarily injects a style tag that disables CSS transitions during a theme switch.
 
 ```tsx
-<ViteThemeProvider defaultTheme="system" disableTransitionOnChange>
+<ViteThemeProvider defaultTheme='system' disableTransitionOnChange>
   <App />
 </ViteThemeProvider>
 ```
@@ -129,14 +129,14 @@ import {
   ViteThemeProvider,
 } from '@space-man/react-theme-animation'
 ;<ViteThemeProvider
-  defaultTheme="system"
-  defaultColorTheme="blue"
+  defaultTheme='system'
+  defaultColorTheme='blue'
   themes={['light', 'dark', 'system']}
   colorThemes={['default', 'blue', 'green', 'purple']}
   animationType={ThemeAnimationType.BLUR_CIRCLE}
   duration={750}
-  storageKey="my-vite-theme"
-  colorStorageKey="my-vite-color-theme"
+  storageKey='my-vite-theme'
+  colorStorageKey='my-vite-color-theme'
 >
   <App />
 </ViteThemeProvider>
@@ -158,8 +158,8 @@ import './index.css'
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ViteThemeProvider
-      defaultTheme="system"
-      defaultColorTheme="default"
+      defaultTheme='system'
+      defaultColorTheme='default'
       colorThemes={['default', 'blue', 'green', 'purple']}
       animationType={ThemeAnimationType.CIRCLE}
       duration={500}
@@ -167,7 +167,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     >
       <App />
     </ViteThemeProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 )
 ```
 

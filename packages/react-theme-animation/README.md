@@ -83,7 +83,7 @@ import {
 
 function App() {
   return (
-    <SpacemanThemeProvider defaultTheme="system" defaultColorTheme="default">
+    <SpacemanThemeProvider defaultTheme='system' defaultColorTheme='default'>
       <YourApp />
     </SpacemanThemeProvider>
   )

@@ -47,7 +47,7 @@ import { ThemeProvider } from '@space-man/react-theme-animation'
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
-    <ThemeProvider defaultTheme="system" defaultColorTheme="default">
+    <ThemeProvider defaultTheme='system' defaultColorTheme='default'>
       {children}
     </ThemeProvider>
   )
@@ -61,7 +61,7 @@ import { Providers } from './providers'
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
       </body>
@@ -79,7 +79,7 @@ import { ThemeProvider } from '@space-man/react-theme-animation'
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ThemeProvider defaultTheme="system" defaultColorTheme="default">
+    <ThemeProvider defaultTheme='system' defaultColorTheme='default'>
       <Component {...pageProps} />
     </ThemeProvider>
   )
@@ -202,7 +202,7 @@ export default async function RootLayout({
   const nonce = (await headers()).get('x-nonce')
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning>
       <body>
         <Providers nonce={nonce ?? undefined}>{children}</Providers>
       </body>
@@ -223,7 +223,7 @@ If you want custom values, pass a `value` map:
 
 ```tsx
 <ThemeProvider
-  attribute="class"
+  attribute='class'
   value={{
     light: 'theme-light',
     dark: 'theme-dark',
@@ -246,9 +246,9 @@ import { ThemeProvider } from '@space-man/react-theme-animation'
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      defaultColorTheme="default"
+      attribute='class'
+      defaultTheme='system'
+      defaultColorTheme='default'
       colorThemes={['default', 'blue', 'green', 'purple']}
       enableSystem
       disableTransitionOnChange
@@ -267,7 +267,7 @@ import './globals.css'
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang='en' suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
       </body>
