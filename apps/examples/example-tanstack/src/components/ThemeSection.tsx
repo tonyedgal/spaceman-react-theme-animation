@@ -35,12 +35,8 @@ export function ThemeSection(): React.JSX.Element {
     ThemeAnimationType.CIRCLE,
   )
 
-  const {
-    theme: currentTheme,
-    colorTheme: currentColorTheme,
-    setTheme,
-    setColorTheme,
-  } = useTanStackTheme()
+  const { theme: currentTheme, colorTheme: currentColorTheme } =
+    useTanStackTheme()
 
   const animationControls = (
     <section className='space-y-4'>
@@ -129,13 +125,13 @@ export function ThemeSection(): React.JSX.Element {
   <ThemeSwitcher
    themes={['light', 'dark', 'system']}
    animationType={animationType}
-   duration={750}
+   duration={400}
   />
 
   <ThemeSwitcher
    themes={['light', 'dark']}
    animationType={animationType}
-   duration={750}
+   duration={400}
   />
 
   <ThemeSelector
@@ -177,7 +173,6 @@ export function ThemeSection(): React.JSX.Element {
                 <ThemeSwitcher
                   themes={['light', 'dark', 'system']}
                   currentTheme={currentTheme}
-                  onThemeChange={setTheme}
                 />
               </div>
 
@@ -188,7 +183,6 @@ export function ThemeSection(): React.JSX.Element {
                 <ThemeSwitcher
                   themes={['light', 'dark']}
                   currentTheme={currentTheme}
-                  onThemeChange={setTheme}
                 />
               </div>
 
@@ -207,7 +201,6 @@ export function ThemeSection(): React.JSX.Element {
                     'supabase',
                   ]}
                   currentColorTheme={currentColorTheme}
-                  onColorThemeChange={setColorTheme}
                 />
               </div>
             </section>

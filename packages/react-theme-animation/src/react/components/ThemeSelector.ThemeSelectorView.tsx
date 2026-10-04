@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 
 import type { ThemeSelectorViewProps } from './ThemeSelector.shared'
 import {
@@ -14,15 +14,30 @@ export function ThemeSelectorView({
   colorThemes,
   onSelectColorTheme,
 }: ThemeSelectorViewProps): React.JSX.Element | null {
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const inputMethod = useRef<'keyboard' | 'pointer'>('keyboard')
+
   return colorThemes.length > 1 ? (
     <div className='flex flex-col gap-2'>
       <Select
         value={colorTheme}
         onValueChange={(value) => {
-          onSelectColorTheme(value)
+          void onSelectColorTheme(value, {
+            element: triggerRef.current,
+            animationOff: inputMethod.current === 'keyboard',
+          }).catch(console.error)
         }}
       >
-        <SelectTrigger className='capitalize'>
+        <SelectTrigger
+          ref={triggerRef}
+          onPointerDownCapture={() => {
+            inputMethod.current = 'pointer'
+          }}
+          onKeyDownCapture={() => {
+            inputMethod.current = 'keyboard'
+          }}
+          className='capitalize'
+        >
           <SelectValue placeholder='Choose a color theme' />
         </SelectTrigger>
         <SelectContent>

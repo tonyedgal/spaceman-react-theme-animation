@@ -1,43 +1,53 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { flushSync } from 'react-dom'
 
+import { getThemeLogoOptions, preloadThemeLogo } from '../../core/logo'
+import { runThemeTransition } from '../../core/transitions'
 import type {
+  AnimationConfig,
+  ColorThemeToggle,
   Theme,
+  ThemeTransitionInput,
   UseThemeAnimationProps,
   UseThemeAnimationReturn,
 } from '../../core/types'
 import { ThemeAnimationType } from '../../core/types'
 import {
-  createBlurCircleAnimation,
-  createCircleAnimation,
-  createSlideAnimation,
+  getAnimationPosition,
+  getSlideFromCoords,
   getSystemTheme,
   injectBaseStyles,
-  prefersReducedMotion,
   resolveTheme,
-  supportsViewTransitions,
 } from '../../core/utils/animations'
+import { getColorTransitionOptions } from './transition-options'
 import { useHydrated } from './use-hydrated'
 
-interface SlideCoordinates {
-  readonly a: number
-  readonly b: number
-}
-
 const isBrowser = 'window' in globalThis
+
+const defaultThemes = ['light', 'dark', 'system'] as const
+
+const defaultColorThemes = ['default'] as const
 
 export const useThemeAnimation = (
   props: Readonly<UseThemeAnimationProps> = {},
 ): UseThemeAnimationReturn => {
   const {
-    duration: propsDuration = 750,
-    easing = 'ease-in-out',
+    duration: propsDuration = 400,
+    easing = 'cubic-bezier(0.32, 0.72, 0, 1)',
     animationType = ThemeAnimationType.CIRCLE,
     blurAmount = 2,
     styleId = 'spaceman-theme-style',
+    clipPathDirection = 'top-left',
+    animationPosition,
+    logo,
+    logoLight,
+    logoDark,
+    logoWidth,
+    logoHeight,
+    gradientWidth,
 
-    themes = ['light', 'dark', 'system'],
-    colorThemes = ['default'],
+    themes = defaultThemes,
+    colorThemes = defaultColorThemes,
     defaultTheme = 'system',
     defaultColorTheme = 'default',
 
@@ -68,12 +78,18 @@ export const useThemeAnimation = (
     slideToY = 0,
   } = props
 
-  const isHighResolution =
-    isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
+  // Validate untyped JavaScript callers as well as the public TypeScript union.
+  getThemeLogoOptions({ logo, logoLight, logoDark })
 
-  const duration = isHighResolution
-    ? Math.max(propsDuration * 0.8, 500)
-    : propsDuration
+  const duration = propsDuration
+
+  useEffect(() => {
+    if (animationType !== ThemeAnimationType.SVG_LOGO) return
+
+    for (const asset of [logo, logoLight, logoDark]) {
+      if (asset !== undefined && asset !== '') void preloadThemeLogo(asset)
+    }
+  }, [animationType, logo, logoLight, logoDark])
 
   const mounted = useHydrated()
 
@@ -194,8 +210,17 @@ export const useThemeAnimation = (
   ])
 
   const ref = useRef<HTMLButtonElement>(null)
+  const requestedTheme = useRef(currentTheme)
+  const requestedColorTheme = useRef(currentColorTheme)
+  const pendingUpdates = useRef(0)
+  useEffect(() => {
+    if (pendingUpdates.current === 0) {
+      requestedTheme.current = currentTheme
+      requestedColorTheme.current = currentColorTheme
+    }
+  }, [currentTheme, currentColorTheme])
 
-  const setTheme = useCallback(
+  const commitTheme = useCallback(
     (newTheme: Theme) => {
       // Always save to localStorage
       if (isBrowser) {
@@ -215,7 +240,7 @@ export const useThemeAnimation = (
     [onThemeChange, externalTheme, storageKey],
   )
 
-  const setColorTheme = useCallback(
+  const commitColorTheme = useCallback(
     (newColorTheme: string) => {
       // Always save to localStorage
       if (isBrowser) {
@@ -235,102 +260,108 @@ export const useThemeAnimation = (
     [onColorThemeChange, externalColorTheme, colorStorageKey],
   )
 
-  const switchTheme = useCallback(
-    async (newTheme: Theme, animationOff = false) => {
-      if (
-        !ref.current ||
-        !supportsViewTransitions() ||
-        prefersReducedMotion() ||
-        animationOff
-      ) {
-        setTheme(newTheme)
+  const setTheme = useCallback(
+    (newTheme: Theme) => {
+      requestedTheme.current = newTheme
+      commitTheme(newTheme)
+    },
+    [commitTheme],
+  )
 
-        return
-      }
+  const setColorTheme = useCallback(
+    (newColorTheme: string) => {
+      requestedColorTheme.current = newColorTheme
+      commitColorTheme(newColorTheme)
+    },
+    [commitColorTheme],
+  )
 
-      // Helper function to convert direction to from coordinates
-      const getSlideFromCoords = (direction: string): SlideCoordinates => {
-        switch (direction) {
-          case 'left':
-            return { a: -100, b: 0 }
-          case 'right':
-            return { a: 100, b: 0 }
-          case 'top':
-            return { a: 0, b: -100 }
-          case 'bottom':
-            return { a: 0, b: 100 }
-          case 'top-left':
-            return { a: -100, b: -100 }
-          case 'top-right':
-            return { a: 100, b: -100 }
-          case 'bottom-left':
-            return { a: -100, b: 100 }
-          case 'bottom-right':
-            return { a: 100, b: 100 }
-          default:
-            return { a: -100, b: 0 }
+  const animateChange = useCallback(
+    async (update: () => void, input: ThemeTransitionInput = false) => {
+      const options =
+        input === true || input === false ? { animationOff: input } : input
+
+      let config: AnimationConfig | null = null
+
+      if (options.animationOff !== true && duration > 0) {
+        if (animationType === ThemeAnimationType.SLIDE) {
+          const from =
+            slideFromX !== undefined && slideFromY !== undefined
+              ? { a: slideFromX, b: slideFromY }
+              : getSlideFromCoords(slideDirection)
+
+          config = {
+            ...from,
+            x: slideToX,
+            y: slideToY,
+            duration,
+            easing,
+            animationType,
+            blurAmount,
+            styleId,
+          }
+        } else {
+          // Read before the first await. A menu may unmount its trigger, and a
+          // responsive/moving layout may change during capture. All units are CSS px.
+          const element = options.element ?? ref.current
+          const rect = options.origin ? null : element?.getBoundingClientRect()
+
+          const origin =
+            (animationType === ThemeAnimationType.SVG_LOGO
+              ? getAnimationPosition('center')
+              : null) ??
+            options.origin ??
+            (animationPosition && animationPosition !== 'trigger'
+              ? getAnimationPosition(animationPosition)
+              : null) ??
+            (rect
+              ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+              : animationType === ThemeAnimationType.CIRCLE ||
+                  animationType === ThemeAnimationType.BLUR_CIRCLE
+                ? null
+                : getAnimationPosition('center'))
+
+          if (
+            origin &&
+            Number.isFinite(origin.x) &&
+            Number.isFinite(origin.y)
+          ) {
+            config = {
+              ...origin,
+              duration,
+              easing,
+              animationType,
+              blurAmount,
+              styleId,
+              clipPathDirection,
+              animationPosition,
+              logo:
+                logoLight !== undefined
+                  ? resolveTheme(requestedTheme.current) === 'light'
+                    ? logoLight
+                    : logoDark
+                  : logo,
+              logoWidth,
+              logoHeight,
+              gradientWidth,
+            }
+          }
         }
       }
 
-      let animationConfig
+      pendingUpdates.current++
 
-      if (animationType === ThemeAnimationType.SLIDE) {
-        // Use custom coordinates if provided, otherwise use direction
-        const fromCoords =
-          slideFromX !== undefined && slideFromY !== undefined
-            ? { a: slideFromX, b: slideFromY }
-            : getSlideFromCoords(slideDirection)
-
-        animationConfig = {
-          a: fromCoords.a,
-          b: fromCoords.b,
-          x: slideToX,
-          y: slideToY,
-          duration,
-          easing,
-          animationType,
-          blurAmount,
-          styleId,
-        }
-      } else {
-        // For circle and blur circle animations, use button center
-        const { top, left, width, height } = ref.current.getBoundingClientRect()
-        const x = left + width / 2
-        const y = top + height / 2
-
-        animationConfig = {
-          x,
-          y,
-          duration,
-          easing,
-          animationType,
-          blurAmount,
-          styleId,
-        }
-      }
-
-      if (animationType === ThemeAnimationType.BLUR_CIRCLE) {
-        createBlurCircleAnimation(animationConfig)
-      }
-
-      if (animationType === ThemeAnimationType.SLIDE) {
-        createSlideAnimation(animationConfig)
-      }
-
-      // Start the view transition
-
-      await document.startViewTransition(() => {
-        flushSync(() => {
-          setTheme(newTheme)
-        })
-      }).ready
-
-      if (animationType === ThemeAnimationType.CIRCLE) {
-        createCircleAnimation(animationConfig)
+      try {
+        await runThemeTransition(() => {
+          flushSync(update)
+        }, config)
+        pendingUpdates.current--
+      } catch (error) {
+        pendingUpdates.current--
+        throw error
       }
     },
     [
-      setTheme,
       duration,
       easing,
       animationType,
@@ -341,11 +372,30 @@ export const useThemeAnimation = (
       slideFromY,
       slideToX,
       slideToY,
+      clipPathDirection,
+      animationPosition,
+      logo,
+      logoLight,
+      logoDark,
+      logoWidth,
+      logoHeight,
+      gradientWidth,
     ],
   )
 
+  const switchTheme = useCallback(
+    async (newTheme: Theme, options?: ThemeTransitionInput) => {
+      if (newTheme === requestedTheme.current) return
+      requestedTheme.current = newTheme
+      await animateChange(() => {
+        commitTheme(newTheme)
+      }, options)
+    },
+    [animateChange, commitTheme],
+  )
+
   const switchColorTheme = useCallback(
-    (newColorTheme: string) => {
+    async (newColorTheme: string, options?: ThemeTransitionInput) => {
       if (!colorThemes.includes(newColorTheme)) {
         console.warn(
           `Color theme "${newColorTheme}" not found in available themes`,
@@ -354,59 +404,60 @@ export const useThemeAnimation = (
         return
       }
 
-      setColorTheme(newColorTheme)
+      if (newColorTheme === requestedColorTheme.current) return
+      requestedColorTheme.current = newColorTheme
+      await animateChange(() => {
+        commitColorTheme(newColorTheme)
+      }, options)
     },
-    [colorThemes, setColorTheme],
+    [colorThemes, animateChange, commitColorTheme],
   )
 
   const toggleTheme = useCallback(
-    async (animationOff = false): Promise<void> => {
-      const newTheme: Theme = resolvedTheme === 'dark' ? 'light' : 'dark'
-      await switchTheme(newTheme, animationOff)
+    async (options?: ThemeTransitionInput) => {
+      await switchTheme(
+        resolveTheme(requestedTheme.current) === 'dark' ? 'light' : 'dark',
+        options,
+      )
     },
-    [resolvedTheme, switchTheme],
+    [switchTheme],
   )
 
   const toggleLightTheme = useCallback(
-    async (animationOff = false): Promise<void> => {
-      if (resolvedTheme === 'light') return
-
-      await switchTheme('light', animationOff)
+    async (options?: ThemeTransitionInput) => {
+      if (resolveTheme(requestedTheme.current) === 'light') return
+      await switchTheme('light', options)
     },
-    [resolvedTheme, switchTheme],
+    [switchTheme],
   )
 
   const toggleDarkTheme = useCallback(
-    async (animationOff = false): Promise<void> => {
-      if (resolvedTheme === 'dark') return
-
-      await switchTheme('dark', animationOff)
+    async (options?: ThemeTransitionInput) => {
+      if (resolveTheme(requestedTheme.current) === 'dark') return
+      await switchTheme('dark', options)
     },
-    [resolvedTheme, switchTheme],
+    [switchTheme],
   )
 
-  const toggleColorTheme = useCallback(() => {
-    const currentIndex = colorThemes.indexOf(currentColorTheme)
-    const nextIndex = (currentIndex + 1) % colorThemes.length
-    const nextColorTheme = colorThemes[nextIndex]
-    setColorTheme(nextColorTheme)
-  }, [currentColorTheme, colorThemes, setColorTheme])
+  const toggleColorTheme = useCallback(
+    async (input?: Parameters<ColorThemeToggle>[0]) => {
+      if (colorThemes.length === 0) return
+      const index = colorThemes.indexOf(requestedColorTheme.current)
+      await switchColorTheme(
+        colorThemes[(index + 1) % colorThemes.length],
+        getColorTransitionOptions(input),
+      )
+    },
+    [colorThemes, switchColorTheme],
+  )
 
   const createColorThemeToggle = useCallback(
-    (targetColorTheme: string) => {
-      return (): void => {
-        if (!colorThemes.includes(targetColorTheme)) {
-          console.warn(
-            `Color theme "${targetColorTheme}" not found in available themes`,
-          )
-
-          return
-        }
-
-        setColorTheme(targetColorTheme)
+    (target: string): ColorThemeToggle => {
+      return async (input) => {
+        return switchColorTheme(target, getColorTransitionOptions(input))
       }
     },
-    [colorThemes, setColorTheme],
+    [switchColorTheme],
   )
 
   const isColorThemeActive = useCallback(

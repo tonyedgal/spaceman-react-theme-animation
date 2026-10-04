@@ -9,13 +9,21 @@ export function ThemeSwitcherWithContext({
   className,
   contextTheme,
   themes = defaultThemes,
-}: Pick<ThemeSwitcherProps, 'className' | 'themes'> & {
-  readonly contextTheme: SharedThemeContextValue
-}): React.JSX.Element {
+}: Readonly<
+  Pick<ThemeSwitcherProps, 'className' | 'themes'> & {
+    readonly contextTheme: SharedThemeContextValue
+  }
+>): React.JSX.Element {
   const handleSwitchTheme = async (
     theme: Theme,
     event?: React.MouseEvent<HTMLButtonElement>,
   ): Promise<void> => {
+    if (event?.detail === 0) {
+      await contextTheme.switchTheme(theme, true)
+
+      return
+    }
+
     if (contextTheme.switchThemeFromElement && event) {
       await contextTheme.switchThemeFromElement(theme, event.currentTarget)
 

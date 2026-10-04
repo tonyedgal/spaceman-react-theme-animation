@@ -12,8 +12,10 @@ export function ThemeSwitcherStandalone({
   animationType,
   duration,
   className,
+  ...animationOptions
 }: ThemeSwitcherProps): React.JSX.Element {
   const standaloneHook = useThemeAnimation({
+    ...animationOptions,
     animationType,
     duration,
     themes,
@@ -21,8 +23,14 @@ export function ThemeSwitcherStandalone({
     onThemeChange,
   })
 
-  const handleSwitchTheme = async (theme: Theme): Promise<void> => {
-    await standaloneHook.switchTheme(theme)
+  const handleSwitchTheme = async (
+    theme: Theme,
+    event?: React.MouseEvent<HTMLButtonElement>,
+  ): Promise<void> => {
+    await standaloneHook.switchTheme(theme, {
+      element: event?.currentTarget,
+      animationOff: event?.detail === 0,
+    })
   }
 
   return (

@@ -12,8 +12,10 @@ export function ThemeSelectorStandalone({
   onColorThemeChange,
   animationType,
   duration,
+  ...animationOptions
 }: ThemeSelectorProps): React.JSX.Element {
   const standaloneHook = useThemeAnimation({
+    ...animationOptions,
     animationType,
     duration,
     themes,
@@ -22,7 +24,7 @@ export function ThemeSelectorStandalone({
     onColorThemeChange,
   })
 
-  const handleColorThemeChange = standaloneHook.setColorTheme
+  const handleColorThemeChange = standaloneHook.switchColorTheme
 
   return (
     <ThemeSelectorView

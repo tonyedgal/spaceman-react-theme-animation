@@ -1,56 +1,53 @@
-import type { ThemeAnimationType } from '../types'
+import type {
+  AnimationConfig,
+  AnimationPosition,
+  SlideDirection,
+  ThemeTransitionOptions,
+} from '../types'
 
-const isBrowser = 'window' in globalThis
+const isBrowser = typeof window !== 'undefined'
 
+/** Injects styles scoped to transitions owned by this library. */
 export const injectBaseStyles = (): void => {
-  if (isBrowser) {
-    const styleId = 'spaceman-theme-base-style'
-
-    if (!document.getElementById(styleId)) {
-      const style = document.createElement('style')
-      style.id = styleId
-
-      const isHighResolution =
-        window.innerWidth >= 3000 || window.innerHeight >= 2000
-
-      style.textContent = `
-        ::view-transition-old(root),
-        ::view-transition-new(root) {
-          animation: none;
-          mix-blend-mode: normal;
-          ${isHighResolution ? 'transform: translateZ(0);' : ''}
-        }
-        
-        ${
-          isHighResolution
-            ? `
-        ::view-transition-group(root),
-        ::view-transition-image-pair(root),
-        ::view-transition-old(root),
-        ::view-transition-new(root) {
-          backface-visibility: hidden;
-          perspective: 1000px;
-          transform: translate3d(0, 0, 0);
-        }
-        `
-            : ''
-        }
-      `
-      document.head.appendChild(style)
+  if (!isBrowser || document.getElementById('spaceman-theme-base-style')) return
+  const style = document.createElement('style')
+  style.id = 'spaceman-theme-base-style'
+  style.textContent = `
+    html[data-spaceman-theme-transition]::view-transition-group(root),
+    html[data-spaceman-theme-transition]::view-transition-old(root),
+    html[data-spaceman-theme-transition]::view-transition-new(root) {
+      animation: none;
     }
-  }
+    html[data-spaceman-theme-transition]::view-transition-old(root),
+    html[data-spaceman-theme-transition]::view-transition-new(root) {
+      mix-blend-mode: normal;
+    }
+    html[data-spaceman-theme-transition],
+    html[data-spaceman-theme-transition] *,
+    html[data-spaceman-theme-transition] *::before,
+    html[data-spaceman-theme-transition] *::after {
+      transition: none !important;
+    }
+  `
+  document.head.appendChild(style)
 }
 
+/**
+ * Creates an SVG blur circle mask for animations
+ * @param blur - Blur amount for the gaussian filter
+ * @returns Data URI string for the SVG mask
+ */
 export const createBlurCircleMask = (blur: number): string => {
-  const isHighResolution =
-    isBrowser && (window.innerWidth >= 3000 || window.innerHeight >= 2000)
-
   const blurFilter = `<filter id="blur"><feGaussianBlur stdDeviation="${blur}" /></filter>`
-  const circleRadius = isHighResolution ? 20 : 25
+  const circleRadius = 25
 
   return `url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100"><defs>${blurFilter}</defs><circle cx="0" cy="0" r="${circleRadius}" fill="white" filter="url(%23blur)"/></svg>')`
 }
 
+/**
+ * Gets the system theme preference
+ * @returns 'light' or 'dark' based on system preference
+ */
 export const getSystemTheme = (): 'light' | 'dark' => {
   if (!isBrowser) return 'light'
 
@@ -59,6 +56,11 @@ export const getSystemTheme = (): 'light' | 'dark' => {
     : 'light'
 }
 
+/**
+ * Resolves a theme value to its actual light/dark value
+ * @param theme - Theme to resolve ('light', 'dark', or 'system')
+ * @returns Resolved theme ('light' or 'dark')
+ */
 export const resolveTheme = (theme: string): 'light' | 'dark' => {
   if (theme === 'system') {
     return getSystemTheme()
@@ -67,6 +69,10 @@ export const resolveTheme = (theme: string): 'light' | 'dark' => {
   return theme === 'dark' ? 'dark' : 'light'
 }
 
+/**
+ * Resolves a stored theme to the server-side class to apply on <html>.
+ * CSS mode uses the 'system' class so media queries can respond before hydration.
+ */
 export const resolveThemeForServer = (
   theme: string,
 ): 'light' | 'dark' | 'system' => {
@@ -77,178 +83,351 @@ export const resolveThemeForServer = (
   return theme === 'dark' ? 'dark' : 'light'
 }
 
+/**
+ * Checks if the browser supports View Transitions API
+ * @returns true if view transitions are supported
+ */
 export const supportsViewTransitions = (): boolean => {
-  return isBrowser && 'startViewTransition' in document
+  return isBrowser && document.startViewTransition instanceof Function
 }
 
+/**
+ * Checks if user prefers reduced motion
+ * @returns true if user prefers reduced motion
+ */
 export const prefersReducedMotion = (): boolean => {
   return (
     isBrowser && window.matchMedia('(prefers-reduced-motion: reduce)').matches
   )
 }
 
-export interface AnimationConfig {
-  readonly a?: number
-  readonly b?: number
-  readonly x: number
-  readonly y: number
-  readonly duration: number
-  readonly easing: string
-  readonly animationType: ThemeAnimationType
-  readonly blurAmount: number
-  readonly styleId: string
+/**
+ * Converts a slide direction to from coordinates
+ * @param direction - Slide direction
+ * @returns Object with a (x) and b (y) coordinates
+ */
+interface SlideCoordinates {
+  readonly a: number
+  readonly b: number
 }
 
-export const createCircleAnimation = (config: AnimationConfig): void => {
-  const { x, y, duration, easing } = config
+export const getSlideFromCoords = (
+  direction: SlideDirection,
+): SlideCoordinates => {
+  switch (direction) {
+    case 'left':
+      return { a: -100, b: 0 }
+    case 'right':
+      return { a: 100, b: 0 }
+    case 'top':
+      return { a: 0, b: -100 }
+    case 'bottom':
+      return { a: 0, b: 100 }
+    case 'top-left':
+      return { a: -100, b: -100 }
+    case 'top-right':
+      return { a: 100, b: -100 }
+    case 'bottom-left':
+      return { a: -100, b: 100 }
+    case 'bottom-right':
+      return { a: 100, b: 100 }
+    default:
+      return { a: -100, b: 0 }
+  }
+}
 
-  // Calculate the distance to each corner of the viewport
-  const topLeft = Math.hypot(x, y)
-  const topRight = Math.hypot(window.innerWidth - x, y)
-  const bottomLeft = Math.hypot(x, window.innerHeight - y)
-  const bottomRight = Math.hypot(window.innerWidth - x, window.innerHeight - y)
+/** Cover the captured snapshot, including fractional zoom and its feather edge. */
+interface SnapshotSize {
+  readonly width: number
+  readonly height: number
+}
 
-  // Find the maximum distance to ensure animation covers the entire viewport
-  const maxRadius = Math.max(topLeft, topRight, bottomLeft, bottomRight)
-
-  document.documentElement.animate(
-    {
-      clipPath: [
-        `circle(0px at ${x}px ${y}px)`,
-        `circle(${maxRadius}px at ${x}px ${y}px)`,
-      ],
-    },
-    {
-      duration,
-      easing,
-      pseudoElement: '::view-transition-new(root)',
-    },
+const getSnapshotSize = (): SnapshotSize => {
+  // innerWidth/Height are integers; the captured CSS box can be fractional at
+  // browser zoom. Read once after ready, and keep every coordinate in CSS px.
+  const snapshot = getComputedStyle(
+    document.documentElement,
+    '::view-transition-new(root)',
   )
+
+  const width = Math.max(window.innerWidth, parseFloat(snapshot.width) || 0)
+  const height = Math.max(window.innerHeight, parseFloat(snapshot.height) || 0)
+
+  return { width, height }
 }
 
-export const createSlideAnimation = (config: AnimationConfig): void => {
-  const { a = -100, b = 0, x, y, duration, styleId } = config
+const getCircleRadius = (x: number, y: number): number => {
+  const { width, height } = getSnapshotSize()
 
-  const styleElement = document.createElement('style')
-  styleElement.id = styleId
-
-  styleElement.textContent = `
-    ::view-transition-old(root) {
-      animation-delay: ${duration}ms;
-    }
-    
-    ::view-transition-new(root) {
-      animation: move-in ${duration}ms;
-      animation-timing-function: cubic-bezier(0.66, 0, 0.34, 1);
-    }
-    
-    @keyframes move-in {
-      from {
-        translate: ${a}% ${b}%;
-      }
-      to {
-        translate: ${x}% ${y}%;
-      }
-    }
-  `
-
-  document.head.appendChild(styleElement)
-
-  // Clean up after animation
-  setTimeout(() => {
-    const styleElement = document.getElementById(styleId)
-
-    if (styleElement) {
-      styleElement.remove()
-    }
-  }, duration)
+  return (
+    Math.hypot(
+      Math.max(Math.abs(x), Math.abs(width - x)),
+      Math.max(Math.abs(y), Math.abs(height - y)),
+    ) + 1
+  ) // Overscan prevents an antialiased final corner from revealing the old view.
 }
 
-export const createBlurCircleAnimation = (config: AnimationConfig): void => {
-  const { x, y, duration, easing, blurAmount, styleId } = config
+/** Viewport CSS coordinates for fixed origins; button origins stay in the hook. */
+export const getAnimationPosition = (
+  position: Exclude<AnimationPosition, 'trigger'>,
+): NonNullable<ThemeTransitionOptions['origin']> => {
+  const x = position.includes('left')
+    ? 0
+    : position.includes('right')
+      ? window.innerWidth
+      : window.innerWidth / 2
 
-  const existingStyle = document.getElementById(styleId)
+  const y = position.includes('top')
+    ? 0
+    : position.includes('bottom')
+      ? window.innerHeight
+      : window.innerHeight / 2
 
-  if (existingStyle) {
-    existingStyle.remove()
+  return { x, y }
+}
+
+let revealSequence = 0
+
+const animateReveal = (
+  config: AnimationConfig,
+  frames: Readonly<PropertyIndexedKeyframes>,
+): Animation => {
+  const animation = document.documentElement.animate(frames, {
+    duration: config.duration,
+    easing: config.easing,
+    fill: 'both',
+    pseudoElement: '::view-transition-new(root)',
+  })
+
+  const effect = animation.effect
+
+  if (!(effect instanceof KeyframeEffect)) return animation
+  const keyframes = effect.getKeyframes()
+
+  const property = keyframes.some((frame) => 'clipPath' in frame)
+    ? 'clipPath'
+    : keyframes.some((frame) => 'maskImage' in frame)
+      ? 'maskImage'
+      : 'transform'
+
+  const value = getComputedStyle(
+    document.documentElement,
+    '::view-transition-new(root)',
+  )[property]
+
+  if (value !== 'none') return animation
+
+  // Some engines accept WAAPI pseudoElement but render no animated style. CSS
+  // pseudo animations are independently supported; retain the same native clock.
+  const paused = animation.playState === 'paused'
+  const time = animation.currentTime
+  animation.cancel()
+  void animation.finished.catch(() => {})
+  const name = `spaceman-theme-reveal-${++revealSequence}`
+  const style = document.createElement('style')
+
+  const rules = keyframes
+    .map((frame) => {
+      const declarations = Object.entries(frame)
+        .filter(
+          ([key]) =>
+            !['offset', 'computedOffset', 'easing', 'composite'].includes(key),
+        )
+        .map(
+          ([key, value]) =>
+            `${key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}:${value};`,
+        )
+        .join('')
+
+      return `${frame.computedOffset * 100}%{${declarations}}`
+    })
+    .join('')
+
+  style.textContent = `@keyframes ${name}{${rules}}html[data-spaceman-theme-transition]::view-transition-new(root){animation:${name} ${config.duration}ms ${config.easing} both;}`
+  document.head.appendChild(style)
+
+  // Reading the name flushes style so the native CSS animation is discoverable.
+  const animationName = getComputedStyle(
+    document.documentElement,
+    '::view-transition-new(root)',
+  ).animationName
+
+  const fallback = document
+    .getAnimations()
+    .find(
+      (candidate) =>
+        candidate instanceof CSSAnimation &&
+        candidate.animationName === animationName,
+    )
+
+  if (!fallback) {
+    style.remove()
+    throw new Error('Transition pseudo animations are unavailable')
   }
 
-  const viewportSize = Math.max(window.innerWidth, window.innerHeight) + 200
+  if (paused) {
+    fallback.pause()
+    fallback.currentTime = time
+  }
 
-  const isHighResolution =
-    window.innerWidth >= 3000 || window.innerHeight >= 2000
+  void fallback.finished.then(
+    () => {
+      style.remove()
+    },
+    () => {
+      style.remove()
+    },
+  )
 
-  const scaleFactor = isHighResolution ? 2.5 : 4
+  return fallback
+}
 
-  const optimalMaskSize = isHighResolution
-    ? Math.min(viewportSize * scaleFactor, 5000)
-    : viewportSize * scaleFactor
+/** A half-plane wipe, including diagonals, with compatible four-point polygons. */
+export const createClipPathAnimation = (config: AnimationConfig): Animation => {
+  const direction = config.clipPathDirection ?? 'top-left'
 
-  const topLeft = Math.hypot(x, y)
-  const topRight = Math.hypot(window.innerWidth - x, y)
-  const bottomLeft = Math.hypot(x, window.innerHeight - y)
-  const bottomRight = Math.hypot(window.innerWidth - x, window.innerHeight - y)
-  const maxRadius = Math.max(topLeft, topRight, bottomLeft, bottomRight)
+  const polygons: Record<SlideDirection, string> = {
+    'top-left': 'polygon(-1% -1%, 101% -101%, -101% 101%, -1% -1%)',
+    top: 'polygon(-1% -1%, 101% -1%, 101% -1%, -1% -1%)',
+    'top-right': 'polygon(101% -1%, 201% 101%, -1% -101%, 101% -1%)',
+    right: 'polygon(101% -1%, 101% 101%, 101% 101%, 101% -1%)',
+    'bottom-right': 'polygon(101% 101%, -1% 201%, 201% -1%, 101% 101%)',
+    bottom: 'polygon(101% 101%, -1% 101%, -1% 101%, 101% 101%)',
+    'bottom-left': 'polygon(-1% 101%, -101% -1%, 101% 201%, -1% 101%)',
+    left: 'polygon(-1% 101%, -1% -1%, -1% -1%, -1% 101%)',
+  }
 
-  const styleElement = document.createElement('style')
-  styleElement.id = styleId
+  // Expand the clipped half-plane in its travel direction. Rectangular end
+  // vertices retain winding order and cover the snapshot with slight overscan.
+  const ends: Record<SlideDirection, string> = {
+    'top-left': 'polygon(-1% -1%, 201% -1%, -1% 201%, -1% -1%)',
+    top: 'polygon(-1% -1%, 101% -1%, 101% 101%, -1% 101%)',
+    'top-right': 'polygon(101% -1%, 101% 201%, -101% -1%, 101% -1%)',
+    right: 'polygon(101% -1%, 101% 101%, -1% 101%, -1% -1%)',
+    'bottom-right': 'polygon(101% 101%, -101% 101%, 101% -101%, 101% 101%)',
+    bottom: 'polygon(101% 101%, -1% 101%, -1% -1%, 101% -1%)',
+    'bottom-left': 'polygon(-1% 101%, -1% -101%, 201% 101%, -1% 101%)',
+    left: 'polygon(-1% 101%, -1% -1%, 101% -1%, 101% 101%)',
+  }
 
-  const blurFactor = isHighResolution ? 1.5 : 1.2
-  const finalMaskSize = Math.max(optimalMaskSize, maxRadius * 2.5)
+  return animateReveal(config, {
+    clipPath: [polygons[direction], ends[direction]],
+  })
+}
 
-  styleElement.textContent = `
-    ::view-transition-group(root) {
-      animation-duration: ${duration}ms;
-      animation-timing-function: ${
-        isHighResolution
-          ? 'cubic-bezier(0.2, 0, 0.2, 1)'
-          : 'linear(' +
-            '0 0%, 0.2342 12.49%, 0.4374 24.99%,' +
-            '0.6093 37.49%, 0.6835 43.74%,' +
-            '0.7499 49.99%, 0.8086 56.25%,' +
-            '0.8593 62.5%, 0.9023 68.75%, 0.9375 75%,' +
-            '0.9648 81.25%, 0.9844 87.5%,' +
-            '0.9961 93.75%, 1 100%' +
-            ')'
-      };
-      will-change: transform;
-    }
-    
-    ::view-transition-new(root) {
-      mask: ${createBlurCircleMask(blurAmount * blurFactor)} 0 0 / 100% 100% no-repeat;
-      mask-position: ${x}px ${y}px;
-      animation: spaceman-mask-scale ${duration}ms ${easing};
-      transform-origin: ${x}px ${y}px;
-      will-change: mask-size, mask-position;
-    }
-    
-    ::view-transition-old(root),
-    .dark::view-transition-old(root) {
-      animation: spaceman-mask-scale ${duration}ms ${easing};
-      transform-origin: ${x}px ${y}px;
-      z-index: -1;
-      will-change: mask-size, mask-position;
-    }
-    
-    @keyframes spaceman-mask-scale {
-      0% {
-        mask-size: 0px;
-        mask-position: ${x}px ${y}px;
-      }
-      100% {
-        mask-size: ${finalMaskSize}px;
-        mask-position: ${x - finalMaskSize / 2}px ${y - finalMaskSize / 2}px;
-      }
-    }
-  `
+/** Feathered polygon/edge mask, without Gaussian filtering or scaling content. */
+export const createPolygonGradientAnimation = (
+  config: AnimationConfig,
+): Animation => {
+  const direction = config.clipPathDirection ?? 'top-left'
+  const { width, height } = getSnapshotSize()
+  const diagonal = direction.includes('-')
+  const left = direction.includes('left')
+  const top = direction.includes('top')
+  const horizontal = direction === 'left' || direction === 'right'
+  const x = left ? 0 : direction.includes('right') ? 1 : 0.5
+  const y = top ? 0 : direction.includes('bottom') ? 1 : 0.5
+  const w = diagonal || horizontal ? width * 3 : width
+  const h = diagonal || !horizontal ? height * 3 : height
 
-  document.head.appendChild(styleElement)
+  const points = diagonal
+    ? `${x * 100},${y * 100} ${(1 - x) * 100},${y * 100} ${x * 100},${(1 - y) * 100}`
+    : '0,0 100,0 100,100 0,100'
 
-  setTimeout(() => {
-    const styleElement = document.getElementById(styleId)
+  // SVG gradient t = x/w + y/h for a diagonal. Its perpendicular CSS
+  // distance is 1 / hypot(1/w, 1/h), including non-square viewports.
+  const length = diagonal ? (w * h) / Math.hypot(w, h) : horizontal ? w : h
 
-    if (styleElement) {
-      styleElement.remove()
-    }
-  }, duration)
+  const feather = Math.max(
+    0,
+    Math.min(config.gradientWidth ?? 80, length * 0.2),
+  )
+
+  const stop = 1 - feather / length
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="edge" x1="${x * 100}" y1="${y * 100}" x2="${100 * (diagonal ? 0.5 : horizontal ? 1 - x : x)}" y2="${100 * (diagonal ? 0.5 : horizontal ? y : 1 - y)}" gradientUnits="userSpaceOnUse"><stop offset="${stop}" stop-color="black"/><stop offset="1" stop-color="black" stop-opacity="0"/></linearGradient></defs><polygon points="${points}" fill="url(#edge)"/></svg>`
+
+  return animateReveal(config, {
+    maskImage: [
+      `url("data:image/svg+xml,${encodeURIComponent(svg)}")`,
+      `url("data:image/svg+xml,${encodeURIComponent(svg)}")`,
+    ],
+    maskMode: ['alpha', 'alpha'],
+    maskRepeat: ['no-repeat', 'no-repeat'],
+    maskSize: [
+      diagonal ? '0px 0px' : horizontal ? `0px ${h}px` : `${w}px 0px`,
+      `${w}px ${h}px`,
+    ],
+    maskPosition: [
+      `${x * width}px ${y * height}px`,
+      `${x * (width - w)}px ${y * (height - h)}px`,
+    ],
+  })
+}
+
+/** Upright triangle; its final incircle contains all four snapshot corners. */
+export const createTriangleAnimation = (config: AnimationConfig): Animation => {
+  const { x, y } = config
+  const radius = getCircleRadius(x, y)
+  const side = Math.sqrt(3) * radius
+
+  return animateReveal(config, {
+    clipPath: [
+      `polygon(${x}px ${y}px, ${x}px ${y}px, ${x}px ${y}px)`,
+      `polygon(${x}px ${y - 2 * radius}px, ${x + side}px ${y + radius}px, ${x - side}px ${y + radius}px)`,
+    ],
+  })
+}
+
+/** The fixed logo has its own snapshot; only the page reveal grows beneath it. */
+export const createSvgLogoAnimation = (config: AnimationConfig): Animation => {
+  const { width, height } = getSnapshotSize()
+
+  return createCircleAnimation({ ...config, x: width / 2, y: height / 2 })
+}
+
+/** Native circular clip; browser compositor support varies by engine. */
+export const createCircleAnimation = (config: AnimationConfig): Animation => {
+  const { x, y } = config
+
+  return animateReveal(config, {
+    clipPath: [
+      `circle(0px at ${x}px ${y}px)`,
+      `circle(${getCircleRadius(x, y)}px at ${x}px ${y}px)`,
+    ],
+  })
+}
+
+/** Predetermined translation uses WAAPI rather than a timer-owned stylesheet. */
+export const createSlideAnimation = (config: AnimationConfig): Animation => {
+  const { a = -100, b = 0, x, y } = config
+
+  return animateReveal(config, {
+    transform: [`translate(${a}%, ${b}%)`, `translate(${x}%, ${y}%)`],
+  })
+}
+
+/**
+ * A bounded radial gradient feathers only the reveal edge. Unlike the old SVG
+ * Gaussian mask, it needs no huge filtered surface or animation on the old view.
+ * Mask animation can still paint; this is not a compositor-only guarantee.
+ */
+export const createBlurCircleAnimation = (
+  config: AnimationConfig,
+): Animation => {
+  const { x, y, blurAmount } = config
+
+  if (blurAmount <= 0) return createCircleAnimation(config)
+  const feather = Math.min(blurAmount, 20)
+  const radius = getCircleRadius(x, y) + feather
+  const diameter = radius * 2
+
+  return animateReveal(config, {
+    maskImage: [
+      `radial-gradient(closest-side, #000 calc(100% - ${feather}px), transparent 100%)`,
+      `radial-gradient(closest-side, #000 calc(100% - ${feather}px), transparent 100%)`,
+    ],
+    maskRepeat: ['no-repeat', 'no-repeat'],
+    maskSize: ['0px 0px', `${diameter}px ${diameter}px`],
+    maskPosition: [`${x}px ${y}px`, `${x - radius}px ${y - radius}px`],
+  })
 }

@@ -65,7 +65,7 @@ export function RootDocument({
           defaultTheme='system'
           defaultColorTheme='default'
           animationType={ThemeAnimationType.CIRCLE}
-          duration={750}
+          duration={400}
           systemThemeMode='css'
         >
           <NavBar />

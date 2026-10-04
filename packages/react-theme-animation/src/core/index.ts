@@ -19,3 +19,17 @@ export {
   resolveThemeForServer,
   supportsViewTransitions,
 } from './utils/animations'
+
+export type {
+  AnimationPosition,
+  ColorThemeToggle,
+  ThemeAnimationOptions,
+  ThemeLogoOptions,
+  ThemeTransitionInput,
+  ThemeTransitionOptions,
+  TransitionDirection,
+} from './types'
+
+export { TRANSITION_DIRECTIONS } from './types'
+
+export { preloadThemeLogo } from './logo'

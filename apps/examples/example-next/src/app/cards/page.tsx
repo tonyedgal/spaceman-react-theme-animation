@@ -20,7 +20,9 @@ function Page(): React.JSX.Element {
     <main className='relative flex min-h-screen w-full items-center justify-center bg-transparent'>
       <div className='bg-background/80 grid grid-cols-1 gap-10 rounded-lg border p-8 md:grid-cols-2'>
         <Button
-          onClick={createColorThemeToggle('supabase')}
+          onClick={(event) => {
+            void createColorThemeToggle('supabase')(event).catch(console.error)
+          }}
           variant='default'
           className={cn(
             'bg-primary text-primary-foreground',
@@ -30,7 +32,9 @@ function Page(): React.JSX.Element {
           {copy.supabase}
         </Button>
         <Button
-          onClick={createColorThemeToggle('mono')}
+          onClick={(event) => {
+            void createColorThemeToggle('mono')(event).catch(console.error)
+          }}
           variant='secondary'
           className={cn(
             'bg-secondary text-secondary-foreground',
