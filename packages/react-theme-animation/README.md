@@ -2,6 +2,13 @@
 
 React theme switching with smooth view transition animations, multi-theme support, and synchronized state management.
 
+## Module support
+
+This package ships ESM only. Use `import` or dynamic `import()` instead of
+`require()`. TypeScript declarations are included. The package does not ship
+source maps. Both built-in controls and their required dependencies remain
+available through the existing exports.
+
 ## Spaceman React Theme Animation v2 release
 
 Version 2 moves the library into a workspace-friendly monorepo, keeps the published package name stable, and standardizes the public API around flat root imports.
@@ -12,7 +19,7 @@ Highlights in this release:
 - framework-specific providers for Next.js, TanStack Start, and Vite
 - TanStack SSR helpers exposed from the root package
 - workspace examples for Next.js, TanStack Start, and TanStack Start SSR
-- build and packaging updates for ESM, CJS, and declaration output
+- build and packaging updates for ESM and declaration output
 
 ## Installation
 
