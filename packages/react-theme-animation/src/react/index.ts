@@ -1,23 +1,27 @@
 export { useThemeAnimation } from './hooks/use-theme-animation'
 
 export { ThemeSwitcher } from './components/ThemeSwitcher'
+
 export { ThemeSelector } from './components/ThemeSelector'
 
 export {
   SpacemanThemeProvider,
   useSpacemanTheme,
 } from './components/SpacemanThemeProvider'
+
 export {
   NextThemeProvider,
   ThemeProvider,
   useNextTheme,
   useTheme,
 } from './components/NextThemeProvider'
+
 export {
   TanStackThemeProvider,
   TanStackStartThemeScript,
   useTanStackTheme,
 } from './components/TanStackThemeProvider'
+
 export { ViteThemeProvider, useViteTheme } from './components/ViteThemeProvider'
 
 export type {
@@ -41,3 +45,17 @@ export {
   supportsViewTransitions,
   prefersReducedMotion,
 } from '../core/utils/animations'
+
+export type {
+  AnimationPosition,
+  TransitionDirection,
+  ThemeAnimationOptions,
+  ThemeLogoOptions,
+  ThemeTransitionOptions,
+  ThemeTransitionInput,
+  ColorThemeToggle,
+} from '../core/types'
+
+export { TRANSITION_DIRECTIONS } from '../core/types'
+
+export { preloadThemeLogo } from '../core/logo'
