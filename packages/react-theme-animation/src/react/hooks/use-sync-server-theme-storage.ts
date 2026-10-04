@@ -11,11 +11,11 @@ export const useSyncServerThemeStorage = ({
   storageKey,
   colorStorageKey,
 }: {
-  enabled: boolean
-  theme?: Theme
-  colorTheme?: ColorTheme
-  storageKey: string
-  colorStorageKey: string
+  readonly enabled: boolean
+  readonly theme?: Theme
+  readonly colorTheme?: ColorTheme
+  readonly storageKey: string
+  readonly colorStorageKey: string
 }): void => {
   useEffect(() => {
     if (!enabled || !isBrowser) return

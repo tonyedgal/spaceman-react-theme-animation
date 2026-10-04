@@ -23,101 +23,101 @@ export type ColorTheme = string
 export type SystemThemeMode = 'css' | 'js'
 
 export interface UseThemeAnimationProps {
-  duration?: number
-  easing?: string
-  animationType?: ThemeAnimationType
-  blurAmount?: number
-  styleId?: string
+  readonly duration?: number
+  readonly easing?: string
+  readonly animationType?: ThemeAnimationType
+  readonly blurAmount?: number
+  readonly styleId?: string
 
-  themes?: readonly Theme[]
-  colorThemes?: readonly ColorTheme[]
-  defaultTheme?: Theme
-  defaultColorTheme?: ColorTheme
+  readonly themes?: readonly Theme[]
+  readonly colorThemes?: readonly ColorTheme[]
+  readonly defaultTheme?: Theme
+  readonly defaultColorTheme?: ColorTheme
 
-  globalClassName?: string
-  colorThemePrefix?: string
-  attribute?: 'class' | 'data-theme'
-  value?: Record<string, string>
-  enableColorScheme?: boolean
+  readonly globalClassName?: string
+  readonly colorThemePrefix?: string
+  readonly attribute?: 'class' | 'data-theme'
+  readonly value?: Record<string, string>
+  readonly enableColorScheme?: boolean
 
-  storageKey?: string
-  colorStorageKey?: string
+  readonly storageKey?: string
+  readonly colorStorageKey?: string
 
-  theme?: Theme
-  colorTheme?: ColorTheme
+  readonly theme?: Theme
+  readonly colorTheme?: ColorTheme
 
-  onThemeChange?: (theme: Theme) => void
-  onColorThemeChange?: (colorTheme: ColorTheme) => void
+  readonly onThemeChange?: (theme: Theme) => void
+  readonly onColorThemeChange?: (colorTheme: ColorTheme) => void
 
-  initialTheme?: Theme
-  initialColorTheme?: ColorTheme
-  systemThemeMode?: SystemThemeMode
+  readonly initialTheme?: Theme
+  readonly initialColorTheme?: ColorTheme
+  readonly systemThemeMode?: SystemThemeMode
 
   // Slide animation options (only valid when animationType is SLIDE)
-  slideDirection?: SlideDirection
-  slideFromX?: number // custom from translate X (%)
-  slideFromY?: number // custom from translate Y (%)
-  slideToX?: number // custom to translate X (%)
-  slideToY?: number // custom to translate Y (%)
+  readonly slideDirection?: SlideDirection
+  readonly slideFromX?: number // custom from translate X (%)
+  readonly slideFromY?: number // custom from translate Y (%)
+  readonly slideToX?: number // custom to translate X (%)
+  readonly slideToY?: number // custom to translate Y (%)
 }
 
 export interface UseThemeAnimationReturn {
-  ref: RefObject<HTMLButtonElement | null>
+  readonly ref: RefObject<HTMLButtonElement | null>
 
-  theme: Theme
-  colorTheme: ColorTheme
-  resolvedTheme: 'light' | 'dark'
-  systemTheme: 'light' | 'dark'
+  readonly theme: Theme
+  readonly colorTheme: ColorTheme
+  readonly resolvedTheme: 'light' | 'dark'
+  readonly systemTheme: 'light' | 'dark'
 
-  setTheme: (theme: Theme) => void
-  setColorTheme: (colorTheme: ColorTheme) => void
+  readonly setTheme: (theme: Theme) => void
+  readonly setColorTheme: (colorTheme: ColorTheme) => void
 
-  switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
-  switchColorTheme: (colorTheme: string) => void
+  readonly switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
+  readonly switchColorTheme: (colorTheme: string) => void
 
-  toggleTheme: (animationOff?: boolean) => Promise<void>
-  toggleLightTheme: (animationOff?: boolean) => Promise<void>
-  toggleDarkTheme: (animationOff?: boolean) => Promise<void>
-  toggleColorTheme: () => void
+  readonly toggleTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleLightTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleDarkTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleColorTheme: () => void
 
-  createColorThemeToggle: (targetColorTheme: string) => () => void
-  isColorThemeActive: (targetColorTheme: string) => boolean
+  readonly createColorThemeToggle: (targetColorTheme: string) => () => void
+  readonly isColorThemeActive: (targetColorTheme: string) => boolean
 }
 
 export interface ThemeSwitcherProps {
-  themes?: readonly Theme[]
-  currentTheme?: Theme
-  onThemeChange?: (theme: Theme) => void
+  readonly themes?: readonly Theme[]
+  readonly currentTheme?: Theme
+  readonly onThemeChange?: (theme: Theme) => void
 
-  animationType?: ThemeAnimationType
-  duration?: number
+  readonly animationType?: ThemeAnimationType
+  readonly duration?: number
 
-  className?: string
-  size?: 'sm' | 'md' | 'lg'
-  variant?: 'default' | 'outline' | 'ghost'
+  readonly className?: string
+  readonly size?: 'sm' | 'md' | 'lg'
+  readonly variant?: 'default' | 'outline' | 'ghost'
 
-  icons?: {
-    light?: React.ReactNode
-    dark?: React.ReactNode
-    system?: React.ReactNode
+  readonly icons?: {
+    readonly light?: React.ReactNode
+    readonly dark?: React.ReactNode
+    readonly system?: React.ReactNode
   }
 }
 
 export interface ThemeSelectorProps {
-  themes?: readonly Theme[]
-  colorThemes?: readonly ColorTheme[]
-  currentTheme?: Theme
-  currentColorTheme?: ColorTheme
+  readonly themes?: readonly Theme[]
+  readonly colorThemes?: readonly ColorTheme[]
+  readonly currentTheme?: Theme
+  readonly currentColorTheme?: ColorTheme
 
-  onThemeChange?: (theme: Theme) => void
-  onColorThemeChange?: (colorTheme: ColorTheme) => void
+  readonly onThemeChange?: (theme: Theme) => void
+  readonly onColorThemeChange?: (colorTheme: ColorTheme) => void
 
-  animationType?: ThemeAnimationType
-  duration?: number
+  readonly animationType?: ThemeAnimationType
+  readonly duration?: number
 
-  className?: string
-  placeholder?: string
+  readonly className?: string
+  readonly placeholder?: string
 
-  themeLabel?: string
-  colorThemeLabel?: string
+  readonly themeLabel?: string
+  readonly colorThemeLabel?: string
 }

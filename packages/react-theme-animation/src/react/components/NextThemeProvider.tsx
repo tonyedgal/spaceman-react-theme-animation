@@ -6,60 +6,61 @@ import type { ColorTheme, Theme } from '../../core/types'
 import { ThemeAnimationType } from '../../core/types'
 import { useHydrated } from '../hooks/use-hydrated'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
+import { ThemePreHydrationScript } from './NextThemeScript'
 import { getNextResolvedTheme, withElementAsRef } from './provider-helpers'
 import { SharedThemeContext } from './shared-theme-context'
 
 const defaultColorThemes = ['default'] as const
 
 export interface NextThemeContextType {
-  ref: React.RefObject<HTMLButtonElement | null>
-  theme: Theme
-  colorTheme: ColorTheme
-  resolvedTheme: 'light' | 'dark'
-  systemTheme: 'light' | 'dark'
-  setTheme: (theme: Theme) => void
-  setColorTheme: (colorTheme: ColorTheme) => void
-  switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
-  switchColorTheme: (colorTheme: string) => void
-  toggleTheme: (animationOff?: boolean) => Promise<void>
-  toggleLightTheme: (animationOff?: boolean) => Promise<void>
-  toggleDarkTheme: (animationOff?: boolean) => Promise<void>
-  toggleColorTheme: () => void
-  createColorThemeToggle: (targetColorTheme: string) => () => void
-  isColorThemeActive: (targetColorTheme: string) => boolean
-  switchThemeFromElement: (
+  readonly ref: React.RefObject<HTMLButtonElement | null>
+  readonly theme: Theme
+  readonly colorTheme: ColorTheme
+  readonly resolvedTheme: 'light' | 'dark'
+  readonly systemTheme: 'light' | 'dark'
+  readonly setTheme: (theme: Theme) => void
+  readonly setColorTheme: (colorTheme: ColorTheme) => void
+  readonly switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
+  readonly switchColorTheme: (colorTheme: string) => void
+  readonly toggleTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleLightTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleDarkTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleColorTheme: () => void
+  readonly createColorThemeToggle: (targetColorTheme: string) => () => void
+  readonly isColorThemeActive: (targetColorTheme: string) => boolean
+  readonly switchThemeFromElement: (
     theme: Theme,
     element: HTMLButtonElement,
   ) => Promise<void>
 }
 
 export interface NextThemeProviderProps {
-  children: React.ReactNode
-  themes?: readonly Theme[]
-  colorThemes?: readonly ColorTheme[]
-  defaultTheme?: Theme
-  defaultColorTheme?: ColorTheme
-  animationType?: ThemeAnimationType
-  duration?: number
-  storageKey?: string
-  colorStorageKey?: string
-  attribute?: 'class' | 'data-theme'
-  value?: Record<string, string>
-  enableSystem?: boolean
-  enableColorScheme?: boolean
-  disableTransitionOnChange?: boolean
-  forcedTheme?: Theme
-  nonce?: string
-  scriptProps?: Omit<
+  readonly children: React.ReactNode
+  readonly themes?: readonly Theme[]
+  readonly colorThemes?: readonly ColorTheme[]
+  readonly defaultTheme?: Theme
+  readonly defaultColorTheme?: ColorTheme
+  readonly animationType?: ThemeAnimationType
+  readonly duration?: number
+  readonly storageKey?: string
+  readonly colorStorageKey?: string
+  readonly attribute?: 'class' | 'data-theme'
+  readonly value?: Record<string, string>
+  readonly enableSystem?: boolean
+  readonly enableColorScheme?: boolean
+  readonly disableTransitionOnChange?: boolean
+  readonly forcedTheme?: Theme
+  readonly nonce?: string
+  readonly scriptProps?: Omit<
     React.ScriptHTMLAttributes<HTMLScriptElement>,
     'dangerouslySetInnerHTML' | 'nonce'
   >
-  colorThemePrefix?: string
-  globalClassName?: string
-  disableAnimationOnInit?: boolean
-  disablePreHydrationScript?: boolean
-  onThemeChange?: (theme: Theme) => void
-  onColorThemeChange?: (colorTheme: ColorTheme) => void
+  readonly colorThemePrefix?: string
+  readonly globalClassName?: string
+  readonly disableAnimationOnInit?: boolean
+  readonly disablePreHydrationScript?: boolean
+  readonly onThemeChange?: (theme: Theme) => void
+  readonly onColorThemeChange?: (colorTheme: ColorTheme) => void
 }
 
 const NextThemeContext = createContext<NextThemeContextType | undefined>(
@@ -81,95 +82,6 @@ const createDisableTransitions = () => {
     }, 1)
   }
 }
-
-const generatePreHydrationScript = ({
-  attribute,
-  colorStorageKey,
-  colorThemePrefix,
-  defaultColorTheme,
-  defaultTheme,
-  enableColorScheme,
-  enableSystem,
-  globalClassName,
-  storageKey,
-  value,
-}: {
-  attribute: 'class' | 'data-theme'
-  colorStorageKey: string
-  colorThemePrefix: string
-  defaultColorTheme: ColorTheme
-  defaultTheme: Theme
-  enableColorScheme: boolean
-  enableSystem: boolean
-  globalClassName: string
-  storageKey: string
-  value?: Record<string, string>
-}): string => {
-  const lightValue = value?.light ?? 'light'
-  const darkValue = value?.dark ?? globalClassName
-  const systemValue = value?.system ?? 'system'
-
-  return `(function(){try{var d=document.documentElement;var theme=localStorage.getItem('${storageKey}')||'${defaultTheme}';var colorTheme=localStorage.getItem('${colorStorageKey}')||'${defaultColorTheme}';if(!${JSON.stringify(
-    enableSystem,
-  )}&&theme==='system'){theme='${defaultTheme === 'system' ? 'light' : defaultTheme}';}var resolved=theme==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):theme;var attr='${attribute}';var lightValue='${lightValue}';var darkValue='${darkValue}';var systemValue='${systemValue}';if(attr==='data-theme'){d.setAttribute('data-theme',theme==='system'?systemValue:(resolved==='dark'?darkValue:lightValue));}else{d.classList.remove(lightValue,darkValue,systemValue,'auto');d.classList.add(theme==='system'?systemValue:(resolved==='dark'?darkValue:lightValue));}if(${JSON.stringify(
-    enableColorScheme,
-  )}){d.style.colorScheme=theme==='system'?'':resolved;}else{d.style.removeProperty('color-scheme');}d.classList.add('${colorThemePrefix}'+colorTheme);}catch(e){console.warn('Theme pre-hydration script failed:',e);}})();`
-}
-
-const ThemePreHydrationScript = React.memo(
-  ({
-    attribute,
-    colorStorageKey,
-    colorThemePrefix,
-    defaultColorTheme,
-    defaultTheme,
-    enableColorScheme,
-    enableSystem,
-    globalClassName,
-    nonce,
-    scriptProps,
-    storageKey,
-    value,
-  }: {
-    attribute: 'class' | 'data-theme'
-    colorStorageKey: string
-    colorThemePrefix: string
-    defaultColorTheme: ColorTheme
-    defaultTheme: Theme
-    enableColorScheme: boolean
-    enableSystem: boolean
-    globalClassName: string
-    nonce?: string
-    scriptProps?: Omit<
-      React.ScriptHTMLAttributes<HTMLScriptElement>,
-      'dangerouslySetInnerHTML' | 'nonce'
-    >
-    storageKey: string
-    value?: Record<string, string>
-  }) => (
-    <script
-      {...scriptProps}
-      nonce={nonce}
-      suppressHydrationWarning
-      dangerouslySetInnerHTML={{
-        __html: generatePreHydrationScript({
-          attribute,
-          colorStorageKey,
-          colorThemePrefix,
-          defaultColorTheme,
-          defaultTheme,
-          enableColorScheme,
-          enableSystem,
-          globalClassName,
-          storageKey,
-          value,
-        }),
-      }}
-    />
-  ),
-)
-
-ThemePreHydrationScript.displayName = 'ThemePreHydrationScript'
 
 export function NextThemeProvider({
   attribute = 'class',
@@ -195,7 +107,7 @@ export function NextThemeProvider({
   themes,
   value,
   animationType = ThemeAnimationType.CIRCLE,
-}: NextThemeProviderProps): React.JSX.Element {
+}: Readonly<NextThemeProviderProps>): React.JSX.Element {
   const allowedThemes = useMemo<readonly Theme[]>(() => {
     if (themes && themes.length > 0) {
       return themes

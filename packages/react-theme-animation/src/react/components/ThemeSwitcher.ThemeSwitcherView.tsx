@@ -29,9 +29,9 @@ export function ThemeSwitcherView({
   )
 
   return (
-    <div
+    <fieldset
       className={clsx(
-        'bg-background border-border inline-flex h-9 items-center overflow-hidden border shadow-sm',
+        'bg-background border-border m-0 inline-flex h-9 min-w-0 items-center overflow-hidden border p-0 shadow-sm',
         isMounted ? 'opacity-100' : 'opacity-0',
         className,
       )}
@@ -39,10 +39,7 @@ export function ThemeSwitcherView({
         borderRadius: 'var(--radius)',
         backgroundColor: 'hsl(var(--background))',
       }}
-      role='radiogroup'
-      onMouseLeave={() => {
-        setHoveredTheme(null)
-      }}
+      aria-label='Theme'
     >
       {filteredOptions.map((option) => (
         <ThemeOption
@@ -57,10 +54,12 @@ export function ThemeSwitcherView({
           onMouseEnter={() => {
             setHoveredTheme(option.value)
           }}
-          onMouseLeave={() => {}}
+          onMouseLeave={() => {
+            setHoveredTheme(null)
+          }}
           buttonRef={theme === option.value ? themeRef : undefined}
         />
       ))}
-    </div>
+    </fieldset>
   )
 }

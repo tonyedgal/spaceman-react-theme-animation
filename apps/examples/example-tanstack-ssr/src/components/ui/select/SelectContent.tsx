@@ -13,7 +13,9 @@ export function SelectContent({
   children,
   position = 'popper',
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Content>): React.JSX.Element {
+}: Readonly<
+  React.ComponentProps<typeof SelectPrimitive.Content>
+>): React.JSX.Element {
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content

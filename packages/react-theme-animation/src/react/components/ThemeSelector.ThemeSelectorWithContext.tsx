@@ -9,7 +9,7 @@ export function ThemeSelectorWithContext({
   colorThemes = defaultColorThemes,
   contextTheme,
 }: Pick<ThemeSelectorProps, 'colorThemes'> & {
-  contextTheme: SharedThemeContextValue
+  readonly contextTheme: SharedThemeContextValue
 }): React.JSX.Element {
   const handleColorThemeChange = contextTheme.setColorTheme
 

@@ -7,7 +7,9 @@ import * as React from 'react'
 export function SelectSeparator({
   className,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Separator>): React.JSX.Element {
+}: Readonly<
+  React.ComponentProps<typeof SelectPrimitive.Separator>
+>): React.JSX.Element {
   return (
     <SelectPrimitive.Separator
       data-slot='select-separator'

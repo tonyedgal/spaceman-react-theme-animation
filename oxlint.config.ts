@@ -15,7 +15,6 @@ export default defineConfig({
     'unicorn',
     'oxc',
     'react',
-    'nextjs',
     'jsx-a11y',
   ],
   options: { typeAware: true },
@@ -63,7 +62,40 @@ export default defineConfig({
     'typescript/prefer-optional-chain': 'error',
     'typescript/prefer-promise-reject-errors': 'error',
     'typescript/prefer-readonly': 'error',
-    'typescript/prefer-readonly-parameter-types': 'error',
+    // Read-only inputs preserve React refs and DOM objects that the browser owns.
+    'typescript/prefer-readonly-parameter-types': [
+      'error',
+      {
+        ignoreInferredTypes: true,
+        treatMethodsAsReadonly: true,
+        allow: [
+          { from: 'package', package: 'clsx', name: ['ClassValue'] },
+          {
+            from: 'lib',
+            name: [
+              'HTMLElement',
+              'HTMLButtonElement',
+              'Element',
+              'Document',
+              'SVGElement',
+              'Readonly',
+            ],
+          },
+          {
+            from: 'package',
+            package: 'react',
+            name: [
+              'RefObject',
+              'ReactNode',
+              'ReactElement',
+              'MouseEvent',
+              'ComponentProps',
+              'ScriptHTMLAttributes',
+            ],
+          },
+        ],
+      },
+    ],
     'typescript/prefer-reduce-type-parameter': 'error',
     'typescript/prefer-regexp-exec': 'error',
     'typescript/prefer-return-this-type': 'error',
@@ -81,27 +113,6 @@ export default defineConfig({
     'typescript/unbound-method': 'error',
     'typescript/use-unknown-in-catch-callback-variable': 'error',
 
-    'nextjs/google-font-display': 'error',
-    'nextjs/google-font-preconnect': 'error',
-    'nextjs/inline-script-id': 'error',
-    'nextjs/next-script-for-ga': 'error',
-    'nextjs/no-assign-module-variable': 'error',
-    'nextjs/no-async-client-component': 'error',
-    'nextjs/no-before-interactive-script-outside-document': 'error',
-    'nextjs/no-css-tags': 'error',
-    'nextjs/no-document-import-in-page': 'error',
-    'nextjs/no-duplicate-head': 'error',
-    'nextjs/no-head-element': 'error',
-    'nextjs/no-head-import-in-document': 'error',
-    'nextjs/no-html-link-for-pages': 'error',
-    'nextjs/no-img-element': 'error',
-    'nextjs/no-page-custom-font': 'error',
-    'nextjs/no-script-component-in-head': 'error',
-    'nextjs/no-styled-jsx-in-document': 'error',
-    'nextjs/no-sync-scripts': 'error',
-    'nextjs/no-title-in-document-head': 'error',
-    'nextjs/no-typos': 'error',
-    'nextjs/no-unwanted-polyfillio': 'error',
     'react/button-has-type': 'error',
     'react/capitalized-calls': 'error',
     'react/checked-requires-onchange-or-readonly': 'error',
@@ -109,7 +120,7 @@ export default defineConfig({
     'react/error-boundaries': 'error',
     'react/exhaustive-deps': 'error',
     'react/exhaustive-effect-dependencies': 'error',
-    'react/forbid-component-props': 'error',
+    'react/forbid-component-props': ['error', { forbid: ['style'] }],
     'react/forbid-dom-props': 'error',
     'react/forbid-elements': 'error',
     'react/forward-ref-uses-ref': 'error',
@@ -127,7 +138,7 @@ export default defineConfig({
     'react/jsx-fragments': 'error',
     'react/jsx-handler-names': 'error',
     'react/jsx-key': 'error',
-    'react/jsx-max-depth': 'error',
+    'react/jsx-max-depth': ['error', { max: 6 }],
     'react/jsx-no-comment-textnodes': 'error',
     'react/jsx-no-constructed-context-values': 'error',
     'react/jsx-no-duplicate-props': 'error',
@@ -138,7 +149,19 @@ export default defineConfig({
     'react/jsx-no-useless-fragment': 'error',
     'react/jsx-pascal-case': 'error',
     'react/jsx-props-no-spread-multi': 'error',
-    'react/jsx-props-no-spreading': 'error',
+    'react/jsx-props-no-spreading': [
+      'error',
+      {
+        explicitSpread: 'ignore',
+        exceptions: [
+          'ThemeSelectorWithContext',
+          'ThemeSelectorStandalone',
+          'ThemeSwitcherWithContext',
+          'ThemeSwitcherStandalone',
+          'SpacemanThemeProvider',
+        ],
+      },
+    ],
     'react/memo-dependencies': 'error',
     'react/no-array-index-key': 'error',
     'react/no-children-prop': 'error',
@@ -259,4 +282,112 @@ export default defineConfig({
     'anti-slop/require-readable-spacing': 'error',
     'anti-slop/require-safety-comment-for-type-assertion': 'error',
   },
+  overrides: [
+    {
+      files: [
+        'packages/react-theme-animation/src/react/components/NextThemeScript.tsx',
+        'packages/react-theme-animation/src/react/components/TanStackStartThemeScript.tsx',
+      ],
+      rules: {
+        // Raw script text is required before hydration, including on React 17/18.
+        // The generators encode every inserted value before writing script text.
+        'react/no-danger': 'off',
+        'react/jsx-props-no-spreading': ['error', { exceptions: ['script'] }],
+      },
+    },
+    {
+      files: ['apps/examples/example-next/**'],
+      plugins: [
+        'eslint',
+        'typescript',
+        'import',
+        'unicorn',
+        'oxc',
+        'react',
+        'jsx-a11y',
+        'nextjs',
+      ],
+      rules: {
+        'nextjs/google-font-display': 'error',
+        'nextjs/google-font-preconnect': 'error',
+        'nextjs/inline-script-id': 'error',
+        'nextjs/next-script-for-ga': 'error',
+        'nextjs/no-assign-module-variable': 'error',
+        'nextjs/no-async-client-component': 'error',
+        'nextjs/no-before-interactive-script-outside-document': 'error',
+        'nextjs/no-css-tags': 'error',
+        'nextjs/no-document-import-in-page': 'error',
+        'nextjs/no-duplicate-head': 'error',
+        'nextjs/no-head-element': 'error',
+        'nextjs/no-head-import-in-document': 'error',
+        'nextjs/no-html-link-for-pages': 'error',
+        'nextjs/no-img-element': 'error',
+        'nextjs/no-page-custom-font': 'error',
+        'nextjs/no-script-component-in-head': 'error',
+        'nextjs/no-styled-jsx-in-document': 'error',
+        'nextjs/no-sync-scripts': 'error',
+        'nextjs/no-title-in-document-head': 'error',
+        'nextjs/no-typos': 'error',
+        'nextjs/no-unwanted-polyfillio': 'error',
+
+        'react/only-export-components': [
+          'error',
+          {
+            allowExportNames: [
+              'metadata',
+              'generateMetadata',
+              'generateStaticParams',
+              'revalidate',
+              'dynamic',
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ['apps/examples/example-tanstack*/src/routes/**'],
+      rules: {
+        'react/only-export-components': [
+          'error',
+          { allowExportNames: ['Route'] },
+        ],
+      },
+    },
+    {
+      files: ['**/components/ui/**'],
+      rules: {
+        'react/jsx-props-no-spreading': [
+          'error',
+          {
+            custom: 'ignore',
+            exceptions: ['button'],
+            explicitSpread: 'ignore',
+          },
+        ],
+        'react/only-export-components': [
+          'error',
+          { allowExportNames: ['buttonVariants'] },
+        ],
+      },
+    },
+    {
+      files: [
+        'packages/react-theme-animation/src/react/components/*ThemeProvider.tsx',
+      ],
+      rules: {
+        'react/only-export-components': [
+          'error',
+          {
+            allowExportNames: [
+              'useSpacemanTheme',
+              'useTanStackTheme',
+              'useNextTheme',
+              'useTheme',
+              'useViteTheme',
+            ],
+          },
+        ],
+      },
+    },
+  ],
 })

@@ -16,7 +16,7 @@ const copy = {
 export function SlideThemeToggle({
   slideDirection = 'left',
 }: {
-  slideDirection?: SlideDirection
+  readonly slideDirection?: SlideDirection
 }): React.JSX.Element {
   const { ref, toggleTheme } = useThemeAnimation({
     duration: 1000,

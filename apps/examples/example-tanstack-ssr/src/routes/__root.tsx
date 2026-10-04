@@ -1,11 +1,4 @@
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import {
-  HeadContent,
-  Outlet,
-  Scripts,
-  createRootRoute,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import { Outlet, createRootRoute } from '@tanstack/react-router'
 import React from 'react'
 
 import {
@@ -15,6 +8,7 @@ import {
 
 import BackgroundPattern from '../components/BackgroundPattern'
 import NavBar from '../components/NavBar'
+import { RootDocument } from '../components/RootDocument'
 import {
   getThemeServerFn,
   setColorThemeServerFn,
@@ -51,45 +45,7 @@ export const Route = createRootRoute({
   component: RootComponent,
 })
 
-function RootDocument({
-  children,
-}: {
-  children: React.ReactNode
-}): React.JSX.Element {
-  const { themeData } = Route.useRouteContext()
-
-  const htmlClass = [
-    themeData.theme,
-    themeData.colorTheme !== 'default' ? `theme-${themeData.colorTheme}` : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
-
-  return (
-    <html lang='en' className={htmlClass} suppressHydrationWarning>
-      <head>
-        <HeadContent />
-      </head>
-      <body className='antialiased'>
-        {children}
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
-        <Scripts />
-      </body>
-    </html>
-  )
-}
-
-function RootComponent(): React.JSX.Element {
+export function RootComponent(): React.JSX.Element {
   const { themeData } = Route.useRouteContext()
 
   return (

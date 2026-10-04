@@ -13,16 +13,19 @@ export function ThemeOption({
   onMouseEnter,
   onMouseLeave,
   buttonRef,
-}: {
-  icon: JSX.Element
-  value: Theme
-  isActive?: boolean
-  isHovered?: boolean
-  onClick: (value: Theme, event?: React.MouseEvent<HTMLButtonElement>) => void
-  onMouseEnter: () => void
-  onMouseLeave: () => void
-  buttonRef?: React.RefObject<HTMLButtonElement | null>
-}): React.JSX.Element {
+}: Readonly<{
+  readonly icon: JSX.Element
+  readonly value: Theme
+  readonly isActive?: boolean
+  readonly isHovered?: boolean
+  readonly onClick: (
+    value: Theme,
+    event?: React.MouseEvent<HTMLButtonElement>,
+  ) => void
+  readonly onMouseEnter: () => void
+  readonly onMouseLeave: () => void
+  readonly buttonRef?: React.RefObject<HTMLButtonElement | null>
+}>): React.JSX.Element {
   return (
     <button
       type='button'
@@ -32,8 +35,7 @@ export function ThemeOption({
         'text-muted-foreground hover:text-foreground',
         isActive === true && 'text-foreground font-medium',
       )}
-      role='radio'
-      aria-checked={isActive}
+      aria-pressed={isActive === true}
       aria-label={`Switch to ${value} theme`}
       onClick={(event) => {
         onClick(value, event)

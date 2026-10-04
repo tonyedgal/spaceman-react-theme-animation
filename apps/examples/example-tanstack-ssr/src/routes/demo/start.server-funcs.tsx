@@ -64,7 +64,7 @@ export const Route = createFileRoute('/demo/start/server-funcs')({
   loader: async () => getTodos(),
 })
 
-function Home(): React.JSX.Element {
+export function Home(): React.JSX.Element {
   const router = useRouter()
   const todos = Route.useLoaderData()
 

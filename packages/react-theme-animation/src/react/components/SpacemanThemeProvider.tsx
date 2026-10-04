@@ -16,25 +16,25 @@ const defaultColorThemes = ['default'] as const
  * Context type for the Spaceman Theme Provider
  */
 interface SpacemanThemeContextType {
-  ref: React.RefObject<HTMLButtonElement | null>
-  theme: Theme
-  colorTheme: ColorTheme
-  resolvedTheme: 'light' | 'dark'
-  setTheme: (theme: Theme) => void
-  setColorTheme: (colorTheme: ColorTheme) => void
+  readonly ref: React.RefObject<HTMLButtonElement | null>
+  readonly theme: Theme
+  readonly colorTheme: ColorTheme
+  readonly resolvedTheme: 'light' | 'dark'
+  readonly setTheme: (theme: Theme) => void
+  readonly setColorTheme: (colorTheme: ColorTheme) => void
 
-  switchTheme: (theme: Theme) => Promise<void>
-  switchColorTheme: (colorTheme: string) => void
+  readonly switchTheme: (theme: Theme) => Promise<void>
+  readonly switchColorTheme: (colorTheme: string) => void
 
-  toggleTheme: () => Promise<void>
-  toggleLightTheme: () => Promise<void>
-  toggleDarkTheme: () => Promise<void>
-  toggleColorTheme: () => void
+  readonly toggleTheme: () => Promise<void>
+  readonly toggleLightTheme: () => Promise<void>
+  readonly toggleDarkTheme: () => Promise<void>
+  readonly toggleColorTheme: () => void
 
-  createColorThemeToggle: (targetColorTheme: string) => () => void
-  isColorThemeActive: (targetColorTheme: string) => boolean
+  readonly createColorThemeToggle: (targetColorTheme: string) => () => void
+  readonly isColorThemeActive: (targetColorTheme: string) => boolean
 
-  switchThemeFromElement: (
+  readonly switchThemeFromElement: (
     theme: Theme,
     element: HTMLButtonElement,
   ) => Promise<void>
@@ -48,13 +48,13 @@ const SpacemanThemeContext = createContext<
  * Props for the Spaceman Theme Provider
  */
 interface SpacemanThemeProviderProps {
-  children: ReactNode
-  themes?: readonly Theme[]
-  colorThemes?: readonly ColorTheme[]
-  defaultTheme?: Theme
-  defaultColorTheme?: ColorTheme
-  animationType?: ThemeAnimationType
-  duration?: number
+  readonly children: ReactNode
+  readonly themes?: readonly Theme[]
+  readonly colorThemes?: readonly ColorTheme[]
+  readonly defaultTheme?: Theme
+  readonly defaultColorTheme?: ColorTheme
+  readonly animationType?: ThemeAnimationType
+  readonly duration?: number
 }
 
 /**

@@ -23,12 +23,12 @@ export const THEME_OPTIONS = [
 ] satisfies { readonly icon: React.JSX.Element; readonly value: Theme }[]
 
 export interface ThemeSwitcherViewProps {
-  className?: string
-  onSwitchTheme: (
+  readonly className?: string
+  readonly onSwitchTheme: (
     theme: Theme,
     event?: React.MouseEvent<HTMLButtonElement>,
   ) => Promise<void>
-  theme: Theme
-  themes: readonly Theme[]
-  themeRef?: React.RefObject<HTMLButtonElement | null>
+  readonly theme: Theme
+  readonly themes: readonly Theme[]
+  readonly themeRef?: React.RefObject<HTMLButtonElement | null>
 }

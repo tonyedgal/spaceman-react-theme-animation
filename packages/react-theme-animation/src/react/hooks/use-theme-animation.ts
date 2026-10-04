@@ -27,7 +27,7 @@ interface SlideCoordinates {
 const isBrowser = 'window' in globalThis
 
 export const useThemeAnimation = (
-  props: UseThemeAnimationProps = {},
+  props: Readonly<UseThemeAnimationProps> = {},
 ): UseThemeAnimationReturn => {
   const {
     duration: propsDuration = 750,

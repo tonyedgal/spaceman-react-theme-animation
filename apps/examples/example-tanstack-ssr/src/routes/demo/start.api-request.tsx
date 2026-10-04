@@ -20,7 +20,7 @@ export const Route = createFileRoute('/demo/start/api-request')({
   component: Home,
 })
 
-function Home(): React.JSX.Element {
+export function Home(): React.JSX.Element {
   const [names, setNames] = useState<string[]>([])
 
   useEffect(() => {

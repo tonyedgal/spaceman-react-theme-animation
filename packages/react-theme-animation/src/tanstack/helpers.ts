@@ -12,15 +12,18 @@ export const COLOR_THEME_PREFIX = 'theme-'
 export type ServerResolvedTheme = 'light' | 'dark' | 'system'
 
 export interface ServerThemeData {
-  theme: ServerResolvedTheme
-  themePreference: Theme
-  colorTheme: ColorTheme
+  readonly theme: ServerResolvedTheme
+  readonly themePreference: Theme
+  readonly colorTheme: ColorTheme
 }
 
 export function buildServerThemeData(
   themeCookie: string | undefined,
   colorThemeCookie: string | undefined,
-  options: { defaultTheme?: Theme; defaultColorTheme?: ColorTheme } = {},
+  options: {
+    readonly defaultTheme?: Theme
+    readonly defaultColorTheme?: ColorTheme
+  } = {},
 ): ServerThemeData {
   const { defaultTheme = 'system', defaultColorTheme = 'default' } = options
 

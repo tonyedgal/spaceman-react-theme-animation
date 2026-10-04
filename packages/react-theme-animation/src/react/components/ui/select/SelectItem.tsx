@@ -10,7 +10,9 @@ export function SelectItem({
   className,
   children,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Item>): React.JSX.Element {
+}: Readonly<
+  React.ComponentProps<typeof SelectPrimitive.Item>
+>): React.JSX.Element {
   return (
     <SelectPrimitive.Item
       data-slot='select-item'

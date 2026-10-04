@@ -13,7 +13,7 @@ export const Route = createFileRoute('/demo/start/ssr/spa-mode')({
   component: RouteComponent,
 })
 
-function RouteComponent(): React.JSX.Element {
+export function RouteComponent(): React.JSX.Element {
   const [punkSongs, setPunkSongs] = useState<
     Awaited<ReturnType<typeof getPunkSongs>>[number][]
   >([])

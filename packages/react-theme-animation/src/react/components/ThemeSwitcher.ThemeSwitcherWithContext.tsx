@@ -10,7 +10,7 @@ export function ThemeSwitcherWithContext({
   contextTheme,
   themes = defaultThemes,
 }: Pick<ThemeSwitcherProps, 'className' | 'themes'> & {
-  contextTheme: SharedThemeContextValue
+  readonly contextTheme: SharedThemeContextValue
 }): React.JSX.Element {
   const handleSwitchTheme = async (
     theme: Theme,

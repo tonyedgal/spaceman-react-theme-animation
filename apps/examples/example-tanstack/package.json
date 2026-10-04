@@ -5,7 +5,8 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite dev --port 3000",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-select": "^2.2.6",

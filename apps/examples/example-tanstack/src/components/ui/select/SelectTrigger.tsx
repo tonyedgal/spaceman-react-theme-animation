@@ -11,9 +11,11 @@ export function SelectTrigger({
   size = 'default',
   children,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
-  size?: 'sm' | 'default'
-}): React.JSX.Element {
+}: Readonly<
+  React.ComponentProps<typeof SelectPrimitive.Trigger> & {
+    readonly size?: 'sm' | 'default'
+  }
+>): React.JSX.Element {
   return (
     <SelectPrimitive.Trigger
       data-slot='select-trigger'
