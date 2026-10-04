@@ -40,7 +40,7 @@ const copy = {
 
 export const Route = createFileRoute('/hook')({ component: HookPage })
 
-function HookPage(): React.JSX.Element {
+export function HookPage(): React.JSX.Element {
   const [slideDirection, setSlideDirection] = useState<SlideDirection>('left')
 
   const isBrowser = 'window' in globalThis

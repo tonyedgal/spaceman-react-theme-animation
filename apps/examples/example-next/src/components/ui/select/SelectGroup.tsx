@@ -5,6 +5,8 @@ import * as React from 'react'
 
 export function SelectGroup({
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Group>): React.JSX.Element {
+}: Readonly<
+  React.ComponentProps<typeof SelectPrimitive.Group>
+>): React.JSX.Element {
   return <SelectPrimitive.Group data-slot='select-group' {...props} />
 }

@@ -42,6 +42,124 @@ export function ThemeSection(): React.JSX.Element {
     setColorTheme,
   } = useTanStackTheme()
 
+  const animationControls = (
+    <section className='space-y-4'>
+      <h2 className='text-2xl font-semibold'>{copy.animationSettings}</h2>
+      <div className='border-border bg-background rounded-lg border p-6'>
+        <div className='flex flex-wrap items-center gap-6'>
+          <div className='space-y-2'>
+            <div className='flex gap-2'>
+              <span className='text-md font-medium'>{copy.animationType}</span>
+              <button
+                type='button'
+                onClick={() => {
+                  setAnimationType(ThemeAnimationType.CIRCLE)
+                }}
+                className={`rounded px-3 py-1 text-sm transition-colors ${
+                  animationType === ThemeAnimationType.CIRCLE
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-accent'
+                }`}
+              >
+                {copy.circle}
+              </button>
+              <button
+                type='button'
+                onClick={() => {
+                  setAnimationType(ThemeAnimationType.BLUR_CIRCLE)
+                }}
+                className={`rounded px-3 py-1 text-sm transition-colors ${
+                  animationType === ThemeAnimationType.BLUR_CIRCLE
+                    ? 'bg-secondary text-secondary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-accent'
+                }`}
+              >
+                {copy.blurCircle}
+              </button>
+            </div>
+          </div>
+
+          <div className='flex items-center gap-2'>
+            <div className='text-md font-medium'>{copy.currentTheme}</div>
+            <div className='bg-muted rounded px-2 py-1 font-mono'>
+              {currentTheme}
+            </div>
+          </div>
+
+          {currentColorTheme !== 'default' && (
+            <div className='flex items-center gap-2'>
+              <div className='text-md font-medium'>{copy.color}</div>
+              <div className='bg-muted rounded px-2 py-1 font-mono'>
+                {currentColorTheme}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+
+  const usageInstructions = (
+    <div className='space-y-4'>
+      <h2 className='text-2xl font-semibold'>{copy.usage}</h2>
+      <div className='border-border bg-background rounded-lg border p-6'>
+        <div className='space-y-4 text-sm'>
+          <div>
+            <h3 className='mb-2 font-semibold'>{copy.installation}</h3>
+            <code className='bg-muted block rounded p-3 font-mono text-xs'>
+              {copy.npmInstallSpaceManReactThemeAnimation}
+            </code>
+          </div>
+
+          <div>
+            <h3 className='mb-2 font-semibold'>{copy.basicUsage}</h3>
+            <code className='bg-muted block rounded p-3 font-mono text-xs whitespace-pre'>
+              {`import {
+  SpacemanThemeProvider,
+  ThemeSelector,
+  ThemeSwitcher,
+} from '@space-man/react-theme-animation';
+
+<SpacemanThemeProvider
+  themes={['light', 'dark', 'system']}
+  colorThemes={['default', 'blue', 'green', 'purple', 'caffeine', 'mono', 'supabase']}
+  defaultTheme="system"
+  defaultColorTheme="default"
+>
+  <ThemeSwitcher
+   themes={['light', 'dark', 'system']}
+   animationType={animationType}
+   duration={750}
+  />
+
+  <ThemeSwitcher
+   themes={['light', 'dark']}
+   animationType={animationType}
+   duration={750}
+  />
+
+  <ThemeSelector
+    colorThemes={[
+      'default',
+      'blue',
+      'green',
+      'purple',
+      'caffeine',
+      'mono',
+      'supabase',
+    ]}
+    currentColorTheme={currentColorTheme}
+    onColorThemeChange={setColorTheme}
+  />
+</SpacemanThemeProvider>
+`}
+            </code>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
   return (
     <div className='container mx-auto px-4 py-8'>
       <div className='mx-auto mt-32 max-w-4xl space-y-8'>
@@ -96,122 +214,10 @@ export function ThemeSection(): React.JSX.Element {
           </div>
 
           {/* Animation Controls */}
-          <section className='space-y-4'>
-            <h2 className='text-2xl font-semibold'>{copy.animationSettings}</h2>
-            <div className='border-border bg-background rounded-lg border p-6'>
-              <div className='flex flex-wrap items-center gap-6'>
-                <div className='space-y-2'>
-                  <div className='flex gap-2'>
-                    <span className='text-md font-medium'>
-                      {copy.animationType}
-                    </span>
-                    <button
-                      type='button'
-                      onClick={() => {
-                        setAnimationType(ThemeAnimationType.CIRCLE)
-                      }}
-                      className={`rounded px-3 py-1 text-sm transition-colors ${
-                        animationType === ThemeAnimationType.CIRCLE
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-muted-foreground hover:bg-accent'
-                      }`}
-                    >
-                      {copy.circle}
-                    </button>
-                    <button
-                      type='button'
-                      onClick={() => {
-                        setAnimationType(ThemeAnimationType.BLUR_CIRCLE)
-                      }}
-                      className={`rounded px-3 py-1 text-sm transition-colors ${
-                        animationType === ThemeAnimationType.BLUR_CIRCLE
-                          ? 'bg-secondary text-secondary-foreground'
-                          : 'bg-muted text-muted-foreground hover:bg-accent'
-                      }`}
-                    >
-                      {copy.blurCircle}
-                    </button>
-                  </div>
-                </div>
-
-                <div className='flex items-center gap-2'>
-                  <div className='text-md font-medium'>{copy.currentTheme}</div>
-                  <div className='bg-muted rounded px-2 py-1 font-mono'>
-                    {currentTheme}
-                  </div>
-                </div>
-
-                {currentColorTheme !== 'default' && (
-                  <div className='flex items-center gap-2'>
-                    <div className='text-md font-medium'>{copy.color}</div>
-                    <div className='bg-muted rounded px-2 py-1 font-mono'>
-                      {currentColorTheme}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
+          {animationControls}
 
           {/* Usage Instructions */}
-          <div className='space-y-4'>
-            <h2 className='text-2xl font-semibold'>{copy.usage}</h2>
-            <div className='border-border bg-background rounded-lg border p-6'>
-              <div className='space-y-4 text-sm'>
-                <div>
-                  <h3 className='mb-2 font-semibold'>{copy.installation}</h3>
-                  <code className='bg-muted block rounded p-3 font-mono text-xs'>
-                    {copy.npmInstallSpaceManReactThemeAnimation}
-                  </code>
-                </div>
-
-                <div>
-                  <h3 className='mb-2 font-semibold'>{copy.basicUsage}</h3>
-                  <code className='bg-muted block rounded p-3 font-mono text-xs whitespace-pre'>
-                    {`import {
-  SpacemanThemeProvider,
-  ThemeSelector,
-  ThemeSwitcher,
-} from '@space-man/react-theme-animation';
-
-<SpacemanThemeProvider
-  themes={['light', 'dark', 'system']}
-  colorThemes={['default', 'blue', 'green', 'purple', 'caffeine', 'mono', 'supabase']}
-  defaultTheme="system"
-  defaultColorTheme="default"
->
-  <ThemeSwitcher
-   themes={['light', 'dark', 'system']}
-   animationType={animationType}
-   duration={750}
-  />
-                        
-  <ThemeSwitcher
-   themes={['light', 'dark']}
-   animationType={animationType}
-   duration={750}
-  />
-                        
-  <ThemeSelector
-    colorThemes={[
-      'default',
-      'blue',
-      'green',
-      'purple',
-      'caffeine',
-      'mono',
-      'supabase',
-    ]}
-    currentColorTheme={currentColorTheme}
-    onColorThemeChange={setColorTheme}
-  />
-</SpacemanThemeProvider>
-`}
-                  </code>
-                </div>
-              </div>
-            </div>
-          </div>
+          {usageInstructions}
         </div>
       </div>
     </div>

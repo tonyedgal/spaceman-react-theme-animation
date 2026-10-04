@@ -8,7 +8,9 @@ import { cn } from '@/lib/utils'
 export function SelectLabel({
   className,
   ...props
-}: React.ComponentProps<typeof SelectPrimitive.Label>): React.JSX.Element {
+}: Readonly<
+  React.ComponentProps<typeof SelectPrimitive.Label>
+>): React.JSX.Element {
   return (
     <SelectPrimitive.Label
       data-slot='select-label'

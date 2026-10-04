@@ -13,7 +13,7 @@ const copy = {
 
 export const Route = createFileRoute('/cards')({ component: CardsPage })
 
-function CardsPage(): React.JSX.Element {
+export function CardsPage(): React.JSX.Element {
   const { createColorThemeToggle, isColorThemeActive } = useThemeAnimation({
     colorThemes: ['default', 'supabase', 'mono', 'caffeine'],
   })

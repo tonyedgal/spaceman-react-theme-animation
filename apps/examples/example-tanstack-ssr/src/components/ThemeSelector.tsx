@@ -18,7 +18,7 @@ export function ThemeSelector({
   colorThemes = defaultColorThemes,
   currentColorTheme,
   onColorThemeChange,
-}: ThemeSelectorProps): React.JSX.Element | null {
+}: Readonly<ThemeSelectorProps>): React.JSX.Element | null {
   // Use controlled props instead of internal hook
   const colorTheme =
     currentColorTheme === undefined || currentColorTheme === ''

@@ -12,7 +12,7 @@ export const Route = createFileRoute('/demo/start/ssr/')({
   component: RouteComponent,
 })
 
-function RouteComponent(): React.JSX.Element {
+export function RouteComponent(): React.JSX.Element {
   return (
     <div
       className='flex min-h-screen items-center justify-center bg-gradient-to-br from-zinc-900 to-black p-4 text-white'

@@ -12,22 +12,22 @@ const defaultThemes = ['light', 'dark', 'system'] as const
 const defaultColorThemes = ['default'] as const
 
 interface ViteThemeContextType {
-  ref: React.RefObject<HTMLButtonElement | null>
-  theme: Theme
-  colorTheme: ColorTheme
-  resolvedTheme: 'light' | 'dark'
-  systemTheme: 'light' | 'dark'
-  setTheme: (theme: Theme) => void
-  setColorTheme: (colorTheme: ColorTheme) => void
-  switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
-  switchColorTheme: (colorTheme: string) => void
-  toggleTheme: (animationOff?: boolean) => Promise<void>
-  toggleLightTheme: (animationOff?: boolean) => Promise<void>
-  toggleDarkTheme: (animationOff?: boolean) => Promise<void>
-  toggleColorTheme: () => void
-  createColorThemeToggle: (targetColorTheme: string) => () => void
-  isColorThemeActive: (targetColorTheme: string) => boolean
-  switchThemeFromElement: (
+  readonly ref: React.RefObject<HTMLButtonElement | null>
+  readonly theme: Theme
+  readonly colorTheme: ColorTheme
+  readonly resolvedTheme: 'light' | 'dark'
+  readonly systemTheme: 'light' | 'dark'
+  readonly setTheme: (theme: Theme) => void
+  readonly setColorTheme: (colorTheme: ColorTheme) => void
+  readonly switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
+  readonly switchColorTheme: (colorTheme: string) => void
+  readonly toggleTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleLightTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleDarkTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleColorTheme: () => void
+  readonly createColorThemeToggle: (targetColorTheme: string) => () => void
+  readonly isColorThemeActive: (targetColorTheme: string) => boolean
+  readonly switchThemeFromElement: (
     theme: Theme,
     element: HTMLButtonElement,
   ) => Promise<void>
@@ -38,19 +38,19 @@ const ViteThemeContext = createContext<ViteThemeContextType | undefined>(
 )
 
 interface ViteThemeProviderProps {
-  children: ReactNode
-  themes?: readonly Theme[]
-  colorThemes?: readonly ColorTheme[]
-  defaultTheme?: Theme
-  defaultColorTheme?: ColorTheme
-  animationType?: ThemeAnimationType
-  duration?: number
-  attribute?: 'class' | 'data-theme'
-  disableTransitionOnChange?: boolean
-  storageKey?: string
-  colorStorageKey?: string
-  globalClassName?: string
-  colorThemePrefix?: string
+  readonly children: ReactNode
+  readonly themes?: readonly Theme[]
+  readonly colorThemes?: readonly ColorTheme[]
+  readonly defaultTheme?: Theme
+  readonly defaultColorTheme?: ColorTheme
+  readonly animationType?: ThemeAnimationType
+  readonly duration?: number
+  readonly attribute?: 'class' | 'data-theme'
+  readonly disableTransitionOnChange?: boolean
+  readonly storageKey?: string
+  readonly colorStorageKey?: string
+  readonly globalClassName?: string
+  readonly colorThemePrefix?: string
 }
 
 /**
@@ -173,10 +173,10 @@ export function ViteThemeProvider({
         await withElementAsRef(themeState.ref, element, async () => {
           await themeState.switchTheme(theme)
         })
-      } catch (error) {
-        throw error
-      } finally {
         cleanup()
+      } catch (error) {
+        cleanup()
+        throw error
       }
     },
     [themeState, applyTransitionDisable],

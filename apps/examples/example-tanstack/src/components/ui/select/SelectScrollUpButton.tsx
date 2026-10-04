@@ -9,8 +9,8 @@ import { cn } from '@/lib/utils'
 export function SelectScrollUpButton({
   className,
   ...props
-}: React.ComponentProps<
-  typeof SelectPrimitive.ScrollUpButton
+}: Readonly<
+  React.ComponentProps<typeof SelectPrimitive.ScrollUpButton>
 >): React.JSX.Element {
   return (
     <SelectPrimitive.ScrollUpButton

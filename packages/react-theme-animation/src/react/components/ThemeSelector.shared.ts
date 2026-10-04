@@ -5,7 +5,7 @@ export const defaultColorThemes = ['default'] as const
 export const defaultThemes = ['light', 'dark', 'system'] as const
 
 export interface ThemeSelectorViewProps {
-  colorTheme: ColorTheme
-  colorThemes: readonly ColorTheme[]
-  onSelectColorTheme: (colorTheme: ColorTheme) => void
+  readonly colorTheme: ColorTheme
+  readonly colorThemes: readonly ColorTheme[]
+  readonly onSelectColorTheme: (colorTheme: ColorTheme) => void
 }

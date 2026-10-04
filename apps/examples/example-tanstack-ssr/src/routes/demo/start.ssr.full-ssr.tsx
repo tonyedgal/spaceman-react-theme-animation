@@ -13,7 +13,7 @@ export const Route = createFileRoute('/demo/start/ssr/full-ssr')({
   loader: async () => getPunkSongs(),
 })
 
-function RouteComponent(): React.JSX.Element {
+export function RouteComponent(): React.JSX.Element {
   const punkSongs = Route.useLoaderData()
 
   return (

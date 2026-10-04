@@ -9,8 +9,8 @@ import { ChevronDownIcon } from './ChevronDownIcon'
 export function SelectScrollDownButton({
   className,
   ...props
-}: React.ComponentProps<
-  typeof SelectPrimitive.ScrollDownButton
+}: Readonly<
+  React.ComponentProps<typeof SelectPrimitive.ScrollDownButton>
 >): React.JSX.Element {
   return (
     <SelectPrimitive.ScrollDownButton

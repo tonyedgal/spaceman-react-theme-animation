@@ -1,4 +1,9 @@
 import type { ReactNode } from 'react'
+
+export { TanStackStartThemeScript } from './TanStackStartThemeScript'
+
+export type { TanStackStartThemeScriptProps } from './TanStackStartThemeScript'
+
 import React, {
   createContext,
   useCallback,
@@ -30,27 +35,27 @@ const defaultThemes = ['light', 'dark', 'system'] as const
 const defaultColorThemes = ['default'] as const
 
 export interface TanStackThemeContextType {
-  ref: React.RefObject<HTMLButtonElement | null>
-  theme: Theme
-  colorTheme: ColorTheme
-  resolvedTheme: 'light' | 'dark'
-  systemTheme: 'light' | 'dark'
-  isHydrated: boolean
-  setTheme: (theme: Theme) => void
-  setColorTheme: (colorTheme: ColorTheme) => void
+  readonly ref: React.RefObject<HTMLButtonElement | null>
+  readonly theme: Theme
+  readonly colorTheme: ColorTheme
+  readonly resolvedTheme: 'light' | 'dark'
+  readonly systemTheme: 'light' | 'dark'
+  readonly isHydrated: boolean
+  readonly setTheme: (theme: Theme) => void
+  readonly setColorTheme: (colorTheme: ColorTheme) => void
 
-  switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
-  switchColorTheme: (colorTheme: string) => void
+  readonly switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
+  readonly switchColorTheme: (colorTheme: string) => void
 
-  toggleTheme: (animationOff?: boolean) => Promise<void>
-  toggleLightTheme: (animationOff?: boolean) => Promise<void>
-  toggleDarkTheme: (animationOff?: boolean) => Promise<void>
-  toggleColorTheme: () => void
+  readonly toggleTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleLightTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleDarkTheme: (animationOff?: boolean) => Promise<void>
+  readonly toggleColorTheme: () => void
 
-  createColorThemeToggle: (targetColorTheme: string) => () => void
-  isColorThemeActive: (targetColorTheme: string) => boolean
+  readonly createColorThemeToggle: (targetColorTheme: string) => () => void
+  readonly isColorThemeActive: (targetColorTheme: string) => boolean
 
-  switchThemeFromElement: (
+  readonly switchThemeFromElement: (
     theme: Theme,
     element: HTMLButtonElement,
   ) => Promise<void>
@@ -61,123 +66,25 @@ const TanStackThemeContext = createContext<
 >(undefined)
 
 export interface TanStackThemeProviderProps {
-  children: ReactNode
-  themes?: readonly Theme[]
-  colorThemes?: readonly ColorTheme[]
-  defaultTheme?: Theme
-  defaultColorTheme?: ColorTheme
-  animationType?: ThemeAnimationType
-  duration?: number
-  storageKey?: string
-  colorStorageKey?: string
-  globalClassName?: string
-  colorThemePrefix?: string
-  serverTheme?: 'light' | 'dark' | 'system'
-  serverColorTheme?: ColorTheme
-  systemThemeMode?: SystemThemeMode
-  onServerThemeChange?: (theme: Theme) => Promise<void> | void
-  onServerColorThemeChange?: (colorTheme: ColorTheme) => Promise<void> | void
+  readonly children: ReactNode
+  readonly themes?: readonly Theme[]
+  readonly colorThemes?: readonly ColorTheme[]
+  readonly defaultTheme?: Theme
+  readonly defaultColorTheme?: ColorTheme
+  readonly animationType?: ThemeAnimationType
+  readonly duration?: number
+  readonly storageKey?: string
+  readonly colorStorageKey?: string
+  readonly globalClassName?: string
+  readonly colorThemePrefix?: string
+  readonly serverTheme?: 'light' | 'dark' | 'system'
+  readonly serverColorTheme?: ColorTheme
+  readonly systemThemeMode?: SystemThemeMode
+  readonly onServerThemeChange?: (theme: Theme) => Promise<void> | void
+  readonly onServerColorThemeChange?: (
+    colorTheme: ColorTheme,
+  ) => Promise<void> | void
 }
-
-export interface TanStackStartThemeScriptProps {
-  storageKey?: string
-  colorStorageKey?: string
-  defaultTheme?: Theme
-  defaultColorTheme?: ColorTheme
-  globalClassName?: string
-  colorThemePrefix?: string
-  nonce?: string
-  systemThemeMode?: SystemThemeMode
-}
-
-const generateTanStackPreHydrationScript = (
-  storageKey: string,
-  colorStorageKey: string,
-  defaultTheme: Theme,
-  defaultColorTheme: ColorTheme,
-  globalClassName: string,
-  colorThemePrefix: string,
-  systemThemeMode: SystemThemeMode,
-): string => {
-  return `
-(function() {
-  try {
-    var theme = localStorage.getItem('${storageKey}') || '${defaultTheme}';
-    var colorTheme = localStorage.getItem('${colorStorageKey}') || '${defaultColorTheme}';
-    var el = document.documentElement;
-    var resolved;
-    if (theme === 'system') {
-      if ('${systemThemeMode}' === 'css') {
-        el.classList.remove('${globalClassName}');
-        el.classList.remove('auto');
-        el.classList.remove('system');
-        el.classList.add('system');
-        el.style.colorScheme = '';
-      } else {
-        resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        if (resolved === 'dark') {
-          el.classList.add('${globalClassName}');
-        } else {
-          el.classList.remove('${globalClassName}');
-        }
-        el.classList.remove('system');
-        el.classList.remove('auto');
-        el.style.colorScheme = resolved;
-      }
-    } else {
-      resolved = theme;
-      el.classList.remove('system');
-      el.classList.remove('auto');
-      if (resolved === 'dark') {
-        el.classList.add('${globalClassName}');
-      } else {
-        el.classList.remove('${globalClassName}');
-      }
-      el.style.colorScheme = resolved;
-    }
-    if (colorTheme && colorTheme !== 'default') {
-      el.classList.add('${colorThemePrefix}' + colorTheme);
-    }
-  } catch (e) {
-    console.warn('Theme pre-hydration script failed:', e);
-  }
-})();
-`
-}
-
-export const TanStackStartThemeScript: React.FC<TanStackStartThemeScriptProps> =
-  React.memo(
-    ({
-      storageKey = STORAGE_KEY,
-      colorStorageKey = COLOR_STORAGE_KEY,
-      defaultTheme = 'system',
-      defaultColorTheme = 'default',
-      globalClassName = GLOBAL_CLASS_NAME,
-      colorThemePrefix = COLOR_THEME_PREFIX,
-      nonce,
-      systemThemeMode = 'js',
-    }) => {
-      const scriptContent = generateTanStackPreHydrationScript(
-        storageKey,
-        colorStorageKey,
-        defaultTheme,
-        defaultColorTheme,
-        globalClassName,
-        colorThemePrefix,
-        systemThemeMode,
-      )
-
-      return (
-        <script
-          nonce={nonce}
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: scriptContent }}
-        />
-      )
-    },
-  )
-
-TanStackStartThemeScript.displayName = 'TanStackStartThemeScript'
 
 const useHydrated = (): boolean => {
   return useSyncExternalStore(
@@ -384,29 +291,29 @@ export function TanStackThemeProvider({
         isHydrated: false,
         setTheme: setThemeWithServer,
         setColorTheme: setColorThemeWithServer,
-        switchTheme: async (theme: Theme) => {
+        switchTheme: async (theme: Theme): Promise<void> => {
           setThemeWithServer(theme)
 
           return Promise.resolve()
         },
-        switchThemeFromElement: async (theme: Theme) => {
+        switchThemeFromElement: async (theme: Theme): Promise<void> => {
           setThemeWithServer(theme)
 
           return Promise.resolve()
         },
         switchColorTheme: switchColorThemeWithServer,
-        toggleTheme: async () => {
+        toggleTheme: async (): Promise<void> => {
           const nextTheme = serverResolvedTheme === 'dark' ? 'light' : 'dark'
           setThemeWithServer(nextTheme)
 
           return Promise.resolve()
         },
-        toggleLightTheme: async () => {
+        toggleLightTheme: async (): Promise<void> => {
           setThemeWithServer('light')
 
           return Promise.resolve()
         },
-        toggleDarkTheme: async () => {
+        toggleDarkTheme: async (): Promise<void> => {
           setThemeWithServer('dark')
 
           return Promise.resolve()

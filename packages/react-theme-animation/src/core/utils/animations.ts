@@ -88,15 +88,15 @@ export const prefersReducedMotion = (): boolean => {
 }
 
 export interface AnimationConfig {
-  a?: number
-  b?: number
-  x: number
-  y: number
-  duration: number
-  easing: string
-  animationType: ThemeAnimationType
-  blurAmount: number
-  styleId: string
+  readonly a?: number
+  readonly b?: number
+  readonly x: number
+  readonly y: number
+  readonly duration: number
+  readonly easing: string
+  readonly animationType: ThemeAnimationType
+  readonly blurAmount: number
+  readonly styleId: string
 }
 
 export const createCircleAnimation = (config: AnimationConfig): void => {
