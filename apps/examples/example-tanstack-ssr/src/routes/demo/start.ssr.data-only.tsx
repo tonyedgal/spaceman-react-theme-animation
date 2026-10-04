@@ -1,14 +1,20 @@
 import { createFileRoute } from '@tanstack/react-router'
+import React from 'react'
 
 import { getPunkSongs } from '@/data/demo.punk-songs'
+
+const copy = {
+  dataOnlySsrPunkSongs: 'Data Only SSR - Punk Songs',
+  separator: ' - ',
+}
 
 export const Route = createFileRoute('/demo/start/ssr/data-only')({
   ssr: 'data-only',
   component: RouteComponent,
-  loader: async () => await getPunkSongs(),
+  loader: async () => getPunkSongs(),
 })
 
-function RouteComponent() {
+function RouteComponent(): React.JSX.Element {
   const punkSongs = Route.useLoaderData()
 
   return (
@@ -21,7 +27,7 @@ function RouteComponent() {
     >
       <div className='w-full max-w-2xl rounded-xl border-8 border-black/10 bg-black/50 p-8 shadow-xl backdrop-blur-md'>
         <h1 className='mb-6 text-3xl font-bold text-pink-400'>
-          Data Only SSR - Punk Songs
+          {copy.dataOnlySsrPunkSongs}
         </h1>
         <ul className='space-y-3'>
           {punkSongs.map((song) => (
@@ -32,7 +38,11 @@ function RouteComponent() {
               <span className='text-lg font-medium text-white'>
                 {song.name}
               </span>
-              <span className='text-white/60'> - {song.artist}</span>
+              <span className='text-white/60'>
+                {' '}
+                {copy.separator}
+                {song.artist}
+              </span>
             </li>
           ))}
         </ul>

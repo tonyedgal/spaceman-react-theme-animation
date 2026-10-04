@@ -1,13 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
+import React from 'react'
 
 import { useThemeAnimation } from '@space-man/react-theme-animation'
 
 import { Button } from '../components/ui/button'
 import { cn } from '../lib/utils'
 
+const copy = {
+  supabase: 'Supabase',
+  mono: 'Mono',
+}
+
 export const Route = createFileRoute('/cards')({ component: CardsPage })
 
-function CardsPage() {
+function CardsPage(): React.JSX.Element {
   const { createColorThemeToggle, isColorThemeActive } = useThemeAnimation({
     colorThemes: ['default', 'supabase', 'mono', 'caffeine'],
   })
@@ -17,23 +23,23 @@ function CardsPage() {
       <div className='bg-background/80 grid grid-cols-1 gap-10 rounded-lg border p-8 md:grid-cols-2'>
         <Button
           onClick={createColorThemeToggle('supabase')}
-          variant={'default'}
+          variant='default'
           className={cn(
             'bg-primary text-primary-foreground',
             `${isColorThemeActive('supabase') ? 'ring-2 ring-blue-500 ring-offset-2' : ''} `,
           )}
         >
-          Supabase
+          {copy.supabase}
         </Button>
         <Button
           onClick={createColorThemeToggle('mono')}
-          variant={'secondary'}
+          variant='secondary'
           className={cn(
             'bg-secondary text-secondary-foreground',
             `${isColorThemeActive('mono') ? 'ring-2 ring-blue-500 ring-offset-2' : ''} `,
           )}
         >
-          Mono
+          {copy.mono}
         </Button>
       </div>
     </main>

@@ -2,12 +2,13 @@
 
 import { MonitorIcon, MoonStarIcon, SunIcon } from 'lucide-react'
 import { motion } from 'motion/react'
-import React, { type JSX, useEffect, useState } from 'react'
+import React, { type JSX } from 'react'
 
 import { cn } from '@/lib/utils'
 import { type Theme, useTheme } from '@space-man/react-theme-animation'
+import { useHydrated } from '@space-man/react-theme-animation/react'
 
-const ThemeOption = ({
+function ThemeOption({
   icon,
   value,
   isActive,
@@ -17,23 +18,26 @@ const ThemeOption = ({
   value: Theme
   isActive?: boolean
   onClick: (value: Theme) => void
-}) => {
+}): React.JSX.Element {
   return (
     <button
+      type='button'
       className={cn(
         'relative flex size-8 cursor-default items-center justify-center rounded-full transition-all [&_svg]:size-4',
-        isActive
+        isActive === true
           ? 'text-zinc-950 dark:text-zinc-50'
           : 'text-zinc-400 hover:text-zinc-950 dark:text-zinc-500 dark:hover:text-zinc-50',
       )}
       role='radio'
       aria-checked={isActive}
       aria-label={`Switch to ${value} theme`}
-      onClick={() => onClick(value)}
+      onClick={() => {
+        onClick(value)
+      }}
     >
       {icon}
 
-      {isActive && (
+      {isActive === true && (
         <motion.div
           layoutId='theme-option'
           transition={{ type: 'spring', bounce: 0.3, duration: 0.6 }}
@@ -47,26 +51,22 @@ const ThemeOption = ({
 const THEME_OPTIONS = [
   {
     icon: <MonitorIcon />,
-    value: 'system' as Theme,
+    value: 'system',
   },
   {
     icon: <SunIcon />,
-    value: 'light' as Theme,
+    value: 'light',
   },
   {
     icon: <MoonStarIcon />,
-    value: 'dark' as Theme,
+    value: 'dark',
   },
-]
+] satisfies { readonly icon: React.JSX.Element; readonly value: Theme }[]
 
-const ThemeSwitch = () => {
+function ThemeSwitch(): React.JSX.Element {
   const { theme, setTheme } = useTheme()
 
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
+  const isMounted = useHydrated()
 
   if (!isMounted) {
     return <div className='flex h-8 w-24' />
@@ -87,7 +87,9 @@ const ThemeSwitch = () => {
           icon={option.icon}
           value={option.value}
           isActive={theme === option.value}
-          onClick={(value) => setTheme(value as Theme)}
+          onClick={(value) => {
+            setTheme(value)
+          }}
         />
       ))}
     </motion.div>

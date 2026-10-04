@@ -9,7 +9,11 @@ import {
   useThemeAnimation,
 } from '@space-man/react-theme-animation'
 
-export function BlurThemeToggle() {
+const copy = {
+  toggleTheme: 'Toggle theme',
+}
+
+export function BlurThemeToggle(): React.JSX.Element {
   const { ref, toggleTheme } = useThemeAnimation({
     duration: 2000,
     animationType: ThemeAnimationType.BLUR_CIRCLE,
@@ -21,11 +25,13 @@ export function BlurThemeToggle() {
         variant='outline'
         size='icon'
         ref={ref}
-        onClick={() => toggleTheme()}
+        onClick={() => {
+          void toggleTheme().catch(console.error)
+        }}
       >
         <Sun className='absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0' />
         <Moon className='h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90' />
-        <span className='sr-only'>Toggle theme</span>
+        <span className='sr-only'>{copy.toggleTheme}</span>
       </Button>
     </div>
   )

@@ -2,7 +2,13 @@ import fs from 'node:fs'
 
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
+import { z } from 'zod'
+
+const copy = {
+  startServerFunctionsTodoExample: 'Start Server Functions - Todo Example',
+  addTodo: 'Add todo',
+}
 
 /*
 const loggingMiddleware = createMiddleware().server(
@@ -18,16 +24,22 @@ const loggedServerFunction = createServerFn({ method: "GET" }).middleware([
 
 const TODOS_FILE = 'todos.json'
 
-async function readTodos() {
-  return JSON.parse(
-    await fs.promises.readFile(TODOS_FILE, 'utf-8').catch(() =>
-      JSON.stringify(
-        [
-          { id: 1, name: 'Get groceries' },
-          { id: 2, name: 'Buy a new phone' },
-        ],
-        null,
-        2,
+const todosSchema = z.array(
+  z.object({ id: z.number().int().positive(), name: z.string() }),
+)
+
+async function readTodos(): Promise<z.infer<typeof todosSchema>> {
+  return todosSchema.parse(
+    JSON.parse(
+      await fs.promises.readFile(TODOS_FILE, 'utf-8').catch(() =>
+        JSON.stringify(
+          [
+            { id: 1, name: 'Get groceries' },
+            { id: 2, name: 'Buy a new phone' },
+          ],
+          null,
+          2,
+        ),
       ),
     ),
   )
@@ -35,7 +47,7 @@ async function readTodos() {
 
 const getTodos = createServerFn({
   method: 'GET',
-}).handler(async () => await readTodos())
+}).handler(async () => readTodos())
 
 const addTodo = createServerFn({ method: 'POST' })
   .inputValidator((d: string) => d)
@@ -43,25 +55,26 @@ const addTodo = createServerFn({ method: 'POST' })
     const todos = await readTodos()
     todos.push({ id: todos.length + 1, name: data })
     await fs.promises.writeFile(TODOS_FILE, JSON.stringify(todos, null, 2))
+
     return todos
   })
 
 export const Route = createFileRoute('/demo/start/server-funcs')({
   component: Home,
-  loader: async () => await getTodos(),
+  loader: async () => getTodos(),
 })
 
-function Home() {
+function Home(): React.JSX.Element {
   const router = useRouter()
-  let todos = Route.useLoaderData()
+  const todos = Route.useLoaderData()
 
   const [todo, setTodo] = useState('')
 
   const submitTodo = useCallback(async () => {
-    todos = await addTodo({ data: todo })
+    await addTodo({ data: todo })
     setTodo('')
-    router.invalidate()
-  }, [addTodo, todo])
+    await router.invalidate()
+  }, [todo, router])
 
   return (
     <div
@@ -72,9 +85,11 @@ function Home() {
       }}
     >
       <div className='w-full max-w-2xl rounded-xl border-8 border-black/10 bg-black/50 p-8 shadow-xl backdrop-blur-md'>
-        <h1 className='mb-4 text-2xl'>Start Server Functions - Todo Example</h1>
+        <h1 className='mb-4 text-2xl'>
+          {copy.startServerFunctionsTodoExample}
+        </h1>
         <ul className='mb-4 space-y-2'>
-          {todos?.map((t) => (
+          {todos.map((t) => (
             <li
               key={t.id}
               className='rounded-lg border border-white/20 bg-white/10 p-3 shadow-md backdrop-blur-sm'
@@ -87,21 +102,26 @@ function Home() {
           <input
             type='text'
             value={todo}
-            onChange={(e) => setTodo(e.target.value)}
+            onChange={(e) => {
+              setTodo(e.target.value)
+            }}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
-                submitTodo()
+                void submitTodo().catch(console.error)
               }
             }}
             placeholder='Enter a new todo...'
             className='w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-white/60 backdrop-blur-sm focus:border-transparent focus:ring-2 focus:ring-blue-400 focus:outline-none'
           />
           <button
+            type='button'
             disabled={todo.trim().length === 0}
-            onClick={submitTodo}
+            onClick={() => {
+              void submitTodo().catch(console.error)
+            }}
             className='rounded-lg bg-blue-500 px-4 py-3 font-bold text-white transition-colors hover:bg-blue-600 disabled:cursor-not-allowed disabled:bg-blue-500/50'
           >
-            Add todo
+            {copy.addTodo}
           </button>
         </div>
       </div>

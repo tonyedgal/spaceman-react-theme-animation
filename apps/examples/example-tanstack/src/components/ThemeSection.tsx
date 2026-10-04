@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 import {
   ThemeAnimationType,
@@ -10,10 +10,31 @@ import {
 import { ThemeSelector } from './ThemeSelector'
 import { ThemeSwitcher } from './ThemeSwitcher'
 
-export const ThemeSection = () => {
+const copy = {
+  themeSwitcher: 'Theme Switcher',
+  toggleBetweenLightDarkAndSystemThemes:
+    'Toggle between light, dark, and system themes with smooth animations.',
+  defaultStyle: 'Default Style:',
+  lightDarkOnly: 'Light/Dark Only:',
+  themeSelector: 'Theme Selector:',
+  animationSettings: 'Animation Settings',
+  animationType: 'Animation Type:',
+  circle: 'Circle',
+  blurCircle: 'Blur Circle',
+  currentTheme: 'Current theme:',
+  color: 'Color:',
+  usage: 'Usage',
+  installation: 'Installation:',
+  npmInstallSpaceManReactThemeAnimation:
+    'npm install @space-man/react-theme-animation motion @radix-ui/react-select',
+  basicUsage: 'Basic Usage:',
+}
+
+export function ThemeSection(): React.JSX.Element {
   const [animationType, setAnimationType] = useState<ThemeAnimationType>(
     ThemeAnimationType.CIRCLE,
   )
+
   const {
     theme: currentTheme,
     colorTheme: currentColorTheme,
@@ -27,15 +48,14 @@ export const ThemeSection = () => {
         {/* Theme Switcher Examples */}
         <div className='space-y-6'>
           <div className='space-y-4'>
-            <h2 className='text-2xl font-semibold'>Theme Switcher</h2>
+            <h2 className='text-2xl font-semibold'>{copy.themeSwitcher}</h2>
             <p className='text-muted-foreground'>
-              Toggle between light, dark, and system themes with smooth
-              animations.
+              {copy.toggleBetweenLightDarkAndSystemThemes}
             </p>
 
             <section className='border-border bg-background flex flex-wrap items-center gap-6 rounded-lg border p-6'>
               <div className='flex items-center gap-2'>
-                <label className='text-md font-medium'>Default Style:</label>
+                <span className='text-md font-medium'>{copy.defaultStyle}</span>
                 <ThemeSwitcher
                   themes={['light', 'dark', 'system']}
                   currentTheme={currentTheme}
@@ -44,7 +64,9 @@ export const ThemeSection = () => {
               </div>
 
               <div className='flex items-center gap-2'>
-                <label className='text-md font-medium'>Light/Dark Only:</label>
+                <span className='text-md font-medium'>
+                  {copy.lightDarkOnly}
+                </span>
                 <ThemeSwitcher
                   themes={['light', 'dark']}
                   currentTheme={currentTheme}
@@ -53,7 +75,9 @@ export const ThemeSection = () => {
               </div>
 
               <div className='flex items-center gap-2'>
-                <label className='text-md font-medium'>Theme Selector:</label>
+                <span className='text-md font-medium'>
+                  {copy.themeSelector}
+                </span>
                 <ThemeSelector
                   colorThemes={[
                     'default',
@@ -73,43 +97,45 @@ export const ThemeSection = () => {
 
           {/* Animation Controls */}
           <section className='space-y-4'>
-            <h2 className='text-2xl font-semibold'>Animation Settings</h2>
+            <h2 className='text-2xl font-semibold'>{copy.animationSettings}</h2>
             <div className='border-border bg-background rounded-lg border p-6'>
               <div className='flex flex-wrap items-center gap-6'>
                 <div className='space-y-2'>
                   <div className='flex gap-2'>
-                    <label className='text-md font-medium'>
-                      Animation Type:
-                    </label>
+                    <span className='text-md font-medium'>
+                      {copy.animationType}
+                    </span>
                     <button
-                      onClick={() =>
+                      type='button'
+                      onClick={() => {
                         setAnimationType(ThemeAnimationType.CIRCLE)
-                      }
+                      }}
                       className={`rounded px-3 py-1 text-sm transition-colors ${
                         animationType === ThemeAnimationType.CIRCLE
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted text-muted-foreground hover:bg-accent'
                       }`}
                     >
-                      Circle
+                      {copy.circle}
                     </button>
                     <button
-                      onClick={() =>
+                      type='button'
+                      onClick={() => {
                         setAnimationType(ThemeAnimationType.BLUR_CIRCLE)
-                      }
+                      }}
                       className={`rounded px-3 py-1 text-sm transition-colors ${
                         animationType === ThemeAnimationType.BLUR_CIRCLE
                           ? 'bg-secondary text-secondary-foreground'
                           : 'bg-muted text-muted-foreground hover:bg-accent'
                       }`}
                     >
-                      Blur Circle
+                      {copy.blurCircle}
                     </button>
                   </div>
                 </div>
 
                 <div className='flex items-center gap-2'>
-                  <div className='text-md font-medium'>Current theme:</div>
+                  <div className='text-md font-medium'>{copy.currentTheme}</div>
                   <div className='bg-muted rounded px-2 py-1 font-mono'>
                     {currentTheme}
                   </div>
@@ -117,7 +143,7 @@ export const ThemeSection = () => {
 
                 {currentColorTheme !== 'default' && (
                   <div className='flex items-center gap-2'>
-                    <div className='text-md font-medium'>Color:</div>
+                    <div className='text-md font-medium'>{copy.color}</div>
                     <div className='bg-muted rounded px-2 py-1 font-mono'>
                       {currentColorTheme}
                     </div>
@@ -129,19 +155,18 @@ export const ThemeSection = () => {
 
           {/* Usage Instructions */}
           <div className='space-y-4'>
-            <h2 className='text-2xl font-semibold'>Usage</h2>
+            <h2 className='text-2xl font-semibold'>{copy.usage}</h2>
             <div className='border-border bg-background rounded-lg border p-6'>
               <div className='space-y-4 text-sm'>
                 <div>
-                  <h3 className='mb-2 font-semibold'>Installation:</h3>
+                  <h3 className='mb-2 font-semibold'>{copy.installation}</h3>
                   <code className='bg-muted block rounded p-3 font-mono text-xs'>
-                    npm install @space-man/react-theme-animation motion
-                    @radix-ui/react-select
+                    {copy.npmInstallSpaceManReactThemeAnimation}
                   </code>
                 </div>
 
                 <div>
-                  <h3 className='mb-2 font-semibold'>Basic Usage:</h3>
+                  <h3 className='mb-2 font-semibold'>{copy.basicUsage}</h3>
                   <code className='bg-muted block rounded p-3 font-mono text-xs whitespace-pre'>
                     {`import {
   SpacemanThemeProvider,

@@ -1,19 +1,30 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { z } from 'zod'
 
-function getNames() {
-  return fetch('/demo/api/names').then((res) => res.json() as Promise<string[]>)
+const copy = {
+  startApiRequestDemoNamesList: 'Start API Request Demo - Names List',
+}
+
+const namesSchema = z.array(z.string())
+
+async function getNames(): Promise<string[]> {
+  const response = await fetch('/demo/api/names')
+
+  if (!response.ok) throw new Error('Names request failed')
+
+  return namesSchema.parse(await response.json())
 }
 
 export const Route = createFileRoute('/demo/start/api-request')({
   component: Home,
 })
 
-function Home() {
-  const [names, setNames] = useState<Array<string>>([])
+function Home(): React.JSX.Element {
+  const [names, setNames] = useState<string[]>([])
 
   useEffect(() => {
-    getNames().then(setNames)
+    void getNames().then(setNames).catch(console.error)
   }, [])
 
   return (
@@ -26,7 +37,7 @@ function Home() {
       }}
     >
       <div className='w-full max-w-2xl rounded-xl border-8 border-black/10 bg-black/50 p-8 shadow-xl backdrop-blur-md'>
-        <h1 className='mb-4 text-2xl'>Start API Request Demo - Names List</h1>
+        <h1 className='mb-4 text-2xl'>{copy.startApiRequestDemoNamesList}</h1>
         <ul className='mb-4 space-y-2'>
           {names.map((name) => (
             <li

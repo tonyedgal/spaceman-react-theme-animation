@@ -1,6 +1,7 @@
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
+import React from 'react'
 
 import {
   TanStackStartThemeScript,
@@ -38,7 +39,11 @@ export const Route = createRootRoute({
   shellComponent: RootDocument,
 })
 
-function RootDocument({ children }: { children: React.ReactNode }) {
+function RootDocument({
+  children,
+}: {
+  children: React.ReactNode
+}): React.JSX.Element {
   return (
     <html lang='en' suppressHydrationWarning>
       <head>
@@ -71,10 +76,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 <div className='w-full gap-6'>{children}</div>
               </div>
 
-              <div className='border-border relative -right-px col-start-1 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]'></div>
-              <div className='border-border relative -left-px col-start-3 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]'></div>
-              <div className='bg-border relative -bottom-px col-span-full col-start-1 row-start-2 h-px'></div>
-              <div className='bg-border relative -top-px col-span-full col-start-1 row-start-4 h-px'></div>
+              <div className='border-border relative -right-px col-start-1 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]' />
+              <div className='border-border relative -left-px col-start-3 row-span-full row-start-1 border-x bg-[image:repeating-linear-gradient(315deg,var(--border)_0,var(--border)_1px,transparent_0,transparent_50%)] bg-[size:10px_10px]' />
+              <div className='bg-border relative -bottom-px col-span-full col-start-1 row-start-2 h-px' />
+              <div className='bg-border relative -top-px col-span-full col-start-1 row-start-4 h-px' />
             </div>
           </main>
           <TanStackDevtools
