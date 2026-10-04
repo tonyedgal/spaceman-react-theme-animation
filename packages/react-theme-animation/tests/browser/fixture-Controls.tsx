@@ -157,6 +157,9 @@ export function Controls({
               }}
             />
             <ThemeSelector
+              className='palette-selector'
+              colorThemeLabel='Palette'
+              placeholder='Pick a palette'
               colorThemes={colorThemes}
               currentColorTheme={themeState.colorTheme}
               onColorThemeChange={(value) => {
