@@ -1,12 +1,12 @@
 export {
+  COLOR_STORAGE_KEY,
+  COLOR_THEME_PREFIX,
+  GLOBAL_CLASS_NAME,
+  STORAGE_KEY,
   buildServerThemeData,
   resolveThemeForServer,
-  STORAGE_KEY,
-  COLOR_STORAGE_KEY,
-  GLOBAL_CLASS_NAME,
-  COLOR_THEME_PREFIX,
 } from './helpers'
 
 export type { ServerResolvedTheme, ServerThemeData } from './helpers'
 
-export type { Theme, ColorTheme } from '../core/types'
+export type { ColorTheme, Theme } from '../core/types'

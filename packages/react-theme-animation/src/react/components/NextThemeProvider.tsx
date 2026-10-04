@@ -1,18 +1,15 @@
 'use client'
 
-import React, {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+import React, { createContext, useCallback, useContext, useMemo } from 'react'
 
-import { ColorTheme, Theme, ThemeAnimationType } from '../../core/types'
+import type { ColorTheme, Theme } from '../../core/types'
+import { ThemeAnimationType } from '../../core/types'
+import { useHydrated } from '../hooks/use-hydrated'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
 import { getNextResolvedTheme, withElementAsRef } from './provider-helpers'
 import { SharedThemeContext } from './shared-theme-context'
+
+const defaultColorThemes = ['default'] as const
 
 export interface NextThemeContextType {
   ref: React.RefObject<HTMLButtonElement | null>
@@ -38,8 +35,8 @@ export interface NextThemeContextType {
 
 export interface NextThemeProviderProps {
   children: React.ReactNode
-  themes?: Theme[]
-  colorThemes?: ColorTheme[]
+  themes?: readonly Theme[]
+  colorThemes?: readonly ColorTheme[]
   defaultTheme?: Theme
   defaultColorTheme?: ColorTheme
   animationType?: ThemeAnimationType
@@ -76,7 +73,7 @@ const createDisableTransitions = () => {
   document.head.appendChild(css)
   window.getComputedStyle(document.body)
 
-  return () => {
+  return (): void => {
     setTimeout(() => {
       if (css.parentNode) {
         css.parentNode.removeChild(css)
@@ -107,7 +104,7 @@ const generatePreHydrationScript = ({
   globalClassName: string
   storageKey: string
   value?: Record<string, string>
-}) => {
+}): string => {
   const lightValue = value?.light ?? 'light'
   const darkValue = value?.dark ?? globalClassName
   const systemValue = value?.system ?? 'system'
@@ -174,12 +171,12 @@ const ThemePreHydrationScript = React.memo(
 
 ThemePreHydrationScript.displayName = 'ThemePreHydrationScript'
 
-export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
+export function NextThemeProvider({
   attribute = 'class',
   children,
   colorStorageKey = 'color-theme',
   colorThemePrefix = 'theme-',
-  colorThemes = ['default'],
+  colorThemes = defaultColorThemes,
   defaultColorTheme = 'default',
   defaultTheme = 'system',
   disableAnimationOnInit = true,
@@ -198,8 +195,8 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
   themes,
   value,
   animationType = ThemeAnimationType.CIRCLE,
-}) => {
-  const allowedThemes = useMemo<Theme[]>(() => {
+}: NextThemeProviderProps): React.JSX.Element {
+  const allowedThemes = useMemo<readonly Theme[]>(() => {
     if (themes && themes.length > 0) {
       return themes
     }
@@ -215,7 +212,7 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
     return defaultTheme
   }, [defaultTheme, enableSystem])
 
-  const [mounted, setMounted] = useState(false)
+  const mounted = useHydrated()
 
   const themeState = useThemeAnimation({
     animationType,
@@ -237,20 +234,20 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
     value,
   })
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
   const withTransitionsDisabled = useCallback(
-    async <T,>(fn: () => Promise<T> | T) => {
+    async <T,>(fn: () => T | Promise<T>) => {
       const cleanup = disableTransitionOnChange
         ? createDisableTransitions()
         : undefined
 
       try {
-        return await fn()
-      } finally {
+        const result = await fn()
         cleanup?.()
+
+        return result
+      } catch (error) {
+        cleanup?.()
+        throw error
       }
     },
     [disableTransitionOnChange],
@@ -258,7 +255,7 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
 
   const setTheme = useCallback(
     (theme: Theme) => {
-      void withTransitionsDisabled(async () => {
+      void withTransitionsDisabled(() => {
         themeState.setTheme(theme)
       })
     },
@@ -266,10 +263,11 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
   )
 
   const switchTheme = useCallback(
-    async (theme: Theme, animationOff: boolean = false) => {
+    async (theme: Theme, animationOff = false) => {
       await withTransitionsDisabled(async () => {
         if (!mounted && disableAnimationOnInit) {
           themeState.setTheme(theme)
+
           return
         }
 
@@ -284,6 +282,7 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
       await withTransitionsDisabled(async () => {
         if (!mounted && disableAnimationOnInit) {
           themeState.setTheme(theme)
+
           return
         }
 
@@ -306,16 +305,16 @@ export const NextThemeProvider: React.FC<NextThemeProviderProps> = ({
       setColorTheme: themeState.setColorTheme,
       switchTheme,
       switchColorTheme: themeState.switchColorTheme,
-      toggleTheme: async (animationOff = false) =>
+      toggleTheme: async (animationOff = false): Promise<void> =>
         switchTheme(
           getNextResolvedTheme(themeState.resolvedTheme),
           animationOff,
         ),
-      toggleLightTheme: async (animationOff = false) => {
+      toggleLightTheme: async (animationOff = false): Promise<void> => {
         if (themeState.resolvedTheme === 'light') return
         await switchTheme('light', animationOff)
       },
-      toggleDarkTheme: async (animationOff = false) => {
+      toggleDarkTheme: async (animationOff = false): Promise<void> => {
         if (themeState.resolvedTheme === 'dark') return
         await switchTheme('dark', animationOff)
       },
@@ -356,9 +355,11 @@ export const ThemeProvider = NextThemeProvider
 
 export const useNextTheme = (): NextThemeContextType => {
   const context = useContext(NextThemeContext)
+
   if (context === undefined) {
     throw new Error('useNextTheme must be used within a NextThemeProvider')
   }
+
   return context
 }
 

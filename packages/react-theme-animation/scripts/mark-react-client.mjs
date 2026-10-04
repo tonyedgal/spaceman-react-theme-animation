@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 
 const directive = "'use client';\n"
 
+/** @param {string} relativePath @returns {Promise<void>} */
 async function markClientEntry(relativePath) {
   const filePath = resolve(process.cwd(), relativePath)
   const source = await readFile(filePath, 'utf8')
