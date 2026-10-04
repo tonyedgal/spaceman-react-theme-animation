@@ -37,11 +37,23 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Prettier Check
+      - name: Oxfmt Check
         run: pnpm run format:check
 
       - name: Build
         run: pnpm run build
+
+      - name: Lint and Formatting
+        run: pnpm quality
+
+      - name: Type Check
+        run: pnpm typecheck
+
+      - name: Package Checks
+        run: |
+          pnpm --filter @space-man/react-theme-animation test
+          pnpm --filter @space-man/react-theme-animation test:unit
+          pnpm --filter @space-man/react-theme-animation test:types
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
