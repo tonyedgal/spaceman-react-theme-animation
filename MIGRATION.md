@@ -21,8 +21,11 @@ remain. Compiled modules share code, JavaScript is minified, and source maps are
 not included. Animated helpers also accept per-call options while retaining
 boolean bypass arguments. See the [transition guide](packages/react-theme-animation/docs/theme-transitions.md).
 
-The release is pending. See [readiness](docs/release-readiness.md) for the React
-minimum and storage-recovery blockers.
+The release is pending. Upgrade React and React DOM to at least 18, Motion to at least 12, and Radix Select to at least 2. React 17 and Motion 11 are no longer supported. Keep all required peers installed.
+
+Storage failures no longer prevent theme updates. Without usable storage, the theme lasts for the current page. The hook exposes server defaults during hydration, then restores saved browser preferences.
+
+`ThemeSelector` now applies styling, placeholder, and palette-label props. Its callback also runs when a provider owns the state. Remove duplicate side effects if the same callback is passed to both the provider and the selector. `themeLabel` is deprecated; use `ThemeSwitcher` for mode selection. See [readiness](docs/release-readiness.md) for the remaining publication steps.
 
 ## Server-only imports
 

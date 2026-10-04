@@ -27,15 +27,19 @@ UI-Theme already disables source maps. No source-map removal is needed there. Do
 
 The Spaceman package retains both controls and required Radix, Motion, and `clsx` dependencies. Do not remove controls or make peers optional as part of this handoff. UI-Theme does not use the same Motion-based switcher implementation, so do not add Motion merely to match Spaceman.
 
-## Do not port these defects
+## Follow-up fixes to consider porting
 
-- Spaceman advertises React >=17 but calls React 18's `useSyncExternalStore`. Correct the compatibility contract before release.
-- A storage write failure leaves the requested theme ahead of the committed theme. Retrying the same destination can do nothing. Check both libraries for this shared pattern.
-- Spaceman's selector still ignores `className`, `placeholder`, and label props. Preserve UI-Theme's working customization props when splitting its components.
-- Spaceman's root entry is not safe to import under React's server condition. Keep server-only helpers separate from client controls.
+- React and React DOM now require >=18. Keep that floor when using `useSyncExternalStore`.
+- `src/react/hooks/theme-storage.ts` makes storage reads and writes best effort. A failed write must not prevent state updates or poison the next request. `use-sync-server-theme-storage.ts` uses the same guard.
+- `use-theme-animation.ts` exposes server defaults during hydration, then restores saved preferences. Test a saved palette that differs from the server default and a dark system preference.
+- Selector view, standalone, and context modules now forward `className`, `placeholder`, and `colorThemeLabel`. The label connects to the trigger. Context controls call their own `onColorThemeChange` after a successful update. Preserve UI-Theme's existing customization and avoid duplicate callbacks.
+- The new `tests/browser/storage-and-selector.spec.ts` and `hydration.spec.ts` cover these fixes against compiled public imports.
+- Release CI now checks an extracted npm archive with minimum and current peers, browser regressions, and production dependency auditing.
+
+Spaceman's root entry remains a client API under React's server condition. Keep server-only helpers on `/core` and `/tanstack`. Motion >=12 is specific to Spaceman's retained switcher; do not add Motion to UI-Theme merely to match this floor.
 
 ## Verification evidence and limits
 
-Spaceman's compiled build passed 244 browser checks with 11 skipped cases. The suite covers Chromium at three DPRs, WebKit, and Firefox. The packed archive passed ordinary Node imports and declaration checks. All three example production builds passed. These results do not replace UI-Theme's own tests or prove runtime Next.js hydration.
+Spaceman's compiled build passed 244 browser checks with 11 skipped cases. The suite covers Chromium at three DPRs, WebKit, and Firefox. The packed archive passed ordinary Node imports and declaration checks. All three example production builds passed. The follow-up also verifies production Next hydration and both TanStack example flows. These checks use the workspace package; they are separate from the extracted archive matrix. They do not replace UI-Theme's own tests.
 
 Use `tests/browser/transitions.spec.ts`, the provider fixtures, and the pointer-to-keyboard selector regression as references. Keep UI-Theme's upload gallery tests and existing features intact. Run its own full checks after each port.

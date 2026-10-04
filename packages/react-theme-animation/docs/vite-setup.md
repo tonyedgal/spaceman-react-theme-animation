@@ -1,5 +1,7 @@
 # Vite React SPA Setup Guide
 
+The planned v3 release requires React and React DOM >=18, Motion >=12, and Radix Select >=2.
+
 Complete guide for using `@space-man/react-theme-animation` in Vite-based React single-page applications.
 
 This package ships ESM only. Use `import` for library APIs. See the [migration guide](../../../MIGRATION.md) for CommonJS applications.
@@ -220,7 +222,7 @@ Define your CSS variables in your global stylesheet:
 
 ### Theme Resets On Reload
 
-Make sure the app can access `localStorage`. The current hook does not recover from storage exceptions. Blocked storage can prevent mounting or theme changes. See the [release readiness audit](../../../docs/release-readiness.md).
+Blocked `localStorage` reads use the configured defaults. Failed writes still update the mode and palette for the current page. Preferences cannot survive a reload while persistence is blocked.
 
 ### Animations Not Running
 

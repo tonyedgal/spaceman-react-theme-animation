@@ -1,5 +1,7 @@
 # TanStack Start Setup Guide
 
+The planned v3 release requires React and React DOM >=18, Motion >=12, and Radix Select >=2.
+
 Complete guide for using `@space-man/react-theme-animation` in TanStack Start apps with flash-aware theme support.
 
 This package ships ESM only. Use `import` for library APIs. See the [migration guide](../../../MIGRATION.md) for CommonJS applications.

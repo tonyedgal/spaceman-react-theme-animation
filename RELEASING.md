@@ -2,7 +2,7 @@
 
 ## Current status
 
-The planned release is `3.0.0`. It is not ready to publish until the confirmed blockers in [release readiness](docs/release-readiness.md) are resolved. Do not run the publish step as part of a local audit.
+The planned release is `3.0.0`. The implementation blockers in [release readiness](docs/release-readiness.md) are resolved. Version generation and external npm authorization still remain. Do not run the publish step as part of a local audit.
 
 Changesets combines the pending major and minor entries. Keep the historical v2 note unchanged. Release tooling must generate the version and changelog; do not edit the generated changelog by hand.
 
@@ -18,12 +18,13 @@ pnpm typecheck
 pnpm --filter @space-man/react-theme-animation test
 pnpm --filter @space-man/react-theme-animation test:unit
 pnpm --filter @space-man/react-theme-animation test:types
+pnpm --filter @space-man/react-theme-animation exec node scripts/check-packed-package.mjs
 pnpm --filter @space-man/react-theme-animation test:browser
 pnpm exec changeset status
 pnpm audit --prod
 ```
 
-Build first. Import, type, and browser fixtures now use compiled package entries. Browser checks require installed Playwright browsers. The existing workflow runs the build, quality, workspace types, import, unit, and type-fixture checks. It does not currently run browser checks or an extracted-tarball consumer check.
+Build first. Import, type, and browser fixtures now use compiled package entries. Browser checks require installed Playwright browsers. The workflow runs builds, quality, workspace types, imports, units, public type fixtures, extracted-package consumers, production security auditing, and the browser suite. The extracted-package check uses React 18.0 / Motion 12.0 / Radix 2.0 and current peers. It checks public imports, declarations, SSR, and shipped files. GitHub Actions execution is still unverified until the branch is pushed.
 
 ## Inspect the release artifact
 
