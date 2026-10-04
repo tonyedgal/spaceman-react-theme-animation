@@ -1,10 +1,18 @@
 # Release notes: planned v3
 
-This release is not published. Changesets currently plans `3.0.0`. The package manifest remains `2.2.0` until the version step runs. See [release readiness](docs/release-readiness.md) for unresolved blockers.
+This release is not published. Changesets currently plans `3.0.0`. The package manifest remains `2.2.0` until the version step runs. See [release readiness](docs/release-readiness.md) for verified checks and the remaining publication steps.
 
 ## Breaking module change
 
 The package ships ESM only. Replace CommonJS `require()` with static `import` or dynamic `import()`. Existing ESM root, `/react`, `/core`, and `/tanstack` paths remain. Type declarations remain included.
+
+## Supported peers and fixes
+
+Require React and React DOM >=18 and Motion >=12. Keep Radix Select >=2 and all UI dependencies required. Extracted-package checks cover these minimums and current peers.
+
+Blocked storage reads use defaults. Failed writes still update mode and palette. Hydration preserves the server render before restoring saved browser preferences.
+
+`ThemeSelector` now applies its class, placeholder, and palette label, and calls its own callback inside a provider. `themeLabel` is deprecated because this selector changes palettes.
 
 ## Transitions
 
@@ -19,9 +27,11 @@ The package ships ESM only. Replace CommonJS `require()` with static `import` or
 
 ## Packaging and tooling
 
-Keep both built-in controls and their required dependencies. Share compiled modules between entries, minify JavaScript, and omit source maps. The measured pre-documentation archive was 20.4 KiB compressed and 76.4 KiB unpacked. README edits can change the final size. Examples are not included in the archive. External dependencies install separately.
+Keep both built-in controls and their required dependencies. Share compiled modules between entries, minify JavaScript, and omit source maps. Readiness records the current archive measurement. Examples are not included in the archive. External dependencies install separately.
 
-Use Oxlint, Oxfmt, and the published `antislop-plugin`. Validate compiled public imports and declarations, browser transitions, and example builds.
+Use Oxlint, Oxfmt, and the published `antislop-plugin`. Update the workspace to React 19.3, Next 16.3.8, Vite 8.3.2, Motion 14, and current TanStack packages. TypeScript stays on the latest compatible 5.9.3 because newer compilers break tsup declaration generation.
+
+Release CI checks compiled imports, units, declarations, minimum/current extracted-package consumers, browser transitions, example builds, and production dependency auditing. The production audit reports zero findings. GitHub Actions dependencies also use their current major releases.
 
 ## Migration
 
