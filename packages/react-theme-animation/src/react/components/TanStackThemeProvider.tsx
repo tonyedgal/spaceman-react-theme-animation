@@ -5,26 +5,26 @@ import React, {
   useContext,
   useSyncExternalStore,
 } from 'react'
-import { useThemeAnimation } from '../hooks/use-theme-animation'
-import { useSyncServerThemeStorage } from '../hooks/use-sync-server-theme-storage'
-import {
+
+import type {
+  UseThemeAnimationProps,
+  ThemeTransitionInput,
+  ColorThemeToggle,
   ColorTheme,
   SystemThemeMode,
   Theme,
-  ThemeAnimationType,
 } from '../../core/types'
+import { ThemeAnimationType } from '../../core/types'
 import {
   COLOR_STORAGE_KEY,
   COLOR_THEME_PREFIX,
   GLOBAL_CLASS_NAME,
   STORAGE_KEY,
 } from '../../tanstack/helpers'
+import { useSyncServerThemeStorage } from '../hooks/use-sync-server-theme-storage'
+import { useThemeAnimation } from '../hooks/use-theme-animation'
+import { getBrowserSystemTheme, getNextResolvedTheme } from './provider-helpers'
 import { SharedThemeContext } from './shared-theme-context'
-import {
-  getBrowserSystemTheme,
-  getNextResolvedTheme,
-  withElementAsRef,
-} from './provider-helpers'
 
 export interface TanStackThemeContextType {
   ref: React.RefObject<HTMLButtonElement | null>
@@ -36,20 +36,23 @@ export interface TanStackThemeContextType {
   setTheme: (theme: Theme) => void
   setColorTheme: (colorTheme: ColorTheme) => void
 
-  switchTheme: (theme: Theme, animationOff?: boolean) => Promise<void>
-  switchColorTheme: (colorTheme: string) => void
+  switchTheme: (theme: Theme, options?: ThemeTransitionInput) => Promise<void>
+  switchColorTheme: (
+    colorTheme: string,
+    options?: ThemeTransitionInput,
+  ) => Promise<void>
 
-  toggleTheme: (animationOff?: boolean) => Promise<void>
-  toggleLightTheme: (animationOff?: boolean) => Promise<void>
-  toggleDarkTheme: (animationOff?: boolean) => Promise<void>
-  toggleColorTheme: () => void
+  toggleTheme: (options?: ThemeTransitionInput) => Promise<void>
+  toggleLightTheme: (options?: ThemeTransitionInput) => Promise<void>
+  toggleDarkTheme: (options?: ThemeTransitionInput) => Promise<void>
+  toggleColorTheme: ColorThemeToggle
 
-  createColorThemeToggle: (targetColorTheme: string) => () => void
+  createColorThemeToggle: (targetColorTheme: string) => ColorThemeToggle
   isColorThemeActive: (targetColorTheme: string) => boolean
 
   switchThemeFromElement: (
     theme: Theme,
-    element: HTMLButtonElement
+    element: HTMLButtonElement,
   ) => Promise<void>
 }
 
@@ -57,7 +60,7 @@ const TanStackThemeContext = createContext<
   TanStackThemeContextType | undefined
 >(undefined)
 
-export interface TanStackThemeProviderProps {
+export type TanStackThemeProviderProps = UseThemeAnimationProps & {
   children: ReactNode
   themes?: Theme[]
   colorThemes?: ColorTheme[]
@@ -94,7 +97,7 @@ const generateTanStackPreHydrationScript = (
   defaultColorTheme: ColorTheme,
   globalClassName: string,
   colorThemePrefix: string,
-  systemThemeMode: SystemThemeMode
+  systemThemeMode: SystemThemeMode,
 ): string => {
   return `
 (function() {
@@ -161,7 +164,7 @@ export const TanStackStartThemeScript: React.FC<TanStackStartThemeScriptProps> =
         defaultColorTheme,
         globalClassName,
         colorThemePrefix,
-        systemThemeMode
+        systemThemeMode,
       )
 
       return (
@@ -171,7 +174,7 @@ export const TanStackStartThemeScript: React.FC<TanStackStartThemeScriptProps> =
           dangerouslySetInnerHTML={{ __html: scriptContent }}
         />
       )
-    }
+    },
   )
 
 TanStackStartThemeScript.displayName = 'TanStackStartThemeScript'
@@ -180,19 +183,8 @@ const useHydrated = (): boolean => {
   return useSyncExternalStore(
     () => () => {},
     () => true,
-    () => false
+    () => false,
   )
-}
-
-const getNextColorTheme = (
-  colorThemes: ColorTheme[],
-  currentColorTheme: ColorTheme
-): ColorTheme => {
-  if (colorThemes.length === 0) return currentColorTheme
-  const currentIndex = colorThemes.indexOf(currentColorTheme)
-  const nextIndex =
-    currentIndex === -1 ? 0 : (currentIndex + 1) % colorThemes.length
-  return colorThemes[nextIndex]
 }
 
 export const TanStackThemeProvider: React.FC<TanStackThemeProviderProps> = ({
@@ -212,12 +204,16 @@ export const TanStackThemeProvider: React.FC<TanStackThemeProviderProps> = ({
   systemThemeMode = 'css',
   onServerThemeChange,
   onServerColorThemeChange,
+  ...animationOptions
 }) => {
   const isHydrated = useHydrated()
   const hasServerTheme = serverTheme !== undefined
   const initialTheme = hasServerTheme ? serverTheme : undefined
 
   const themeState = useThemeAnimation({
+    ...animationOptions,
+    onColorThemeChange: onServerColorThemeChange,
+    onThemeChange: onServerThemeChange,
     themes,
     colorThemes,
     defaultTheme,
@@ -244,109 +240,109 @@ export const TanStackThemeProvider: React.FC<TanStackThemeProviderProps> = ({
   const setThemeWithServer = useCallback(
     (newTheme: Theme) => {
       themeState.setTheme(newTheme)
-      onServerThemeChange?.(newTheme)
     },
-    [themeState, onServerThemeChange]
+    [themeState, onServerThemeChange],
   )
 
   const setColorThemeWithServer = useCallback(
     (newColorTheme: ColorTheme) => {
       themeState.setColorTheme(newColorTheme)
-      onServerColorThemeChange?.(newColorTheme)
     },
-    [themeState, onServerColorThemeChange]
+    [themeState, onServerColorThemeChange],
   )
 
   const switchThemeWithHydrationAwareness = useCallback(
-    async (theme: Theme, animationOff: boolean = false) => {
+    async (theme: Theme, animationOff: ThemeTransitionInput = false) => {
       if (!isHydrated) {
         setThemeWithServer(theme)
+
         return
       }
 
       await themeState.switchTheme(theme, animationOff)
-      onServerThemeChange?.(theme)
     },
-    [isHydrated, themeState, setThemeWithServer, onServerThemeChange]
+    [isHydrated, themeState, setThemeWithServer, onServerThemeChange],
   )
 
   const toggleThemeWithHydrationAwareness = useCallback(
-    async (animationOff: boolean = false) => {
+    async (animationOff: ThemeTransitionInput = false) => {
       const nextTheme = getNextResolvedTheme(themeState.resolvedTheme)
 
       if (!isHydrated) {
         setThemeWithServer(nextTheme)
+
         return
       }
 
       await themeState.toggleTheme(animationOff)
-      onServerThemeChange?.(nextTheme)
     },
-    [isHydrated, themeState, setThemeWithServer, onServerThemeChange]
+    [isHydrated, themeState, setThemeWithServer, onServerThemeChange],
   )
 
   const toggleLightThemeWithHydrationAwareness = useCallback(
-    async (animationOff: boolean = false) => {
+    async (animationOff: ThemeTransitionInput = false) => {
       if (!isHydrated) {
         setThemeWithServer('light')
+
         return
       }
 
       await themeState.toggleLightTheme(animationOff)
-      onServerThemeChange?.('light')
     },
-    [isHydrated, themeState, setThemeWithServer, onServerThemeChange]
+    [isHydrated, themeState, setThemeWithServer, onServerThemeChange],
   )
 
   const toggleDarkThemeWithHydrationAwareness = useCallback(
-    async (animationOff: boolean = false) => {
+    async (animationOff: ThemeTransitionInput = false) => {
       if (!isHydrated) {
         setThemeWithServer('dark')
+
         return
       }
 
       await themeState.toggleDarkTheme(animationOff)
-      onServerThemeChange?.('dark')
     },
-    [isHydrated, themeState, setThemeWithServer, onServerThemeChange]
+    [isHydrated, themeState, setThemeWithServer, onServerThemeChange],
   )
 
   const switchColorThemeWithServer = useCallback(
-    (newColorTheme: ColorTheme) => {
-      themeState.switchColorTheme(newColorTheme)
-      onServerColorThemeChange?.(newColorTheme)
+    async (newColorTheme: ColorTheme, options?: ThemeTransitionInput) => {
+      if (!colorThemes.includes(newColorTheme)) return
+      await themeState.switchColorTheme(newColorTheme, options)
     },
-    [themeState, onServerColorThemeChange]
+    [colorThemes, themeState, onServerColorThemeChange],
   )
 
-  const toggleColorThemeWithServer = useCallback(() => {
-    const nextColorTheme = getNextColorTheme(colorThemes, themeState.colorTheme)
-    themeState.toggleColorTheme()
-    onServerColorThemeChange?.(nextColorTheme)
-  }, [colorThemes, themeState, onServerColorThemeChange])
+  const toggleColorThemeWithServer: ColorThemeToggle = useCallback(
+    async (input) => {
+      await themeState.toggleColorTheme(input)
+    },
+    [themeState],
+  )
 
   const createColorThemeToggleWithServer = useCallback(
-    (targetColorTheme: ColorTheme) => () => {
-      themeState.createColorThemeToggle(targetColorTheme)()
-      onServerColorThemeChange?.(targetColorTheme)
-    },
-    [themeState, onServerColorThemeChange]
+    (targetColorTheme: ColorTheme): ColorThemeToggle =>
+      (input) =>
+        switchColorThemeWithServer(
+          targetColorTheme,
+          input && typeof input === 'object' && 'currentTarget' in input
+            ? { element: input.currentTarget, animationOff: input.detail === 0 }
+            : input,
+        ),
+    [switchColorThemeWithServer],
   )
 
   const switchThemeFromElement = useCallback(
     async (theme: Theme, element: HTMLButtonElement) => {
       if (!isHydrated) {
         setThemeWithServer(theme)
+
         return
       }
 
-      await withElementAsRef(themeState.ref, element, async () => {
-        await themeState.switchTheme(theme)
-      })
-
-      onServerThemeChange?.(theme)
+      await themeState.switchTheme(theme, { element })
     },
-    [isHydrated, themeState, setThemeWithServer, onServerThemeChange]
+    [isHydrated, themeState, setThemeWithServer, onServerThemeChange],
   )
 
   const systemTheme = getBrowserSystemTheme()
@@ -354,9 +350,12 @@ export const TanStackThemeProvider: React.FC<TanStackThemeProviderProps> = ({
   const serverResolvedTheme: 'light' | 'dark' = (() => {
     if (hasServerTheme) {
       if (serverTheme === 'dark') return 'dark'
+
       if (serverTheme === 'system') return systemTheme
+
       return 'light'
     }
+
     return defaultTheme === 'dark' ? 'dark' : 'light'
   })()
 
@@ -424,10 +423,12 @@ export const TanStackThemeProvider: React.FC<TanStackThemeProviderProps> = ({
 
 export const useTanStackTheme = (): TanStackThemeContextType => {
   const context = useContext(TanStackThemeContext)
+
   if (context === undefined) {
     throw new Error(
-      'useTanStackTheme must be used within a TanStackThemeProvider'
+      'useTanStackTheme must be used within a TanStackThemeProvider',
     )
   }
+
   return context
 }

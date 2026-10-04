@@ -1,6 +1,13 @@
-import React from 'react'
-import { ThemeSelectorProps, ColorTheme } from '../../core/types'
+import React, { useRef } from 'react'
+
+import type {
+  ThemeSelectorProps,
+  ColorTheme,
+  ThemeTransitionInput,
+} from '../../core/types'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
+import type { SharedThemeContextValue } from './shared-theme-context'
+import { useSharedThemeContext } from './shared-theme-context'
 import {
   Select,
   SelectContent,
@@ -8,15 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select'
-import {
-  SharedThemeContextValue,
-  useSharedThemeContext,
-} from './shared-theme-context'
 
 interface ThemeSelectorViewProps {
   colorTheme: ColorTheme
   colorThemes: ColorTheme[]
-  onSelectColorTheme: (colorTheme: ColorTheme) => void
+  onSelectColorTheme: (
+    colorTheme: ColorTheme,
+    options?: ThemeTransitionInput,
+  ) => Promise<void>
 }
 
 const ThemeSelectorView: React.FC<ThemeSelectorViewProps> = ({
@@ -24,20 +30,33 @@ const ThemeSelectorView: React.FC<ThemeSelectorViewProps> = ({
   colorThemes,
   onSelectColorTheme,
 }) => {
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const keyboard = useRef(false)
+  const handleColorChange = (color: string) => {
+    void onSelectColorTheme(color, {
+      element: triggerRef.current,
+      animationOff: keyboard.current,
+    })
+  }
   return (
     <>
       {colorThemes.length > 1 ? (
-        <div className="flex flex-col gap-2">
-          <Select
-            value={colorTheme}
-            onValueChange={value => onSelectColorTheme(value as ColorTheme)}
-          >
-            <SelectTrigger className="capitalize">
-              <SelectValue placeholder="Choose a color theme" />
+        <div
+          className='flex flex-col gap-2'
+          onKeyDownCapture={() => {
+            keyboard.current = true
+          }}
+          onPointerDownCapture={() => {
+            keyboard.current = false
+          }}
+        >
+          <Select value={colorTheme} onValueChange={handleColorChange}>
+            <SelectTrigger ref={triggerRef} className='capitalize'>
+              <SelectValue placeholder='Choose a color theme' />
             </SelectTrigger>
             <SelectContent>
-              {colorThemes.map(theme => (
-                <SelectItem key={theme} className="capitalize" value={theme}>
+              {colorThemes.map((theme) => (
+                <SelectItem key={theme} className='capitalize' value={theme}>
                   {theme}
                 </SelectItem>
               ))}
@@ -58,7 +77,7 @@ const ThemeSelectorWithContext: React.FC<
     <ThemeSelectorView
       colorTheme={contextTheme.colorTheme}
       colorThemes={colorThemes}
-      onSelectColorTheme={contextTheme.setColorTheme}
+      onSelectColorTheme={contextTheme.switchColorTheme}
     />
   )
 }
@@ -70,8 +89,10 @@ const ThemeSelectorStandalone: React.FC<ThemeSelectorProps> = ({
   onColorThemeChange,
   animationType,
   duration,
+  ...animationOptions
 }) => {
   const standaloneHook = useThemeAnimation({
+    ...animationOptions,
     animationType,
     duration,
     themes,
@@ -84,12 +105,12 @@ const ThemeSelectorStandalone: React.FC<ThemeSelectorProps> = ({
     <ThemeSelectorView
       colorTheme={standaloneHook.colorTheme}
       colorThemes={colorThemes}
-      onSelectColorTheme={standaloneHook.setColorTheme}
+      onSelectColorTheme={standaloneHook.switchColorTheme}
     />
   )
 }
 
-export const ThemeSelector: React.FC<ThemeSelectorProps> = props => {
+export const ThemeSelector: React.FC<ThemeSelectorProps> = (props) => {
   const contextTheme = useSharedThemeContext()
 
   if (contextTheme) {

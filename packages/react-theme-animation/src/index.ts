@@ -1,6 +1,7 @@
 export { useThemeAnimation } from './react/hooks/use-theme-animation'
 
 export { ThemeSwitcher } from './react/components/ThemeSwitcher'
+
 export { ThemeSelector } from './react/components/ThemeSelector'
 
 export {
@@ -15,11 +16,13 @@ export {
   useNextTheme,
   useTheme,
 } from './react/components/NextThemeProvider'
+
 export {
   TanStackThemeProvider,
   TanStackStartThemeScript,
   useTanStackTheme,
 } from './react/components/TanStackThemeProvider'
+
 export {
   ViteThemeProvider,
   useViteTheme,
@@ -56,3 +59,17 @@ export {
 } from './tanstack/helpers'
 
 export type { ServerResolvedTheme, ServerThemeData } from './tanstack/helpers'
+
+export type {
+  AnimationPosition,
+  TransitionDirection,
+  ThemeAnimationOptions,
+  ThemeLogoOptions,
+  ThemeTransitionOptions,
+  ThemeTransitionInput,
+  ColorThemeToggle,
+} from './core/types'
+
+export { TRANSITION_DIRECTIONS } from './core/types'
+
+export { preloadThemeLogo } from './core/logo'
