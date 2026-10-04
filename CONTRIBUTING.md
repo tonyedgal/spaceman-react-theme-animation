@@ -79,6 +79,7 @@ pnpm quality
 pnpm --filter @space-man/react-theme-animation test
 pnpm --filter @space-man/react-theme-animation test:unit
 pnpm --filter @space-man/react-theme-animation test:types
+pnpm --filter @space-man/react-theme-animation exec node scripts/check-packed-package.mjs
 pnpm --filter @space-man/react-theme-animation test:browser
 ```
 
@@ -146,3 +147,9 @@ The TanStack builds format the generated route trees after generation. This keep
 ## Release artifacts
 
 The package ships ESM only with shared, minified JavaScript and TypeScript declarations. Build before running the import, type, and browser checks. The fixtures use compiled public entries. Review [release readiness](docs/release-readiness.md) and [the releasing guide](RELEASING.md) before changing versions or publishing.
+
+## Dependency compatibility
+
+Use React and React DOM >=18, Motion >=12, and Radix Select >=2. Development uses React 19.3 and Motion 14. TypeScript stays on 5.9.3: tsup 8.5.1 fails to build declarations with TypeScript 6 and 7. Do not hide compiler failures with deprecation flags. Replace or update the declaration builder before raising the compiler version.
+
+Vite 8 resolves TypeScript paths directly with `resolve.tsconfigPaths`; the old path plugin is no longer needed. TanStack server functions use `.validator()`.

@@ -1,94 +1,55 @@
-# Release readiness audit
+# Release readiness
 
-Date: 2026-10-04. Implementation reviewed at `bb3d62e` on `feat/oxc-theme-transitions`. User-selected baseline: merge-base with `main`, `2d4fed20d3bb2786e068212026f05560d916f518`. Comparison command: `git diff 2d4fed20d3bb2786e068212026f05560d916f518...HEAD`. Docs created after this review do not close implementation findings.
+Date: 2026-10-05. Branch: `feat/oxc-theme-transitions`. The original review used the merge-base with `main`, `2d4fed20d3bb2786e068212026f05560d916f518`. This report includes the dependency and implementation fixes that followed that review.
 
 ## Decision
 
-**Do not publish yet.** Two confirmed implementation defects block release. The pending Changesets plan the library's next version as `3.0.0`. The current manifest remains `2.2.0`. No versioning or publishing was performed.
+The confirmed implementation blockers are resolved. Changesets plans `3.0.0`; the manifest stays at `2.2.0` until release tooling generates the version. Version generation, external npm publisher verification, and publication approval remain. Nothing was pushed or published.
 
-## Standards review
+## Findings and resolution
 
-| Finding                                     | Evidence                                                                                                                                                                                                          | Required action                                                                                                                                |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| P1: React 17 contract is false              | `packages/react-theme-animation/package.json` advertises React and React DOM >=17. `src/react/hooks/use-hydrated.ts` imports and calls `useSyncExternalStore`, introduced in React 18. The main hook calls it.    | Raise both minimums to 18 or use a compatibility shim. Test the declared minimum. See [React 18](https://react.dev/blog/2022/03/29/react-v18). |
-| Server import boundary is not covered       | `scripts/mark-react-client.mjs` marks only `/react`. A root import with `node --conditions=react-server` fails inside Motion because server React has no `createContext`. `/tanstack` loads under that condition. | Use `/tanstack` and `/core` for server helpers. Test a real Next server/client boundary. This is not established as a new branch regression.   |
-| Release CI omits artifact and browser gates | `.github/workflows/publish.yml` runs normal package imports, units, and types, but no browser suite or extracted-tarball consumer.                                                                                | Require equivalent pre-release evidence or add CI gates. Local evidence exists, but CI does not preserve it.                                   |
-| npm authorization is external               | The workflow has OIDC permission and package provenance settings. The repository does not show the npm trusted-publisher configuration.                                                                           | Verify the external publisher matches the workflow identity before publishing. Do not treat dry-run output as authentication evidence.         |
+| Review axis                 | Original finding                                                                | Resolution and evidence                                                                                                                                                                                                             |
+| --------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Standards and specification | React >=17 conflicted with `useSyncExternalStore`.                              | React and React DOM now require >=18. Extracted consumers pass with React 18.0 and current React 19.3.                                                                                                                              |
+| Specification               | Storage failures prevented updates and poisoned retries.                        | Reads and writes are best effort in `theme-storage.ts`. Five provider paths pass blocked-storage and restored-persistence browser tests.                                                                                            |
+| Follow-up runtime check     | Saved palettes and system preferences differed during hydration.                | The hook exposes server defaults until hydration finishes. Compiled-browser tests render real server markup and hydrate with saved values and a dark system preference. The production Next app passes the same saved-palette flow. |
+| API review                  | Selector customization and callback props were ignored.                         | The selector forwards class, placeholder, and palette label. Labels connect to the trigger. Provider-backed selectors call their own callback once. `themeLabel` is deprecated because the selector changes palettes.               |
+| Minimum peer check          | Earliest Motion 11 could not resolve its animation entry.                       | Motion now requires >=12. React 18.0 / Motion 12.0 / Radix 2.0 pass imports, SSR, and declarations from the npm archive.                                                                                                            |
+| Standards                   | Release CI lacked browser and archive gates.                                    | The workflow now runs browser checks, extracted-package matrices, and production auditing before Changesets. Actions were updated; Changesets v2 uses its renamed script inputs. Remote CI has not run locally.                     |
+| Security                    | Production audit reported 3 critical, 35 high, 33 moderate, and 9 low findings. | Updated dependencies report zero findings at every severity. See [audit history](release-dependency-audit.md).                                                                                                                      |
+| Runtime verification        | Real framework hydration and navigation were untested.                          | Production Next and both TanStack development servers pass palette/mode changes, navigation, and reload. The cookie example also verifies cookie-derived HTML and persisted server writes.                                          |
 
-No other confirmed standards violation was reported. The baseline smell review did not identify a concrete blocker beyond these contracts and validation boundaries.
+The framework checks use the workspace build. The extracted archive is checked separately in Node and TypeScript. These checks do not claim that an extracted archive ran inside every framework.
 
-## Specification review
+## Verified checks
 
-| Finding                                  | Requirement and evidence                                                                                                                                                                                                                                                  | Required action                                                                                                                                                           |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P1: supported consumers must work        | The retained public controls/providers now use a React 18-only hook despite a >=17 manifest.                                                                                                                                                                              | Resolve the same React minimum issue recorded by Standards. It is one defect, not two.                                                                                    |
-| P2: failed storage writes poison retries | The documented transition contract preserves state updates. `use-theme-animation.ts` updates `requestedTheme`/`requestedColorTheme` before commit. `localStorage.setItem` can throw before React state changes. A retry sees the requested destination and returns early. | Treat persistence as best effort or recover requested refs after failure without overwriting newer requests. Add failure-and-retry coverage for mode and palette changes. |
-| Runtime SSR evidence is incomplete       | The browser fixtures run in Vite. Next and TanStack examples compile, but the suite does not prove real framework hydration/navigation.                                                                                                                                   | Test the packed package in an actual Next SSR/hydration flow. Add equivalent TanStack runtime evidence for the cookie and script setups.                                  |
+| Check                          | Result                                                                                                                                                                                                                                                                                                       |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Oxlint and Oxfmt               | Passed. No rules were disabled to resolve dependency or implementation failures.                                                                                                                                                                                                                             |
+| Workspace types and builds     | Library, Next, and both TanStack examples pass.                                                                                                                                                                                                                                                              |
+| Import, unit, and public types | Public entries share identity; both unit checks and declaration fixtures pass.                                                                                                                                                                                                                               |
+| Extracted archive              | Minimum and current peers pass imports, declarations with library checking enabled, and server rendering. Archive excludes examples, tests, source maps, and CommonJS.                                                                                                                                       |
+| Browser regressions            | 340 cases: 329 passed across the full run and sequential correction run; 11 intentional visual skips. The first run used an invalid JSX transform in six new SSR fixtures. A concurrent focused run also removed one trace file. Corrected fixtures and all seven affected cases pass when run sequentially. |
+| Framework runtime              | Next production and both TanStack development theme flows pass without hydration or page errors.                                                                                                                                                                                                             |
+| Production security            | Zero critical, high, moderate, low, and informational findings.                                                                                                                                                                                                                                              |
+| Package size                   | 21,594 bytes compressed; 80,339 bytes unpacked; 17 files. Required external dependencies install separately.                                                                                                                                                                                                 |
+| Changesets                     | The library's planned release remains 3.0.0. Private example apps do not publish.                                                                                                                                                                                                                            |
 
-Reproduction of the storage failure against the compiled package: start at palette `default`; make `Storage.prototype.setItem` throw `SecurityError`; await `switchColorTheme('ocean', true)` and catch the rejection; restore storage; retry the same call. Result: palette remains `default`, and `color-theme` remains unset. This was observed in Chromium, not inferred from the code alone. Storage reads in the hook also lack a failure guard, so blocked storage is not a supported fallback today.
+Browser projects cover Chromium DPR 1, 2, and mobile DPR 3, plus WebKit and Firefox. The Firefox skips remain explicit. These checks do not establish a universal frame-rate guarantee.
 
-No confirmed missing animation feature or unwanted removal of the controls was found. The handoff comparison confirms that UI-Theme already has most animation features.
+## Dependency limits
 
-## Dependency security
+All retained direct npm dependencies use the current releases except TypeScript. TypeScript 7.0.2 breaks tsup's declaration compiler API. TypeScript 6.0.3 fails because tsup internally supplies a deprecated `baseUrl`. TypeScript stays at the latest compatible 5.9.3; no deprecation errors were silenced. Replace or update the declaration builder before adopting a newer compiler.
 
-The fresh production workspace audit reports 3 critical, 35 high, 33 moderate, and 9 low findings. Critical findings are in the private Next.js example. No reported path points to the library importer. The examples do not ship in the npm archive. See [dependency audit](release-dependency-audit.md) for advisory links and scope. Fix the affected dependencies before deploying the examples. This is an additional workspace release/deployment gate, separate from the two confirmed library defects.
+The Netlify development plugin has one upstream optional-peer mismatch between `unstorage` and `@netlify/blobs`. No override or warning suppression was added. The production audit is clean. Example dependencies do not ship in the library archive.
 
-## Other existing implementation gaps
+The root export remains a client API under React's server condition. Use `/core` and `/tanstack` for server-only helpers. Next providers stay inside a local client wrapper. The examples contained stale physical dependency folders before the upgrades; fresh installs from the lockfile verified the actual new router versions.
 
-| Gap                               | Status                                                                                                                                                                                             | Release treatment                                                                                                        |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Selector customization            | `ThemeSelectorProps` accepts `className`, `placeholder`, `themeLabel`, and `colorThemeLabel`. The view ignores these props and hardcodes the placeholder. This also exists at the review baseline. | Implement supported customization or remove/deprecate unsupported promises. Do not claim these props work.               |
-| Provider-backed selector callback | `ThemeSelectorWithContext` forwards only `colorThemes` and provider state. The control's `onColorThemeChange` is not notified in this path.                                                        | Decide whether the control callback or provider callback owns notifications, then document and test it.                  |
-| Minimum dependency matrix         | Tests use the locked React 19, Motion 12, and Radix 2 versions. They do not prove all advertised lower versions.                                                                                   | Check React minimum first. Run a minimal consumer with the lowest claimed UI peers, or narrow support based on evidence. |
-| Firefox visual skips              | 11 browser checks skip unsupported screenshot assertions or redundant large-snapshot checks. Behavioural coverage still runs.                                                                      | Retain the stated limitation. Do not claim every visual assertion passed on Firefox.                                     |
-| Performance guarantee             | Geometry, timing, lifecycle, and rendered corners are tested. No universal frame-rate or compositor-only guarantee follows.                                                                        | Keep the current documentation limits. Profile target hardware before making performance claims.                         |
+## Remaining release steps
 
-## Evidence already available
+1. Generate the Changesets version and changelog on the release branch. Check the version is 3.0.0 and all pending notes are included.
+2. Run the release checks from [RELEASING.md](../RELEASING.md) against the versioned artifact. Run the updated workflow remotely before release.
+3. Verify npm's trusted-publisher identity matches the repository and workflow. Local packaging cannot prove external authorization or provenance.
+4. Inspect the final archive and publish only with explicit release approval.
 
-| Check                             | Result                                                                                                              |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Oxlint and Oxfmt                  | Passed after the ESM changes.                                                                                       |
-| Workspace types                   | All four packages passed.                                                                                           |
-| Production builds                 | Library, Next example, and both TanStack examples passed.                                                           |
-| Import smoke checks               | Root and all public subpaths passed. Shared controls/providers retain identity between entries.                     |
-| Unit checks                       | Both runtime logo-validation and script-serialization checks passed.                                                |
-| Published type surface            | Local and extracted-tarball declarations compiled.                                                                  |
-| Compiled browser suite            | 244 passed, 11 skipped, across Chromium DPR 1–3, WebKit, and Firefox.                                               |
-| Artifact                          | 17 files. ESM entries, shared chunks, `.d.ts`, manifest, README, license. No maps, CJS, examples, source, or tests. |
-| Package size before this doc pass | 20,851 bytes compressed; 78,255 bytes unpacked. README edits require a fresh final measurement.                     |
-| Changesets status                 | Planned library release 3.0.0. Example Next gets a private version update. Private apps do not publish.             |
-
-These checks were completed in this session before the docs pass. No implementation changed during the docs pass. Fresh formatting and link checks cover the documentation. Final release checks must be repeated after blocker fixes and version generation.
-
-## Documentation audit
-
-| File                                                       | Action                                                                                                                                                                      |
-| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `README.md`                                                | Link the transition guide, planned v3 notes, readiness audit, and UI-Theme handoff.                                                                                         |
-| `packages/react-theme-animation/README.md`                 | Keep ESM guidance. Clarify client/server imports and required UI dependencies. Replace the package-relative guide link, which breaks in the tarball, with a repository URL. |
-| `MIGRATION.md`                                             | Add CommonJS-to-ESM migration, module output changes, unchanged control availability, and server-only import paths.                                                         |
-| `RELEASE_NOTES_v3.md`                                      | Add unpublished v3 notes. State the major reason and all added transition APIs.                                                                                             |
-| `RELEASING.md`                                             | Document compiled-build checks, packed consumers, current CI coverage, planned version, and authentication limits.                                                          |
-| `CONTRIBUTING.md`                                          | Make the build-first requirement and all release checks explicit.                                                                                                           |
-| Three framework guides                                     | State ESM use. Keep Next client wrappers. Separate server helpers in TanStack docs. Correct the Vite blocked-storage claim.                                                 |
-| `packages/react-theme-animation/docs/theme-transitions.md` | State that compiled entries need a build before browser/gallery checks.                                                                                                     |
-| Three example READMEs                                      | Replace app-local npm installation instructions with root pnpm workspace commands. State the example features and link the transition guide.                                |
-| `SUPPORT.md`                                               | Request module format, storage availability, browser, DPR/zoom, trigger details, and transition settings for animation reports.                                             |
-| `SECURITY.md`                                              | Reviewed. No release-specific change needed.                                                                                                                                |
-| `RELEASE_NOTES_v2.md`                                      | Preserve as a historical dual-module release record.                                                                                                                        |
-| Existing changelogs                                        | Preserve. Changesets generates the v3 entries during versioning.                                                                                                            |
-| Existing Changesets                                        | Keep major ESM entry and pending feature entries. Recheck the generated release description after versioning.                                                               |
-
-## Remaining release sequence
-
-1. Resolve React minimum and storage failure/retry defects. Upgrade vulnerable example dependencies before their deployment.
-2. Resolve or explicitly disposition selector customization and callback gaps.
-3. Test the minimum dependency versions and actual framework hydration.
-4. Rerun build, quality, workspace types, unit/type/import checks, compiled browser checks, and extracted-tarball tests.
-5. Generate the Changesets version and changelog on the release branch. Inspect the new version, lockfile, and package metadata.
-6. Verify npm trusted publishing and provenance configuration externally.
-7. Pack and inspect the versioned archive. Publish only after the required approval.
-
-## Review method
-
-The code-review skill runs Standards and Spec separately. Both reports are preserved above; shared findings are identified without merging the review axes. `docs/agents/issue-tracker.md` is absent. The skill's tracker setup command is `/setup-matt-pocock-skills`; no tracker installation was needed for this audit because the user supplied the attached chat and current requirements. No task messages, pull requests, pushes, or publications were sent by this audit. The UI-Theme handoff is a prepared document.
+The [UI-Theme handoff](ui-theme-handoff.md) includes storage, hydration, selector, and validation fixes. It is prepared for that agent; no message was sent and no UI-Theme files were changed.
