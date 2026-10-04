@@ -21,6 +21,7 @@ export {
 } from './utils/animations'
 
 export type {
+  AnimationConfig,
   AnimationPosition,
   ColorThemeToggle,
   ThemeAnimationOptions,
@@ -33,3 +34,17 @@ export type {
 export { TRANSITION_DIRECTIONS } from './types'
 
 export { preloadThemeLogo } from './logo'
+
+export { runThemeTransition } from './transitions'
+
+export {
+  createBlurCircleAnimation,
+  createCircleAnimation,
+  createClipPathAnimation,
+  createPolygonGradientAnimation,
+  createSlideAnimation,
+  createSvgLogoAnimation,
+  createTriangleAnimation,
+  getAnimationPosition,
+  getSlideFromCoords,
+} from './utils/animations'
