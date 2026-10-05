@@ -1,6 +1,6 @@
 # Release notes: planned v3
 
-This release is not published. Changesets currently plans `3.0.0`. The package manifest remains `2.2.0` until the version step runs. See [release readiness](docs/release-readiness.md) for verified checks and the remaining publication steps.
+This release is not published. Changesets currently plans `3.0.0`. The package manifest remains `2.3.0` until the version step runs. See [release readiness](docs/release-readiness.md) for verified checks and the remaining publication steps.
 
 ## Breaking module change
 
