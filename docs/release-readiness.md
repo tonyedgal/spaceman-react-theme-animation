@@ -4,7 +4,7 @@ Date: 2026-10-05. Branch: `feat/oxc-theme-transitions`. The original review used
 
 ## Decision
 
-The confirmed implementation blockers are resolved. Changesets plans `3.0.0`; the manifest stays at `2.2.0` until release tooling generates the version. Version generation, external npm publisher verification, and publication approval remain. Nothing was pushed or published.
+The confirmed implementation blockers are resolved. Changesets plans `3.0.0`; the manifest stays at `2.3.0` until release tooling generates the version. Version generation, external npm publisher verification, and publication approval remain. Nothing was pushed or published.
 
 ## Findings and resolution
 
