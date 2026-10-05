@@ -1,5 +1,27 @@
 # @space-man/react-theme-animation
 
+## 3.0.0
+
+### Major Changes
+
+- e3d1421: Ship ESM only and remove the CommonJS exports. Replace `require()` calls with static `import` or dynamic `import()`.
+
+  Reduce the published package with shared compiled modules, minified JavaScript, and no source maps. Keep all existing ESM entry points, type declarations, built-in controls, and required dependencies. Validate the compiled exports and controls through public package imports.
+
+- 9a21f6e: Require React and React DOM 18 or newer and Motion 12 or newer. Keep Radix Select 2 or newer and the controls' dependencies required. Verify these minimum versions and current peers using extracted npm archives.
+
+  Keep theme updates working when storage reads or writes fail. Match server defaults during hydration before restoring saved browser preferences. Apply ThemeSelector styling, placeholder, and palette-label props and notify provider-backed selector consumers. Deprecate themeLabel because the selector changes palettes.
+
+  Update compatible workspace dependencies, clear the production security findings, and add browser, archive, and security gates to release CI. Document the supported versions, fixed release blockers, and remaining versioning and publisher checks. TypeScript stays on 5.9.3 until the declaration builder supports newer compilers.
+
+### Minor Changes
+
+- 74b832d: Unify animated mode and palette changes across the hook and all providers. Add per-call element and CSS-pixel origins while retaining boolean animation bypass arguments. Use a 400 ms default, preserve explicit durations on large displays, and replace the blurred reveal's large filtered masks with a bounded edge feather.
+
+  Add directional clip-path and gradient wipes, triangle reveals, fixed origins, and stationary SVG logos with paired destination assets and automatic sizing. Coordinate rapid requests per document and preserve updates through reduced motion, failed captures, and unsupported animation APIs.
+
+  Clean provider and example code under the shared Oxlint rules. Replace local anti-slop links with the published antislop-plugin and use Oxlint/Oxfmt for workspace and release checks. Add browser, runtime, and public API checks, including selectors that change from pointer to keyboard input. Update transition and contributor guides.
+
 ## 2.3.0
 
 ### Minor Changes
