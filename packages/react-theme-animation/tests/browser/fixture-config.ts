@@ -70,7 +70,7 @@ export const config = {
   animationType,
   duration: params.has('defaults') ? undefined : duration,
   easing: params.get('easing') ?? undefined,
-  colorThemes,
+  colorThemes: params.has('defaultColorThemes') ? undefined : colorThemes,
   defaultTheme: 'light' as const,
   clipPathDirection: z
     .enum(TRANSITION_DIRECTIONS)

@@ -1,6 +1,22 @@
 import { expect, test } from '@playwright/test'
 
 for (const provider of ['hook', 'ui', 'next', 'vite', 'tanstack']) {
+  test(`${provider} exposes the provided color themes`, async ({ page }) => {
+    await page.goto(`/?provider=${provider}`)
+    await expect(page.locator('html')).toHaveClass(/theme-default/)
+    expect(
+      await page.evaluate(() => window.themeFixture.state.colorThemes),
+    ).toEqual(['default', 'ocean', 'rose'])
+  })
+
+  test(`${provider} exposes the default color themes`, async ({ page }) => {
+    await page.goto(`/?provider=${provider}&defaultColorThemes`)
+    await expect(page.locator('html')).toHaveClass(/theme-default/)
+    expect(
+      await page.evaluate(() => window.themeFixture.state.colorThemes),
+    ).toEqual(['default'])
+  })
+
   test(`${provider} updates mode and palette when storage is blocked`, async ({
     page,
   }) => {
