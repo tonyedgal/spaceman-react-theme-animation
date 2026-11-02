@@ -146,7 +146,7 @@ The TanStack builds format the generated route trees after generation. This keep
 
 ## Release artifacts
 
-The package ships ESM only with shared, minified JavaScript and TypeScript declarations. Build before running the import, type, and browser checks. The fixtures use compiled public entries. Review [release readiness](docs/release-readiness.md) and [the releasing guide](RELEASING.md) before changing versions or publishing.
+The package ships ESM only with shared, minified JavaScript and TypeScript declarations. Build before running the import, type, and browser checks. The fixtures use compiled public entries. Review [the releasing guide](RELEASING.md) before changing versions or publishing.
 
 ## Dependency compatibility
 
