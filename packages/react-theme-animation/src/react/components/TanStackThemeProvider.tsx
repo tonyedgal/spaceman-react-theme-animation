@@ -41,6 +41,7 @@ export interface TanStackThemeContextType {
   readonly ref: React.RefObject<HTMLButtonElement | null>
   readonly theme: Theme
   readonly colorTheme: ColorTheme
+  readonly colorThemes: readonly ColorTheme[]
   readonly resolvedTheme: 'light' | 'dark'
   readonly systemTheme: 'light' | 'dark'
   readonly isHydrated: boolean
@@ -295,6 +296,7 @@ export function TanStackThemeProvider({
         ref: { current: null },
         theme: initialTheme ?? defaultTheme,
         colorTheme: serverColorTheme ?? defaultColorTheme,
+        colorThemes,
         resolvedTheme: serverResolvedTheme,
         systemTheme: 'light',
         isHydrated: false,
@@ -336,6 +338,7 @@ export function TanStackThemeProvider({
       ref: themeState.ref,
       theme: themeState.theme,
       colorTheme: themeState.colorTheme,
+      colorThemes: themeState.colorThemes,
       resolvedTheme: themeState.resolvedTheme,
       systemTheme,
       isHydrated: true,
@@ -357,6 +360,7 @@ export function TanStackThemeProvider({
     defaultTheme,
     serverColorTheme,
     defaultColorTheme,
+    colorThemes,
     serverResolvedTheme,
     setThemeWithServer,
     setColorThemeWithServer,

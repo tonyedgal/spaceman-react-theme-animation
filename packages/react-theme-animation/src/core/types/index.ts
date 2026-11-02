@@ -147,6 +147,7 @@ export interface UseThemeAnimationReturn {
 
   readonly theme: Theme
   readonly colorTheme: ColorTheme
+  readonly colorThemes: readonly ColorTheme[]
   readonly resolvedTheme: 'light' | 'dark'
   readonly systemTheme: 'light' | 'dark'
 
