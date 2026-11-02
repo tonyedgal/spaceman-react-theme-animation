@@ -24,6 +24,7 @@ interface SpacemanThemeContextType {
   readonly ref: React.RefObject<HTMLButtonElement | null>
   readonly theme: Theme
   readonly colorTheme: ColorTheme
+  readonly colorThemes: readonly ColorTheme[]
   readonly resolvedTheme: 'light' | 'dark'
   readonly setTheme: (theme: Theme) => void
   readonly setColorTheme: (colorTheme: ColorTheme) => void
@@ -119,6 +120,7 @@ export function SpacemanThemeProvider({
         ref: { current: null },
         theme: defaultTheme,
         colorTheme: defaultColorTheme,
+        colorThemes,
         resolvedTheme: defaultTheme === 'dark' ? 'dark' : 'light',
         setTheme: (): void => {},
         setColorTheme: (): void => {},
@@ -142,6 +144,7 @@ export function SpacemanThemeProvider({
       ref: themeState.ref,
       theme: themeState.theme,
       colorTheme: themeState.colorTheme,
+      colorThemes: themeState.colorThemes,
       resolvedTheme: themeState.resolvedTheme,
       setTheme: themeState.setTheme,
       setColorTheme: themeState.setColorTheme,
@@ -162,6 +165,7 @@ export function SpacemanThemeProvider({
     mounted,
     defaultTheme,
     defaultColorTheme,
+    colorThemes,
     themeState,
     switchThemeFromElement,
   ])

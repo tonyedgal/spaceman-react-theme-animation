@@ -21,6 +21,7 @@ export interface NextThemeContextType {
   readonly ref: React.RefObject<HTMLButtonElement | null>
   readonly theme: Theme
   readonly colorTheme: ColorTheme
+  readonly colorThemes: readonly ColorTheme[]
   readonly resolvedTheme: 'light' | 'dark'
   readonly systemTheme: 'light' | 'dark'
   readonly setTheme: (theme: Theme) => void
@@ -224,6 +225,7 @@ export function NextThemeProvider({
       ref: themeState.ref,
       theme: themeState.theme,
       colorTheme: themeState.colorTheme,
+      colorThemes: themeState.colorThemes,
       resolvedTheme: themeState.resolvedTheme,
       systemTheme: themeState.systemTheme,
       setTheme,
