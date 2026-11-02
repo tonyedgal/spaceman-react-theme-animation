@@ -25,7 +25,7 @@ Highlights in this release:
 
 Radix Select, Motion, React, and React DOM remain required peer dependencies. `clsx` remains a direct dependency. Keep compatible peers installed even when the application uses only hooks. The controls remain included in this package.
 
-The planned v3 release requires React and React DOM 18 or newer, Motion 12 or newer, and Radix Select 2 or newer. React 17 is no longer supported. Extracted-package checks cover React 18.0, Motion 12.0, and Radix 2.0 together, plus the current development versions. See the [readiness audit](https://github.com/tonyedgal/spaceman-react-theme-animation/blob/main/docs/release-readiness.md) for release evidence.
+Version 3 requires React and React DOM 18 or newer, Motion 12 or newer, and Radix Select 2 or newer. React 17 is no longer supported. Extracted-package checks cover React 18.0, Motion 12.0, and Radix 2.0 together, plus the current development versions.
 
 Storage is optional persistence. Blocked reads use the configured defaults. Failed writes still update the theme for the current page. Saved preferences become visible after hydration, so the first client render matches the server HTML.
 

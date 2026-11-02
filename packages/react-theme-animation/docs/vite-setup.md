@@ -1,6 +1,6 @@
 # Vite React SPA Setup Guide
 
-The planned v3 release requires React and React DOM >=18, Motion >=12, and Radix Select >=2.
+Version 3 requires React and React DOM >=18, Motion >=12, and Radix Select >=2.
 
 Complete guide for using `@space-man/react-theme-animation` in Vite-based React single-page applications.
 

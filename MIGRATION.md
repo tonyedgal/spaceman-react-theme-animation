@@ -21,11 +21,11 @@ remain. Compiled modules share code, JavaScript is minified, and source maps are
 not included. Animated helpers also accept per-call options while retaining
 boolean bypass arguments. See the [transition guide](packages/react-theme-animation/docs/theme-transitions.md).
 
-The release is pending. Upgrade React and React DOM to at least 18, Motion to at least 12, and Radix Select to at least 2. React 17 and Motion 11 are no longer supported. Keep all required peers installed.
+Upgrade React and React DOM to at least 18, Motion to at least 12, and Radix Select to at least 2. React 17 and Motion 11 are no longer supported. Keep all required peers installed.
 
 Storage failures no longer prevent theme updates. Without usable storage, the theme lasts for the current page. The hook exposes server defaults during hydration, then restores saved browser preferences.
 
-`ThemeSelector` now applies styling, placeholder, and palette-label props. Its callback also runs when a provider owns the state. Remove duplicate side effects if the same callback is passed to both the provider and the selector. `themeLabel` is deprecated; use `ThemeSwitcher` for mode selection. See [readiness](docs/release-readiness.md) for the remaining publication steps.
+`ThemeSelector` now applies styling, placeholder, and palette-label props. Its callback also runs when a provider owns the state. Remove duplicate side effects if the same callback is passed to both the provider and the selector. `themeLabel` is deprecated; use `ThemeSwitcher` for mode selection.
 
 ## Server-only imports
 
@@ -85,7 +85,7 @@ These subpath exports still exist for migration safety:
 - `@space-man/react-theme-animation/core`
 - `@space-man/react-theme-animation/tanstack`
 
-The subpaths remain supported in the planned v3 release. `/core` and `/tanstack` also keep server-only code separate from the controls.
+The subpaths remain supported in v3. `/core` and `/tanstack` also keep server-only code separate from the controls.
 
 ## Recommended Update
 
