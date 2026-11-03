@@ -3,6 +3,15 @@ import React from 'react'
 import { renderToString } from 'react-dom/server'
 
 import { HydrationApp } from './hydration-app'
+import { colorThemeApps } from './hydration-color-themes'
+
+for (const [provider, App] of Object.entries(colorThemeApps)) {
+  test(`${provider} exposes color themes before hydration`, () => {
+    expect(renderToString(React.createElement(App))).toContain(
+      '<output>default:ocean</output>',
+    )
+  })
+}
 
 for (const savedPreference of [true, false]) {
   test(`hydrates server defaults with ${savedPreference ? 'saved preferences' : 'a dark system preference'}`, async ({
