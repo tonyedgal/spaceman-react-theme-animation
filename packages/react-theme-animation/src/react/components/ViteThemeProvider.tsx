@@ -171,6 +171,29 @@ export function ViteThemeProvider({
     [themeState, withTransitionsDisabled],
   )
 
+  const setColorTheme = useCallback(
+    (colorTheme: string) => {
+      void withTransitionsDisabled(() => {
+        themeState.setColorTheme(colorTheme)
+      })
+    },
+    [themeState, withTransitionsDisabled],
+  )
+
+  const switchColorTheme = useCallback(
+    async (colorTheme: string, options?: ThemeTransitionInput) =>
+      withTransitionsDisabled(async () =>
+        themeState.switchColorTheme(colorTheme, options),
+      ),
+    [themeState, withTransitionsDisabled],
+  )
+
+  const toggleColorTheme: ColorThemeToggle = useCallback(
+    async (input) =>
+      withTransitionsDisabled(async () => themeState.toggleColorTheme(input)),
+    [themeState, withTransitionsDisabled],
+  )
+
   const systemTheme = getBrowserSystemTheme()
 
   const contextValue = useMemo<ViteThemeContextType>(
@@ -182,20 +205,23 @@ export function ViteThemeProvider({
       resolvedTheme: themeState.resolvedTheme,
       systemTheme,
       setTheme: wrappedSetTheme,
-      setColorTheme: themeState.setColorTheme,
+      setColorTheme,
       switchTheme: wrappedSwitchTheme,
       switchThemeFromElement,
-      switchColorTheme: themeState.switchColorTheme,
+      switchColorTheme,
       toggleTheme: wrappedToggleTheme,
       toggleLightTheme: wrappedToggleLightTheme,
       toggleDarkTheme: wrappedToggleDarkTheme,
-      toggleColorTheme: themeState.toggleColorTheme,
+      toggleColorTheme,
       createColorThemeToggle: themeState.createColorThemeToggle,
       isColorThemeActive: themeState.isColorThemeActive,
     }),
     [
       themeState,
       systemTheme,
+      setColorTheme,
+      switchColorTheme,
+      toggleColorTheme,
       wrappedSetTheme,
       wrappedSwitchTheme,
       switchThemeFromElement,

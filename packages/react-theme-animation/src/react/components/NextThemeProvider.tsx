@@ -188,6 +188,29 @@ export function NextThemeProvider({
     [disableAnimationOnInit, mounted, themeState, withTransitionsDisabled],
   )
 
+  const setColorTheme = useCallback(
+    (colorTheme: string) => {
+      void withTransitionsDisabled(() => {
+        themeState.setColorTheme(colorTheme)
+      })
+    },
+    [themeState, withTransitionsDisabled],
+  )
+
+  const switchColorTheme = useCallback(
+    async (colorTheme: string, options?: ThemeTransitionInput) =>
+      withTransitionsDisabled(async () =>
+        themeState.switchColorTheme(colorTheme, options),
+      ),
+    [themeState, withTransitionsDisabled],
+  )
+
+  const toggleColorTheme: ColorThemeToggle = useCallback(
+    async (input) =>
+      withTransitionsDisabled(async () => themeState.toggleColorTheme(input)),
+    [themeState, withTransitionsDisabled],
+  )
+
   const contextValue = useMemo<NextThemeContextType>(
     () => ({
       ref: themeState.ref,
@@ -197,9 +220,9 @@ export function NextThemeProvider({
       resolvedTheme: themeState.resolvedTheme,
       systemTheme: themeState.systemTheme,
       setTheme,
-      setColorTheme: themeState.setColorTheme,
+      setColorTheme,
       switchTheme,
-      switchColorTheme: themeState.switchColorTheme,
+      switchColorTheme,
       toggleTheme: async (
         options: ThemeTransitionInput = false,
       ): Promise<void> =>
@@ -216,13 +239,16 @@ export function NextThemeProvider({
         withTransitionsDisabled(async () =>
           themeState.toggleDarkTheme(options),
         ),
-      toggleColorTheme: themeState.toggleColorTheme,
+      toggleColorTheme,
       createColorThemeToggle: themeState.createColorThemeToggle,
       isColorThemeActive: themeState.isColorThemeActive,
       switchThemeFromElement,
     }),
     [
       setTheme,
+      setColorTheme,
+      switchColorTheme,
+      toggleColorTheme,
       switchTheme,
       switchThemeFromElement,
       themeState,
