@@ -12,6 +12,7 @@ import type {
 import { ThemeAnimationType } from '../../core/types'
 import { useHydrated } from '../hooks/use-hydrated'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
+import { useTransitionFreeze } from '../hooks/use-transition-freeze'
 import { SharedThemeContext } from './shared-theme-context'
 
 const defaultThemes = ['light', 'dark', 'system'] as const
@@ -70,6 +71,7 @@ export type SpacemanThemeProviderProps = UseThemeAnimationProps & {
   readonly defaultColorTheme?: ColorTheme
   readonly animationType?: ThemeAnimationTypeInput
   readonly duration?: number
+  readonly disableTransitionOnChange?: boolean
 }
 
 /**
@@ -85,6 +87,7 @@ export type SpacemanThemeProviderProps = UseThemeAnimationProps & {
  * @param defaultColorTheme - Default color theme to use (default: 'default')
  * @param animationType - Animation type for theme transitions (default: CIRCLE)
  * @param duration - Animation duration in milliseconds (default: 400)
+ * @param disableTransitionOnChange - Temporarily disable CSS transitions during theme changes (default: false)
  */
 export function SpacemanThemeProvider({
   children,
@@ -94,6 +97,7 @@ export function SpacemanThemeProvider({
   defaultColorTheme = 'default',
   animationType = ThemeAnimationType.CIRCLE,
   duration = 400,
+  disableTransitionOnChange = false,
   ...animationOptions
 }: Readonly<SpacemanThemeProviderProps>): React.JSX.Element {
   const mounted = useHydrated()
@@ -108,11 +112,75 @@ export function SpacemanThemeProvider({
     duration,
   })
 
-  const switchThemeFromElement = useCallback(
-    async (theme: Theme, element: HTMLButtonElement): Promise<void> => {
-      await themeState.switchTheme(theme, { element })
+  const withTransitionsDisabled = useTransitionFreeze(
+    disableTransitionOnChange,
+    animationOptions.nonce,
+  )
+
+  const wrappedSetTheme = useCallback(
+    (theme: Theme) => {
+      void withTransitionsDisabled(() => {
+        themeState.setTheme(theme)
+      })
     },
-    [themeState],
+    [themeState, withTransitionsDisabled],
+  )
+
+  const wrappedSwitchTheme = useCallback(
+    async (theme: Theme, options?: ThemeTransitionInput) =>
+      withTransitionsDisabled(async () =>
+        themeState.switchTheme(theme, options),
+      ),
+    [themeState, withTransitionsDisabled],
+  )
+
+  const wrappedToggleTheme = useCallback(
+    async (options?: ThemeTransitionInput): Promise<void> =>
+      withTransitionsDisabled(async () => themeState.toggleTheme(options)),
+    [themeState, withTransitionsDisabled],
+  )
+
+  const wrappedToggleLightTheme = useCallback(
+    async (options?: ThemeTransitionInput): Promise<void> =>
+      withTransitionsDisabled(async () => themeState.toggleLightTheme(options)),
+    [themeState, withTransitionsDisabled],
+  )
+
+  const wrappedToggleDarkTheme = useCallback(
+    async (options?: ThemeTransitionInput): Promise<void> =>
+      withTransitionsDisabled(async () => themeState.toggleDarkTheme(options)),
+    [themeState, withTransitionsDisabled],
+  )
+
+  const setColorTheme = useCallback(
+    (colorTheme: ColorTheme) => {
+      void withTransitionsDisabled(() => {
+        themeState.setColorTheme(colorTheme)
+      })
+    },
+    [themeState, withTransitionsDisabled],
+  )
+
+  const switchColorTheme = useCallback(
+    async (colorTheme: string, options?: ThemeTransitionInput) =>
+      withTransitionsDisabled(async () =>
+        themeState.switchColorTheme(colorTheme, options),
+      ),
+    [themeState, withTransitionsDisabled],
+  )
+
+  const toggleColorTheme: ColorThemeToggle = useCallback(
+    async (input) =>
+      withTransitionsDisabled(async () => themeState.toggleColorTheme(input)),
+    [themeState, withTransitionsDisabled],
+  )
+
+  const switchThemeFromElement = useCallback(
+    async (theme: Theme, element: HTMLButtonElement): Promise<void> =>
+      withTransitionsDisabled(async () =>
+        themeState.switchTheme(theme, { element }),
+      ),
+    [themeState, withTransitionsDisabled],
   )
 
   const contextValue = useMemo<SpacemanThemeContextType>(() => {
@@ -147,17 +215,17 @@ export function SpacemanThemeProvider({
       colorTheme: themeState.colorTheme,
       colorThemes: themeState.colorThemes,
       resolvedTheme: themeState.resolvedTheme,
-      setTheme: themeState.setTheme,
-      setColorTheme: themeState.setColorTheme,
+      setTheme: wrappedSetTheme,
+      setColorTheme,
 
-      switchTheme: themeState.switchTheme,
+      switchTheme: wrappedSwitchTheme,
       switchThemeFromElement,
-      switchColorTheme: themeState.switchColorTheme,
+      switchColorTheme,
 
-      toggleTheme: themeState.toggleTheme,
-      toggleLightTheme: themeState.toggleLightTheme,
-      toggleDarkTheme: themeState.toggleDarkTheme,
-      toggleColorTheme: themeState.toggleColorTheme,
+      toggleTheme: wrappedToggleTheme,
+      toggleLightTheme: wrappedToggleLightTheme,
+      toggleDarkTheme: wrappedToggleDarkTheme,
+      toggleColorTheme,
 
       createColorThemeToggle: themeState.createColorThemeToggle,
       isColorThemeActive: themeState.isColorThemeActive,
@@ -169,6 +237,14 @@ export function SpacemanThemeProvider({
     colorThemes,
     themeState,
     switchThemeFromElement,
+    wrappedSetTheme,
+    wrappedSwitchTheme,
+    wrappedToggleTheme,
+    wrappedToggleLightTheme,
+    wrappedToggleDarkTheme,
+    setColorTheme,
+    switchColorTheme,
+    toggleColorTheme,
   ])
 
   return (
