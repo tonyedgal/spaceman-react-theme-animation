@@ -12,6 +12,7 @@ import type {
 import { ThemeAnimationType } from '../../core/types'
 import { useHydrated } from '../hooks/use-hydrated'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
+import { useTransitionFreeze } from '../hooks/use-transition-freeze'
 import { ThemePreHydrationScript } from './NextThemeScript'
 import { SharedThemeContext } from './shared-theme-context'
 
@@ -81,22 +82,6 @@ const NextThemeContext = createContext<NextThemeContextType | undefined>(
   undefined,
 )
 
-const createDisableTransitions = () => {
-  const css = document.createElement('style')
-  css.textContent =
-    '*,*::before,*::after{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}'
-  document.head.appendChild(css)
-  window.getComputedStyle(document.body)
-
-  return (): void => {
-    setTimeout(() => {
-      if (css.parentNode) {
-        css.parentNode.removeChild(css)
-      }
-    }, 1)
-  }
-}
-
 export function NextThemeProvider({
   attribute = 'class',
   children,
@@ -162,24 +147,7 @@ export function NextThemeProvider({
     value,
   })
 
-  const withTransitionsDisabled = useCallback(
-    async <T,>(fn: () => T | Promise<T>) => {
-      const cleanup = disableTransitionOnChange
-        ? createDisableTransitions()
-        : undefined
-
-      try {
-        const result = await fn()
-        cleanup?.()
-
-        return result
-      } catch (error) {
-        cleanup?.()
-        throw error
-      }
-    },
-    [disableTransitionOnChange],
-  )
+  const withTransitionsDisabled = useTransitionFreeze(disableTransitionOnChange)
 
   const setTheme = useCallback(
     (theme: Theme) => {
