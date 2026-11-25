@@ -270,6 +270,7 @@ export function NextThemeProvider({
             attribute={attribute}
             colorStorageKey={colorStorageKey}
             colorThemePrefix={colorThemePrefix}
+            colorThemes={colorThemes}
             defaultColorTheme={defaultColorTheme}
             defaultTheme={effectiveDefaultTheme}
             enableColorScheme={enableColorScheme}
@@ -278,6 +279,7 @@ export function NextThemeProvider({
             nonce={nonce}
             scriptProps={scriptProps}
             storageKey={storageKey}
+            themes={allowedThemes}
             value={value}
           />
         ) : null}

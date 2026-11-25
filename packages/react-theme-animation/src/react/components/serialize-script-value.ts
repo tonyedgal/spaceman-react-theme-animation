@@ -7,3 +7,7 @@ export function serializeScriptValue(value: string | boolean): string {
     .replaceAll('\u2028', '\\u2028')
     .replaceAll('\u2029', '\\u2029')
 }
+
+export function serializeScriptList(values: readonly string[]): string {
+  return `[${values.map(serializeScriptValue).join(',')}]`
+}
