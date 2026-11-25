@@ -7,6 +7,7 @@ import type {
   Theme,
   ThemeTransitionInput,
   UseThemeAnimationProps,
+  ThemeAnimationTypeInput,
 } from '../../core/types'
 import { ThemeAnimationType } from '../../core/types'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
@@ -59,7 +60,7 @@ export type ViteThemeProviderProps = UseThemeAnimationProps & {
   readonly colorThemes?: readonly ColorTheme[]
   readonly defaultTheme?: Theme
   readonly defaultColorTheme?: ColorTheme
-  readonly animationType?: ThemeAnimationType
+  readonly animationType?: ThemeAnimationTypeInput
   readonly duration?: number
   readonly attribute?: 'class' | 'data-theme'
   readonly disableTransitionOnChange?: boolean

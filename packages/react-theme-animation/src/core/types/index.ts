@@ -10,6 +10,10 @@ export enum ThemeAnimationType {
   SVG_LOGO = 'svg-logo',
 }
 
+export type ThemeAnimationTypeInput =
+  | ThemeAnimationType
+  | `${ThemeAnimationType}`
+
 export type SlideDirection =
   | 'left'
   | 'right'
@@ -88,7 +92,7 @@ export type SystemThemeMode = 'css' | 'js'
 export type UseThemeAnimationProps = ThemeAnimationOptions & {
   readonly duration?: number
   readonly easing?: string
-  readonly animationType?: ThemeAnimationType
+  readonly animationType?: ThemeAnimationTypeInput
   readonly blurAmount?: number
   readonly styleId?: string
   readonly nonce?: string
@@ -181,7 +185,7 @@ export type ThemeSwitcherProps = ThemeAnimationOptions & {
   readonly currentTheme?: Theme
   readonly onThemeChange?: (theme: Theme) => void
 
-  readonly animationType?: ThemeAnimationType
+  readonly animationType?: ThemeAnimationTypeInput
   readonly duration?: number
 
   readonly className?: string
@@ -204,7 +208,7 @@ export type ThemeSelectorProps = ThemeAnimationOptions & {
   readonly onThemeChange?: (theme: Theme) => void
   readonly onColorThemeChange?: (colorTheme: ColorTheme) => void
 
-  readonly animationType?: ThemeAnimationType
+  readonly animationType?: ThemeAnimationTypeInput
   readonly duration?: number
 
   readonly className?: string
