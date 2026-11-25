@@ -38,6 +38,7 @@ export const useThemeAnimation = (
     animationType = ThemeAnimationType.CIRCLE,
     blurAmount = 2,
     styleId = 'spaceman-theme-style',
+    nonce,
     clipPathDirection = 'top-left',
     animationPosition,
     logo,
@@ -96,8 +97,8 @@ export const useThemeAnimation = (
 
   // Inject base styles once on mount
   useEffect(() => {
-    injectBaseStyles()
-  }, [])
+    injectBaseStyles(nonce)
+  }, [nonce])
 
   const [internalTheme, setInternalTheme] = useState<Theme>(() => {
     if (initialTheme !== undefined) return initialTheme
@@ -316,6 +317,7 @@ export const useThemeAnimation = (
             animationType,
             blurAmount,
             styleId,
+            nonce,
           }
         } else {
           // Read before the first await. A menu may unmount its trigger, and a
@@ -350,6 +352,7 @@ export const useThemeAnimation = (
               animationType,
               blurAmount,
               styleId,
+              nonce,
               clipPathDirection,
               animationPosition,
               logo:
@@ -384,6 +387,7 @@ export const useThemeAnimation = (
       animationType,
       blurAmount,
       styleId,
+      nonce,
       slideDirection,
       slideFromX,
       slideFromY,

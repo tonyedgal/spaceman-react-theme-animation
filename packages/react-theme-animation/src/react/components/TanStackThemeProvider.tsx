@@ -173,7 +173,10 @@ export function TanStackThemeProvider({
     colorStorageKey,
   })
 
-  const withTransitionsDisabled = useTransitionFreeze(disableTransitionOnChange)
+  const withTransitionsDisabled = useTransitionFreeze(
+    disableTransitionOnChange,
+    animationOptions.nonce,
+  )
 
   const setThemeWithServer = useCallback(
     (newTheme: Theme) => {

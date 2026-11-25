@@ -76,6 +76,7 @@ export interface AnimationConfig extends ThemeAnimationSettings {
   readonly animationType: ThemeAnimationType
   readonly blurAmount: number
   readonly styleId: string
+  readonly nonce?: string
 }
 
 export type Theme = 'light' | 'dark' | 'system'
@@ -90,6 +91,7 @@ export type UseThemeAnimationProps = ThemeAnimationOptions & {
   readonly animationType?: ThemeAnimationType
   readonly blurAmount?: number
   readonly styleId?: string
+  readonly nonce?: string
 
   readonly themes?: readonly Theme[]
   readonly colorThemes?: readonly ColorTheme[]

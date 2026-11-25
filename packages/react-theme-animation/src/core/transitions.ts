@@ -72,7 +72,7 @@ export const runThemeTransition = async (
       return
     }
 
-    injectBaseStyles()
+    injectBaseStyles(config.nonce)
     document.documentElement.setAttribute('data-spaceman-theme-transition', '')
 
     if (config.animationType === ThemeAnimationType.SVG_LOGO) {
