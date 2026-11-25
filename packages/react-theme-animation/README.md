@@ -117,6 +117,12 @@ function ThemeToggle() {
 }
 ```
 
+### SpacemanThemeProvider Props
+
+| Prop                        | Type      | Default | Description                                                   |
+| --------------------------- | --------- | ------- | ------------------------------------------------------------- |
+| `disableTransitionOnChange` | `boolean` | `false` | Freeze CSS transitions while the theme or color theme changes |
+
 ## Documentation
 
 Repository documentation, framework guides, migration notes, and examples are linked from the GitHub docs hub:
