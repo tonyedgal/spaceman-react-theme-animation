@@ -219,11 +219,15 @@ export const useThemeAnimation = (
   ])
 
   const ref = useRef<HTMLButtonElement>(null)
+  const committedTheme = useRef(currentTheme)
+  const committedColorTheme = useRef(currentColorTheme)
   const requestedTheme = useRef(currentTheme)
   const requestedColorTheme = useRef(currentColorTheme)
   const pendingUpdates = useRef(0)
   useEffect(() => {
     if (pendingUpdates.current === 0) {
+      committedTheme.current = currentTheme
+      committedColorTheme.current = currentColorTheme
       requestedTheme.current = currentTheme
       requestedColorTheme.current = currentColorTheme
     }
@@ -245,6 +249,8 @@ export const useThemeAnimation = (
       if (onThemeChange) {
         onThemeChange(newTheme)
       }
+
+      committedTheme.current = newTheme
     },
     [onThemeChange, externalTheme, storageKey],
   )
@@ -265,6 +271,8 @@ export const useThemeAnimation = (
       if (onColorThemeChange) {
         onColorThemeChange(newColorTheme)
       }
+
+      committedColorTheme.current = newColorTheme
     },
     [onColorThemeChange, externalColorTheme, colorStorageKey],
   )
@@ -396,9 +404,16 @@ export const useThemeAnimation = (
     async (newTheme: Theme, options?: ThemeTransitionInput) => {
       if (newTheme === requestedTheme.current) return
       requestedTheme.current = newTheme
-      await animateChange(() => {
-        commitTheme(newTheme)
-      }, options)
+
+      try {
+        await animateChange(() => {
+          commitTheme(newTheme)
+        }, options)
+      } catch (error) {
+        if (requestedTheme.current === newTheme)
+          requestedTheme.current = committedTheme.current
+        throw error
+      }
     },
     [animateChange, commitTheme],
   )
@@ -415,9 +430,16 @@ export const useThemeAnimation = (
 
       if (newColorTheme === requestedColorTheme.current) return
       requestedColorTheme.current = newColorTheme
-      await animateChange(() => {
-        commitColorTheme(newColorTheme)
-      }, options)
+
+      try {
+        await animateChange(() => {
+          commitColorTheme(newColorTheme)
+        }, options)
+      } catch (error) {
+        if (requestedColorTheme.current === newColorTheme)
+          requestedColorTheme.current = committedColorTheme.current
+        throw error
+      }
     },
     [colorThemes, animateChange, commitColorTheme],
   )
