@@ -12,7 +12,6 @@ import type {
 import { ThemeAnimationType } from '../../core/types'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
 import { useTransitionFreeze } from '../hooks/use-transition-freeze'
-import { getBrowserSystemTheme } from './provider-helpers'
 import { SharedThemeContext } from './shared-theme-context'
 
 const defaultThemes = ['light', 'dark', 'system'] as const
@@ -198,7 +197,7 @@ export function ViteThemeProvider({
     [themeState, withTransitionsDisabled],
   )
 
-  const systemTheme = getBrowserSystemTheme()
+  const { systemTheme } = themeState
 
   const contextValue = useMemo<ViteThemeContextType>(
     () => ({
