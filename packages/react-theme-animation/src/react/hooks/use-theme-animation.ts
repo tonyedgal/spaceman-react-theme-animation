@@ -138,8 +138,11 @@ export const useThemeAnimation = (
     externalColorTheme ??
     (mounted ? internalColorTheme : (initialColorTheme ?? defaultColorTheme))
 
-  const [, setSystemTheme] = useState<'light' | 'dark'>(() => getSystemTheme())
-  const systemTheme = mounted ? getSystemTheme() : 'light'
+  const [browserSystemTheme, setBrowserSystemTheme] = useState<
+    'light' | 'dark'
+  >(getSystemTheme)
+
+  const systemTheme = mounted ? browserSystemTheme : 'light'
 
   const resolvedTheme =
     currentTheme === 'system' ? systemTheme : resolveTheme(currentTheme)
@@ -150,10 +153,11 @@ export const useThemeAnimation = (
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
     const handleChange = (): void => {
-      setSystemTheme(getSystemTheme())
+      setBrowserSystemTheme(getSystemTheme())
     }
 
     mediaQuery.addEventListener('change', handleChange)
+    handleChange()
 
     return (): void => {
       mediaQuery.removeEventListener('change', handleChange)

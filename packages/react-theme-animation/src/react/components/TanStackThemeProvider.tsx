@@ -31,7 +31,7 @@ import {
 import { useSyncServerThemeStorage } from '../hooks/use-sync-server-theme-storage'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
 import { useTransitionFreeze } from '../hooks/use-transition-freeze'
-import { getBrowserSystemTheme, getNextResolvedTheme } from './provider-helpers'
+import { getNextResolvedTheme } from './provider-helpers'
 import { notifyServerChange } from './server-notifications'
 import { SharedThemeContext } from './shared-theme-context'
 
@@ -303,7 +303,7 @@ export function TanStackThemeProvider({
     [isHydrated, themeState, setThemeWithServer, withTransitionsDisabled],
   )
 
-  const systemTheme = getBrowserSystemTheme()
+  const { systemTheme } = themeState
 
   const serverResolvedTheme: 'light' | 'dark' = (() => {
     if (hasServerTheme) {
