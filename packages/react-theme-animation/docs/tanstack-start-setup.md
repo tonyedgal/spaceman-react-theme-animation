@@ -57,6 +57,8 @@ Both approaches support:
 - `systemThemeMode="js"` for JavaScript-based system-theme resolution
 - the same `useTanStackTheme()` client hook API
 
+The defaults differ: `TanStackThemeProvider` defaults `systemThemeMode` to `'css'`, and `TanStackStartThemeScript` defaults it to `'js'`. When you use both, pass the same `systemThemeMode` value to each, so the script and the provider write the same classes.
+
 ## Reference Apps
 
 - `apps/examples/example-tanstack` - pre-hydration script setup
@@ -333,26 +335,32 @@ Shared provider props such as `defaultTheme`, `colorThemes`, `animationType`, `d
 
 TanStack-specific additions:
 
-| Prop                       | Type                                            | Default |
-| -------------------------- | ----------------------------------------------- | ------- |
-| `serverTheme`              | `'light' \| 'dark' \| 'system'`                 | -       |
-| `serverColorTheme`         | `string`                                        | -       |
-| `systemThemeMode`          | `'css' \| 'js'`                                 | `'css'` |
-| `onServerThemeChange`      | `(theme: Theme) => void \| Promise<void>`       | -       |
-| `onServerColorThemeChange` | `(colorTheme: string) => void \| Promise<void>` | -       |
+| Prop                        | Type                                            | Default |
+| --------------------------- | ----------------------------------------------- | ------- |
+| `serverTheme`               | `'light' \| 'dark' \| 'system'`                 | -       |
+| `serverColorTheme`          | `string`                                        | -       |
+| `systemThemeMode`           | `'css' \| 'js'`                                 | `'css'` |
+| `disableTransitionOnChange` | `boolean`                                       | `false` |
+| `nonce`                     | `string`                                        | -       |
+| `onServerThemeChange`       | `(theme: Theme) => void \| Promise<void>`       | -       |
+| `onServerColorThemeChange`  | `(colorTheme: string) => void \| Promise<void>` | -       |
 
 ### `TanStackStartThemeScript`
 
-| Prop                | Type            | Default         |
-| ------------------- | --------------- | --------------- |
-| `storageKey`        | `string`        | `'theme'`       |
-| `colorStorageKey`   | `string`        | `'color-theme'` |
-| `defaultTheme`      | `Theme`         | `'system'`      |
-| `defaultColorTheme` | `string`        | `'default'`     |
-| `globalClassName`   | `string`        | `'dark'`        |
-| `colorThemePrefix`  | `string`        | `'theme-'`      |
-| `nonce`             | `string`        | -               |
-| `systemThemeMode`   | `'css' \| 'js'` | `'js'`          |
+| Prop                | Type            | Default                       |
+| ------------------- | --------------- | ----------------------------- |
+| `storageKey`        | `string`        | `'theme'`                     |
+| `colorStorageKey`   | `string`        | `'color-theme'`               |
+| `defaultTheme`      | `Theme`         | `'system'`                    |
+| `defaultColorTheme` | `string`        | `'default'`                   |
+| `globalClassName`   | `string`        | `'dark'`                      |
+| `colorThemePrefix`  | `string`        | `'theme-'`                    |
+| `nonce`             | `string`        | -                             |
+| `systemThemeMode`   | `'css' \| 'js'` | `'js'`                        |
+| `themes`            | `Theme[]`       | `['light', 'dark', 'system']` |
+| `colorThemes`       | `string[]`      | -                             |
+
+The script ignores a stored theme that is not in `themes`, and a stored color theme that is not in `colorThemes`, and uses the defaults instead. Without `colorThemes`, the script accepts any stored color theme.
 
 ## Server Helpers
 
