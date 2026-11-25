@@ -1324,7 +1324,7 @@ test('selector uses keyboard input after a pointer opens the popup', async ({
   ).toEqual(['selector:ocean'])
 })
 
-for (const provider of ['next', 'vite', 'tanstack']) {
+for (const provider of ['ui', 'next', 'vite', 'tanstack']) {
   for (const method of ['setTheme', 'setColorTheme'] as const) {
     for (const frozen of [true, false]) {
       test(`${provider} ${method} ${frozen ? 'skips' : 'runs'} CSS transitions ${frozen ? 'with' : 'without'} disableTransitionOnChange`, async ({
@@ -1451,7 +1451,7 @@ for (const provider of ['hook', 'ui', 'next', 'vite', 'tanstack']) {
   })
 }
 
-for (const provider of ['next', 'vite', 'tanstack']) {
+for (const provider of ['ui', 'next', 'vite', 'tanstack']) {
   test(`${provider} disableTransitionOnChange style carries the CSP nonce`, async ({
     page,
   }) => {
