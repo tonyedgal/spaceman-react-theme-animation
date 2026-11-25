@@ -8,7 +8,7 @@ import {
   ViteThemeProvider,
 } from '@space-man/react-theme-animation/react'
 
-import { callbacks, config, provider } from './fixture-config'
+import { callbacks, config, params, provider } from './fixture-config'
 import { HookControls } from './fixture-HookControls'
 import { NextControls } from './fixture-NextControls'
 import { TanStackControls } from './fixture-TanStackControls'
@@ -18,21 +18,33 @@ import { ViteControls } from './fixture-ViteControls'
 
 import './fixture.css'
 
+const disableTransitionOnChange = params.has('disableTransitions')
+
 const app: React.JSX.Element =
   provider === 'ui' ? (
     <SpacemanThemeProvider {...config}>
       <UIControls />
     </SpacemanThemeProvider>
   ) : provider === 'next' ? (
-    <NextThemeProvider {...config}>
+    <NextThemeProvider
+      {...config}
+      disableTransitionOnChange={disableTransitionOnChange}
+    >
       <NextControls />
     </NextThemeProvider>
   ) : provider === 'vite' ? (
-    <ViteThemeProvider {...config}>
+    <ViteThemeProvider
+      {...config}
+      disableTransitionOnChange={disableTransitionOnChange}
+    >
       <ViteControls />
     </ViteThemeProvider>
   ) : provider === 'tanstack' ? (
-    <TanStackThemeProvider {...config} {...callbacks}>
+    <TanStackThemeProvider
+      {...config}
+      {...callbacks}
+      disableTransitionOnChange={disableTransitionOnChange}
+    >
       <TanStackControls />
     </TanStackThemeProvider>
   ) : (

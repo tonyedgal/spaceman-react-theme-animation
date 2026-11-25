@@ -1323,3 +1323,66 @@ test('selector uses keyboard input after a pointer opens the popup', async ({
     await page.evaluate(() => window.themeFixture.inspection.callbacks),
   ).toEqual(['selector:ocean'])
 })
+
+for (const provider of ['next', 'vite', 'tanstack']) {
+  for (const method of ['setTheme', 'setColorTheme'] as const) {
+    for (const frozen of [true, false]) {
+      test(`${provider} ${method} ${frozen ? 'skips' : 'runs'} CSS transitions ${frozen ? 'with' : 'without'} disableTransitionOnChange`, async ({
+        page,
+      }) => {
+        await open(
+          page,
+          `provider=${provider}${frozen ? '&disableTransitions' : ''}`,
+        )
+
+        const result = await page.evaluate(async (name) => {
+          const style = document.createElement('style')
+          style.textContent =
+            '.probe{background-color:rgb(255,255,255);transition:background-color 1s linear}.dark .probe,.theme-ocean .probe{background-color:rgb(0,0,0)}'
+          document.head.append(style)
+          const probe = document.createElement('div')
+          probe.className = 'probe'
+          document.body.append(probe)
+          void getComputedStyle(probe).backgroundColor
+          const root = document.documentElement
+
+          const changed = new Promise<string>((resolve) => {
+            const observer = new MutationObserver(() => {
+              if (
+                root.classList.contains('dark') ||
+                root.classList.contains('theme-ocean')
+              ) {
+                observer.disconnect()
+                resolve(getComputedStyle(probe).backgroundColor)
+              }
+            })
+
+            observer.observe(root, { attributes: true })
+          })
+
+          if (name === 'setTheme') window.themeFixture.state.setTheme('dark')
+          else window.themeFixture.state.setColorTheme('ocean')
+
+          const now = await changed
+          await new Promise<void>((resolve) => {
+            setTimeout(() => {
+              resolve()
+            }, 50)
+          })
+
+          return {
+            now,
+            restored: ![...document.head.querySelectorAll('style')].some(
+              (element) => element.textContent.includes('transition:none'),
+            ),
+          }
+        }, method)
+
+        if (frozen) expect(result.now).toBe('rgb(0, 0, 0)')
+        else expect(result.now).not.toBe('rgb(0, 0, 0)')
+
+        expect(result.restored).toBe(true)
+      })
+    }
+  }
+}
