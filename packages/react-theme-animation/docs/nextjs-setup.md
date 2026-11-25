@@ -172,7 +172,7 @@ Additional package-specific props:
 
 ## CSP / Nonce Support
 
-If your app uses CSP headers, pass the nonce into the provider so the pre-hydration script can run safely.
+If your app uses CSP headers, pass the nonce into the provider. The pre-hydration script and the injected transition `<style>` elements use it.
 
 ```tsx
 // app/providers.tsx

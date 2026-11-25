@@ -112,6 +112,7 @@ export function ColorThemeButtons() {
 | `colorStorageKey`           | `string`                  | `'vite-color-theme'`          |
 | `globalClassName`           | `string`                  | `'dark'`                      |
 | `colorThemePrefix`          | `string`                  | `'theme-'`                    |
+| `nonce`                     | `string`                  | -                             |
 
 ## Disable CSS Transitions During Theme Change
 

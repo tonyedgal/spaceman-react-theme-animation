@@ -4,6 +4,8 @@ Core consumers can import `runThemeTransition`, `AnimationConfig`, and the low-l
 
 Mode and palette changes share the same native View Transition lifecycle. `setTheme` and `setColorTheme` remain immediate setters; `switchTheme`, `switchColorTheme`, and the toggle helpers return promises for the state update and capture readiness. They do not wait for the entire visual playback.
 
+`animationType` accepts a `ThemeAnimationType` member or its string value, such as `'circle'` or `'svg-logo'`. Pass `nonce` to apply a CSP nonce to the `<style>` elements that the transitions inject.
+
 ```tsx
 const theme = useThemeAnimation({
   colorThemes: ['default', 'ocean', 'rose'],
