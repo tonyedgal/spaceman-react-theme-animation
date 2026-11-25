@@ -89,6 +89,10 @@ export const mountTransitionLogo = (
   element.setAttribute('data-spaceman-theme-logo', '')
   element.style.cssText = `position:fixed;left:calc(50% - ${width / 2}px);top:calc(50% - ${height / 2}px);width:${width}px;height:${height}px;max-width:none;max-height:none;object-fit:contain;display:block;margin:0;padding:0;border:0;transform:none;pointer-events:none;z-index:2147483647;view-transition-name:${name};`
   const style = document.createElement('style')
+
+  if (config.nonce !== undefined && config.nonce !== '')
+    style.nonce = config.nonce
+
   style.setAttribute('data-spaceman-theme-logo-style', '')
   style.textContent = `
     @keyframes ${name}-fade { 0%, 85% { opacity:1; } 100% { opacity:0; } }

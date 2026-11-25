@@ -1,7 +1,9 @@
 import { useCallback } from 'react'
 
-const freezeTransitions = (): (() => void) => {
-  const css = document.createElement('style')
+import { createStyle } from '../../core/utils/create-style'
+
+const freezeTransitions = (nonce?: string): (() => void) => {
+  const css = createStyle(nonce)
   css.textContent =
     '*,*::before,*::after{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}'
   document.head.appendChild(css)
@@ -16,10 +18,13 @@ const freezeTransitions = (): (() => void) => {
 
 export type TransitionFreeze = <T>(fn: () => T | Promise<T>) => Promise<T>
 
-export function useTransitionFreeze(enabled: boolean): TransitionFreeze {
+export function useTransitionFreeze(
+  enabled: boolean,
+  nonce?: string,
+): TransitionFreeze {
   return useCallback(
     async <T>(fn: () => T | Promise<T>): Promise<T> => {
-      const release = enabled ? freezeTransitions() : undefined
+      const release = enabled ? freezeTransitions(nonce) : undefined
 
       try {
         const result = await fn()
@@ -31,6 +36,6 @@ export function useTransitionFreeze(enabled: boolean): TransitionFreeze {
         throw error
       }
     },
-    [enabled],
+    [enabled, nonce],
   )
 }

@@ -142,12 +142,16 @@ export function NextThemeProvider({
     onColorThemeChange,
     onThemeChange,
     storageKey,
+    nonce,
     theme: forcedTheme,
     themes: allowedThemes,
     value,
   })
 
-  const withTransitionsDisabled = useTransitionFreeze(disableTransitionOnChange)
+  const withTransitionsDisabled = useTransitionFreeze(
+    disableTransitionOnChange,
+    nonce,
+  )
 
   const setTheme = useCallback(
     (theme: Theme) => {

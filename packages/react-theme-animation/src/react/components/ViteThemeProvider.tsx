@@ -122,7 +122,10 @@ export function ViteThemeProvider({
     colorThemePrefix,
   })
 
-  const withTransitionsDisabled = useTransitionFreeze(disableTransitionOnChange)
+  const withTransitionsDisabled = useTransitionFreeze(
+    disableTransitionOnChange,
+    animationOptions.nonce,
+  )
 
   const wrappedSetTheme = useCallback(
     (theme: Theme) => {

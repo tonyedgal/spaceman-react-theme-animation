@@ -4,13 +4,14 @@ import type {
   SlideDirection,
   ThemeTransitionOptions,
 } from '../types'
+import { createStyle } from './create-style'
 
 const isBrowser = typeof window !== 'undefined'
 
 /** Injects styles scoped to transitions owned by this library. */
-export const injectBaseStyles = (): void => {
+export const injectBaseStyles = (nonce?: string): void => {
   if (!isBrowser || document.getElementById('spaceman-theme-base-style')) return
-  const style = document.createElement('style')
+  const style = createStyle(nonce)
   style.id = 'spaceman-theme-base-style'
   style.textContent = `
     html[data-spaceman-theme-transition]::view-transition-group(root),
@@ -244,7 +245,7 @@ const animateReveal = (
   animation.cancel()
   void animation.finished.catch(() => {})
   const name = `spaceman-theme-reveal-${++revealSequence}`
-  const style = document.createElement('style')
+  const style = createStyle(config.nonce)
 
   const rules = keyframes
     .map((frame) => {
