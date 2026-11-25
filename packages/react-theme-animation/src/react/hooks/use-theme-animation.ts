@@ -35,7 +35,7 @@ export const useThemeAnimation = (
   const {
     duration: propsDuration = 400,
     easing = 'cubic-bezier(0.32, 0.72, 0, 1)',
-    animationType = ThemeAnimationType.CIRCLE,
+    animationType: animationTypeInput = ThemeAnimationType.CIRCLE,
     blurAmount = 2,
     styleId = 'spaceman-theme-style',
     nonce,
@@ -84,6 +84,11 @@ export const useThemeAnimation = (
   getThemeLogoOptions({ logo, logoLight, logoDark })
 
   const duration = propsDuration
+
+  const animationType =
+    Object.values(ThemeAnimationType).find(
+      (type) => type === animationTypeInput,
+    ) ?? ThemeAnimationType.CIRCLE
 
   useEffect(() => {
     if (animationType !== ThemeAnimationType.SVG_LOGO) return

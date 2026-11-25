@@ -4,6 +4,7 @@ import type {
   ColorThemeToggle,
   ThemeTransitionInput,
   UseThemeAnimationProps,
+  ThemeAnimationTypeInput,
 } from '../../core/types'
 import { getColorTransitionOptions } from '../hooks/transition-options'
 
@@ -84,7 +85,7 @@ export type TanStackThemeProviderProps = UseThemeAnimationProps & {
   readonly colorThemes?: readonly ColorTheme[]
   readonly defaultTheme?: Theme
   readonly defaultColorTheme?: ColorTheme
-  readonly animationType?: ThemeAnimationType
+  readonly animationType?: ThemeAnimationTypeInput
   readonly duration?: number
   readonly storageKey?: string
   readonly colorStorageKey?: string

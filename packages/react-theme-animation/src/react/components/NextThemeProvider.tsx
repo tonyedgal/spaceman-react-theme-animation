@@ -8,6 +8,7 @@ import type {
   Theme,
   ThemeTransitionInput,
   UseThemeAnimationProps,
+  ThemeAnimationTypeInput,
 } from '../../core/types'
 import { ThemeAnimationType } from '../../core/types'
 import { useHydrated } from '../hooks/use-hydrated'
@@ -55,7 +56,7 @@ export type NextThemeProviderProps = UseThemeAnimationProps & {
   readonly colorThemes?: readonly ColorTheme[]
   readonly defaultTheme?: Theme
   readonly defaultColorTheme?: ColorTheme
-  readonly animationType?: ThemeAnimationType
+  readonly animationType?: ThemeAnimationTypeInput
   readonly duration?: number
   readonly storageKey?: string
   readonly colorStorageKey?: string
