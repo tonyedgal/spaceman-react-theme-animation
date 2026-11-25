@@ -9,7 +9,10 @@ import {
   GLOBAL_CLASS_NAME,
   STORAGE_KEY,
 } from '../../tanstack/helpers'
-import { serializeScriptValue } from './serialize-script-value'
+import {
+  serializeScriptList,
+  serializeScriptValue,
+} from './serialize-script-value'
 
 export interface TanStackStartThemeScriptProps {
   readonly storageKey?: string
@@ -20,7 +23,11 @@ export interface TanStackStartThemeScriptProps {
   readonly colorThemePrefix?: string
   readonly nonce?: string
   readonly systemThemeMode?: SystemThemeMode
+  readonly themes?: readonly Theme[]
+  readonly colorThemes?: readonly ColorTheme[]
 }
+
+const defaultThemes = ['light', 'dark', 'system'] as const
 
 const generateTanStackPreHydrationScript = (
   storageKey: string,
@@ -30,12 +37,16 @@ const generateTanStackPreHydrationScript = (
   globalClassName: string,
   colorThemePrefix: string,
   systemThemeMode: SystemThemeMode,
+  themes: readonly Theme[],
+  colorThemes: readonly ColorTheme[] | undefined,
 ): string => {
   return `
 (function() {
   try {
     var theme = localStorage.getItem(${serializeScriptValue(storageKey)}) || ${serializeScriptValue(defaultTheme)};
     var colorTheme = localStorage.getItem(${serializeScriptValue(colorStorageKey)}) || ${serializeScriptValue(defaultColorTheme)};
+    if (${serializeScriptList(themes)}.indexOf(theme) < 0) theme = ${serializeScriptValue(defaultTheme)};
+    if (${colorThemes === undefined ? 'false' : `${serializeScriptList(colorThemes)}.indexOf(colorTheme) < 0`}) colorTheme = ${serializeScriptValue(defaultColorTheme)};
     var el = document.documentElement;
     var resolved;
     if (theme === 'system') {
@@ -87,6 +98,8 @@ export const TanStackStartThemeScript: React.FC<TanStackStartThemeScriptProps> =
     colorThemePrefix = COLOR_THEME_PREFIX,
     nonce,
     systemThemeMode = 'js',
+    themes = defaultThemes,
+    colorThemes,
   }: Readonly<TanStackStartThemeScriptProps>): React.JSX.Element {
     const scriptContent = generateTanStackPreHydrationScript(
       storageKey,
@@ -96,6 +109,8 @@ export const TanStackStartThemeScript: React.FC<TanStackStartThemeScriptProps> =
       globalClassName,
       colorThemePrefix,
       systemThemeMode,
+      themes,
+      colorThemes,
     )
 
     return (
