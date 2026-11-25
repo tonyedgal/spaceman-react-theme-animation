@@ -10,6 +10,7 @@ import type {
 } from '../../core/types'
 import { ThemeAnimationType } from '../../core/types'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
+import { useTransitionFreeze } from '../hooks/use-transition-freeze'
 import { getBrowserSystemTheme } from './provider-helpers'
 import { SharedThemeContext } from './shared-theme-context'
 
@@ -121,80 +122,53 @@ export function ViteThemeProvider({
     colorThemePrefix,
   })
 
-  const applyTransitionDisable = useCallback(() => {
-    if (!disableTransitionOnChange) return (): void => {}
-
-    const css = document.createElement('style')
-    css.textContent = `*,*::before,*::after{-webkit-transition:none!important;-moz-transition:none!important;-o-transition:none!important;-ms-transition:none!important;transition:none!important}`
-    document.head.appendChild(css)
-
-    window.getComputedStyle(document.body)
-
-    return (): void => {
-      setTimeout(() => {
-        document.head.removeChild(css)
-      }, 1)
-    }
-  }, [disableTransitionOnChange])
+  const withTransitionsDisabled = useTransitionFreeze(disableTransitionOnChange)
 
   const wrappedSetTheme = useCallback(
     (theme: Theme) => {
-      const cleanup = applyTransitionDisable()
-      themeState.setTheme(theme)
-      cleanup()
+      void withTransitionsDisabled(() => {
+        themeState.setTheme(theme)
+      })
     },
-    [themeState, applyTransitionDisable],
+    [themeState, withTransitionsDisabled],
   )
 
   const wrappedSwitchTheme = useCallback(
-    async (theme: Theme, animationOff: ThemeTransitionInput = false) => {
-      const cleanup = applyTransitionDisable()
-      await themeState.switchTheme(theme, animationOff)
-      cleanup()
-    },
-    [themeState, applyTransitionDisable],
+    async (theme: Theme, animationOff: ThemeTransitionInput = false) =>
+      withTransitionsDisabled(async () =>
+        themeState.switchTheme(theme, animationOff),
+      ),
+    [themeState, withTransitionsDisabled],
   )
 
   const wrappedToggleTheme = useCallback(
-    async (animationOff: ThemeTransitionInput = false): Promise<void> => {
-      const cleanup = applyTransitionDisable()
-      await themeState.toggleTheme(animationOff)
-      cleanup()
-    },
-    [themeState, applyTransitionDisable],
+    async (animationOff: ThemeTransitionInput = false): Promise<void> =>
+      withTransitionsDisabled(async () => themeState.toggleTheme(animationOff)),
+    [themeState, withTransitionsDisabled],
   )
 
   const wrappedToggleLightTheme = useCallback(
-    async (animationOff: ThemeTransitionInput = false): Promise<void> => {
-      const cleanup = applyTransitionDisable()
-      await themeState.toggleLightTheme(animationOff)
-      cleanup()
-    },
-    [themeState, applyTransitionDisable],
+    async (animationOff: ThemeTransitionInput = false): Promise<void> =>
+      withTransitionsDisabled(async () =>
+        themeState.toggleLightTheme(animationOff),
+      ),
+    [themeState, withTransitionsDisabled],
   )
 
   const wrappedToggleDarkTheme = useCallback(
-    async (animationOff: ThemeTransitionInput = false): Promise<void> => {
-      const cleanup = applyTransitionDisable()
-      await themeState.toggleDarkTheme(animationOff)
-      cleanup()
-    },
-    [themeState, applyTransitionDisable],
+    async (animationOff: ThemeTransitionInput = false): Promise<void> =>
+      withTransitionsDisabled(async () =>
+        themeState.toggleDarkTheme(animationOff),
+      ),
+    [themeState, withTransitionsDisabled],
   )
 
   const switchThemeFromElement = useCallback(
-    async (theme: Theme, element: HTMLButtonElement): Promise<void> => {
-      const cleanup = applyTransitionDisable()
-
-      try {
-        await themeState.switchTheme(theme, { element })
-        cleanup()
-      } catch (error) {
-        cleanup()
-        throw error
-      }
-    },
-    [themeState, applyTransitionDisable],
+    async (theme: Theme, element: HTMLButtonElement): Promise<void> =>
+      withTransitionsDisabled(async () =>
+        themeState.switchTheme(theme, { element }),
+      ),
+    [themeState, withTransitionsDisabled],
   )
 
   const systemTheme = getBrowserSystemTheme()
