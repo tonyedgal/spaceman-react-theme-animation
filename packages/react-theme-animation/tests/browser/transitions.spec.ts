@@ -84,11 +84,90 @@ async function expectOrigin(
   const clip = z.array(z.string()).parse(frames.clipPath)[0]
 
   const coords = required(
-    /^circle\(0px at ([\d.e+-]+)px ([\d.e+-]+)px\)$/.exec(clip),
+    /^circle\(0% at ([\d.e+-]+)% ([\d.e+-]+)%\)$/.exec(clip),
   )
 
-  expect(Number(coords[1])).toBeCloseTo(origin.x, 3)
-  expect(Number(coords[2])).toBeCloseTo(origin.y, 3)
+  const viewport = await page.evaluate(() => ({
+    width: innerWidth,
+    height: innerHeight,
+  }))
+
+  expect((Number(coords[1]) / 100) * viewport.width).toBeCloseTo(origin.x, 3)
+  expect((Number(coords[2]) / 100) * viewport.height).toBeCloseTo(origin.y, 3)
+}
+
+async function lastFrames(
+  page: Readonly<Page>,
+): Promise<
+  Window['themeFixture']['inspection']['animations'][number]['frames']
+> {
+  await expect
+    .poll(async () =>
+      page.evaluate(() => window.themeFixture.inspection.animations.length),
+    )
+    .toBeGreaterThan(0)
+
+  return page.evaluate(
+    () =>
+      window.themeFixture.required(
+        window.themeFixture.inspection.animations.at(-1),
+      ).frames,
+  )
+}
+
+function firstNumbers(values: readonly string[] | undefined): number[] {
+  return [...(values?.[0] ?? '').matchAll(/-?[\d.]+(?:e[+-]?\d+)?/g)].map(
+    Number,
+  )
+}
+
+interface Bounds {
+  readonly left: number
+  readonly top: number
+  readonly right: number
+  readonly bottom: number
+}
+
+async function darkBounds(page: Readonly<Page>): Promise<Bounds> {
+  const png = (await page.screenshot()).toString('base64')
+
+  return page.evaluate(async (data) => {
+    const image = new Image()
+    image.src = `data:image/png;base64,${data}`
+    await image.decode()
+    const canvas = document.createElement('canvas')
+    canvas.width = image.width
+    canvas.height = image.height
+    const context = window.themeFixture.required(canvas.getContext('2d'))
+    context.drawImage(image, 0, 0)
+    const pixels = context.getImageData(0, 0, image.width, image.height).data
+    const scale = image.width / window.innerWidth
+    let [left, top, right, bottom] = [Infinity, Infinity, -1, -1]
+
+    for (let y = 0; y < image.height; y++) {
+      for (let x = 0; x < image.width; x++) {
+        const i = (y * image.width + x) * 4
+
+        if (
+          Math.abs(pixels[i] - 0x12) < 3 &&
+          Math.abs(pixels[i + 1] - 0x24) < 3 &&
+          Math.abs(pixels[i + 2] - 0x33) < 3
+        ) {
+          left = Math.min(left, x)
+          right = Math.max(right, x)
+          top = Math.min(top, y)
+          bottom = Math.max(bottom, y)
+        }
+      }
+    }
+
+    return {
+      left: left / scale,
+      top: top / scale,
+      right: (right + 1) / scale,
+      bottom: (bottom + 1) / scale,
+    }
+  }, png)
 }
 
 test('declared ref stays in viewport CSS pixels under transformed parents and scrolling', async ({
@@ -574,6 +653,168 @@ test('clicked element overrides the ref without mutating it, including fixed mob
   expect(
     await page.evaluate(() => window.themeFixture.state.ref.current?.id),
   ).toBe('ref-toggle')
+  await settle(page)
+})
+
+test('triangle, blur circle and polygon gradient keyframes start at the origin', async ({
+  page,
+}) => {
+  const origin = { x: 125.5, y: 230.25 }
+  const viewport = required(page.viewportSize())
+
+  await open(page, 'animation=triangle&duration=100')
+  await page.evaluate(
+    async (point) => window.themeFixture.state.toggleTheme({ origin: point }),
+    origin,
+  )
+  const vertices = firstNumbers((await lastFrames(page)).clipPath)
+  expect(vertices).toHaveLength(6)
+
+  for (let i = 0; i < 6; i += 2) {
+    expect((vertices[i] / 100) * viewport.width).toBeCloseTo(origin.x, 3)
+    expect((vertices[i + 1] / 100) * viewport.height).toBeCloseTo(origin.y, 3)
+  }
+
+  await settle(page)
+
+  await open(page, 'animation=blur-circle&duration=100')
+  await page.evaluate(
+    async (point) => window.themeFixture.state.toggleTheme({ origin: point }),
+    origin,
+  )
+  expect(firstNumbers((await lastFrames(page)).maskPosition)).toEqual([
+    origin.x,
+    origin.y,
+  ])
+  await settle(page)
+
+  await open(
+    page,
+    'animation=polygon-gradient&direction=bottom-right&duration=100',
+  )
+  await page.evaluate(async () => window.themeFixture.state.toggleTheme())
+  expect(firstNumbers((await lastFrames(page)).maskPosition)).toEqual([
+    viewport.width,
+    viewport.height,
+  ])
+  await settle(page)
+})
+
+for (const animation of [
+  'circle',
+  'triangle',
+  'blur-circle',
+  'polygon-gradient',
+]) {
+  test(`root zoom keeps the ${animation} reveal on the clicked element`, async ({
+    page,
+    browserName,
+    isMobile,
+  }) => {
+    test.skip(
+      browserName === 'firefox',
+      'Firefox page screenshots omit active view transitions',
+    )
+    test.skip(
+      isMobile &&
+        (animation === 'blur-circle' || animation === 'polygon-gradient'),
+      'Mobile emulation resizes the layout viewport under root zoom',
+    )
+
+    async function bounds(
+      zoom: string,
+    ): Promise<{ dark: Bounds; center: { x: number; y: number } }> {
+      await open(page, `animation=${animation}&duration=6000&progress=0.03`)
+      await page.evaluate((value) => {
+        document.documentElement.style.zoom = value
+        const target = document.createElement('button')
+        target.id = 'zoom-target'
+        target.textContent = 'Target'
+        target.style.cssText = 'position:fixed;left:30vw;top:30vh'
+        document.body.append(target)
+      }, zoom)
+      await page.locator('#freeze').click()
+      const box = required(await page.locator('#zoom-target').boundingBox())
+      void page.evaluate(async () =>
+        window.themeFixture.state.switchTheme('dark', {
+          element: document.getElementById('zoom-target'),
+        }),
+      )
+      await page.waitForFunction(() =>
+        document
+          .getAnimations()
+          .some((running) => running.playState === 'paused'),
+      )
+      await page.evaluate(
+        async () =>
+          new Promise<void>((resolve) => {
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                resolve()
+              })
+            })
+          }),
+      )
+      const dark = await darkBounds(page)
+      await page.evaluate(() => {
+        window.themeFixture
+          .required(window.themeFixture.inspection.transitions.at(-1))
+          .skipTransition()
+      })
+      await settle(page)
+      await page.evaluate(async () =>
+        window.themeFixture.state.switchTheme('light', false),
+      )
+
+      return {
+        dark,
+        center: { x: box.x + box.width / 2, y: box.y + box.height / 2 },
+      }
+    }
+
+    const plain = await bounds('1')
+    const zoomed = await bounds('1.5')
+
+    if (animation === 'polygon-gradient') {
+      expect(zoomed.dark.left).toBeLessThan(1)
+      expect(zoomed.dark.top).toBeLessThan(1)
+      expect(zoomed.dark.right / plain.dark.right).toBeCloseTo(1, 1)
+      expect(zoomed.dark.bottom / plain.dark.bottom).toBeCloseTo(1, 1)
+
+      return
+    }
+
+    const { dark, center: target } = zoomed
+
+    expect(Math.abs((dark.left + dark.right) / 2 - target.x)).toBeLessThan(8)
+
+    // a triangle's box is not centred on its incircle, so measure from the base.
+    const middleY =
+      animation === 'triangle'
+        ? dark.bottom - ((dark.right - dark.left) * Math.sqrt(3)) / 6
+        : (dark.top + dark.bottom) / 2
+
+    expect(Math.abs(middleY - target.y)).toBeLessThan(8)
+    expect(plain.dark.right).toBeGreaterThan(plain.dark.left)
+  })
+}
+
+test('a rejected theme change can retry the same theme', async ({ page }) => {
+  await open(page, 'rejectOnce&duration=100')
+
+  const first = await page.evaluate(async () =>
+    window.themeFixture.state.switchTheme('dark').then(
+      () => 'resolved',
+      () => 'rejected',
+    ),
+  )
+
+  expect(first).toBe('rejected')
+  await settle(page)
+  await expect(page.locator('html')).not.toHaveClass(/\bdark\b/)
+
+  await page.evaluate(async () => window.themeFixture.state.switchTheme('dark'))
+  await expect(page.locator('html')).toHaveClass(/\bdark\b/)
   await settle(page)
 })
 

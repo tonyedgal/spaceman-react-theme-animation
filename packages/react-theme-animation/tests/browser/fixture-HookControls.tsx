@@ -14,7 +14,22 @@ import './fixture.css'
 
 export function HookControls(): React.JSX.Element {
   const [options, setOptions] = React.useState(config)
-  const state = useThemeAnimation(options)
+  const [controlled, setControlled] = React.useState<'light' | 'dark'>('light')
+  const failures = React.useRef(params.has('rejectOnce') ? 1 : 0)
+
+  const state = useThemeAnimation(
+    params.has('rejectOnce')
+      ? {
+          ...options,
+          theme: controlled,
+          onThemeChange: (theme): void => {
+            if (failures.current-- > 0) throw new Error('rejected')
+            setControlled(theme === 'dark' ? 'dark' : 'light')
+          },
+        }
+      : options,
+  )
+
   const asset = React.useRef<string | null>(null)
   React.useEffect(
     () => (): void => {
