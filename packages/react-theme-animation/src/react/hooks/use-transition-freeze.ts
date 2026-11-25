@@ -9,10 +9,13 @@ const freezeTransitions = (nonce?: string): (() => void) => {
   document.head.appendChild(css)
   window.getComputedStyle(document.body)
 
+  // react can commit the class after a 1 ms timer, so wait two frames.
   return (): void => {
-    setTimeout(() => {
-      css.remove()
-    }, 1)
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        css.remove()
+      })
+    })
   }
 }
 
