@@ -84,6 +84,7 @@ export const config = {
     logoLight: params.get('logoLight') ?? undefined,
     logoDark: params.get('logoDark') ?? undefined,
   }),
+  nonce: params.get('nonce') ?? undefined,
   logoWidth: dimension(params.get('logoWidth')),
   logoHeight: dimension(params.get('logoHeight')),
 }

@@ -1386,3 +1386,142 @@ for (const provider of ['next', 'vite', 'tanstack']) {
     }
   }
 }
+
+async function withNoncePolicy(page: Readonly<Page>): Promise<void> {
+  await page.route('**/*', async (route) => {
+    if (route.request().resourceType() !== 'document') {
+      await route.continue()
+
+      return
+    }
+
+    const response = await route.fetch()
+
+    await route.fulfill({
+      response,
+      headers: {
+        ...response.headers(),
+        'content-security-policy': "style-src 'nonce-spaceman-test'",
+      },
+    })
+  })
+}
+
+async function styleApplied(
+  page: Readonly<Page>,
+  selector: string,
+): Promise<boolean> {
+  return page.evaluate((query) => {
+    const style = document.querySelector<HTMLStyleElement>(query)
+
+    return style?.sheet ? style.sheet.cssRules.length > 0 : false
+  }, selector)
+}
+
+for (const provider of ['hook', 'ui', 'next', 'vite', 'tanstack']) {
+  test(`${provider} injected styles apply under a nonce-based CSP`, async ({
+    page,
+  }) => {
+    await withNoncePolicy(page)
+
+    await open(page, `provider=${provider}`)
+    expect(await styleApplied(page, '#spaceman-theme-base-style')).toBe(false)
+
+    await open(
+      page,
+      `provider=${provider}&nonce=spaceman-test&animation=svg-logo&logo=/logo.svg&duration=6000`,
+    )
+    expect(await styleApplied(page, '#spaceman-theme-base-style')).toBe(true)
+
+    await page.evaluate(async () => window.themeFixture.preloadLogo())
+    await page.locator('#freeze').click()
+    void page.evaluate(async () => window.themeFixture.state.toggleTheme())
+    await expect(page.locator('[data-spaceman-theme-logo-style]')).toHaveCount(
+      1,
+    )
+    expect(await styleApplied(page, '[data-spaceman-theme-logo-style]')).toBe(
+      true,
+    )
+    await page.evaluate(() => {
+      window.themeFixture
+        .required(window.themeFixture.inspection.transitions.at(-1))
+        .skipTransition()
+    })
+    await settle(page)
+  })
+}
+
+for (const provider of ['next', 'vite', 'tanstack']) {
+  test(`${provider} disableTransitionOnChange style carries the CSP nonce`, async ({
+    page,
+  }) => {
+    await open(
+      page,
+      `provider=${provider}&disableTransitions&nonce=spaceman-test`,
+    )
+
+    const nonces = await page.evaluate(async () => {
+      const added: (string | undefined)[] = []
+
+      const observer = new MutationObserver((records) => {
+        for (const record of records)
+          for (const node of record.addedNodes)
+            if (
+              node instanceof HTMLStyleElement &&
+              node.textContent.includes('transition:none')
+            )
+              added.push(node.nonce)
+      })
+
+      observer.observe(document.head, { childList: true })
+      window.themeFixture.state.setTheme('dark')
+      await new Promise<void>((resolve) => {
+        setTimeout(() => {
+          resolve()
+        }, 20)
+      })
+      observer.disconnect()
+
+      return added
+    })
+
+    expect(nonces).toEqual(['spaceman-test'])
+    await expect(page.locator('html')).toHaveClass(/dark/)
+  })
+}
+
+test('the CSS keyframe fallback style carries the CSP nonce', async ({
+  page,
+}) => {
+  await open(page, 'nonce=spaceman-test&duration=100')
+
+  const nonces = await page.evaluate(async () => {
+    const root = document.documentElement
+    const animate = root.animate.bind(root)
+    const added: HTMLStyleElement[] = []
+
+    const observer = new MutationObserver((records) => {
+      for (const record of records)
+        for (const node of record.addedNodes)
+          if (node instanceof HTMLStyleElement) added.push(node)
+    })
+
+    observer.observe(document.head, { childList: true })
+    root.animate = (frames, options): Animation =>
+      animate(frames, window.themeFixture.withoutPseudoOptions(options))
+
+    try {
+      await window.themeFixture.state.toggleTheme()
+    } finally {
+      root.animate = animate
+      observer.disconnect()
+    }
+
+    return added.flatMap((style) =>
+      style.textContent.includes('spaceman-theme-reveal-') ? [style.nonce] : [],
+    )
+  })
+
+  expect(nonces).toEqual(['spaceman-test'])
+  await settle(page)
+})
