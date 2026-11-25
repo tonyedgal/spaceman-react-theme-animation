@@ -22,7 +22,10 @@ const disableTransitionOnChange = params.has('disableTransitions')
 
 const app: React.JSX.Element =
   provider === 'ui' ? (
-    <SpacemanThemeProvider {...config}>
+    <SpacemanThemeProvider
+      {...config}
+      disableTransitionOnChange={disableTransitionOnChange}
+    >
       <UIControls />
     </SpacemanThemeProvider>
   ) : provider === 'next' ? (
