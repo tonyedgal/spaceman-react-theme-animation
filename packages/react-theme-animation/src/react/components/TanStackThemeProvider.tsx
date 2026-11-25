@@ -29,6 +29,7 @@ import {
 } from '../../tanstack/helpers'
 import { useSyncServerThemeStorage } from '../hooks/use-sync-server-theme-storage'
 import { useThemeAnimation } from '../hooks/use-theme-animation'
+import { useTransitionFreeze } from '../hooks/use-transition-freeze'
 import { getBrowserSystemTheme, getNextResolvedTheme } from './provider-helpers'
 import { notifyServerChange } from './server-notifications'
 import { SharedThemeContext } from './shared-theme-context'
@@ -92,6 +93,7 @@ export type TanStackThemeProviderProps = UseThemeAnimationProps & {
   readonly serverTheme?: 'light' | 'dark' | 'system'
   readonly serverColorTheme?: ColorTheme
   readonly systemThemeMode?: SystemThemeMode
+  readonly disableTransitionOnChange?: boolean
   readonly onServerThemeChange?: (theme: Theme) => Promise<void> | void
   readonly onServerColorThemeChange?: (
     colorTheme: ColorTheme,
@@ -121,6 +123,7 @@ export function TanStackThemeProvider({
   serverTheme,
   serverColorTheme,
   systemThemeMode = 'css',
+  disableTransitionOnChange = false,
   onServerThemeChange,
   onServerColorThemeChange,
   ...animationOptions
@@ -170,18 +173,24 @@ export function TanStackThemeProvider({
     colorStorageKey,
   })
 
+  const withTransitionsDisabled = useTransitionFreeze(disableTransitionOnChange)
+
   const setThemeWithServer = useCallback(
     (newTheme: Theme) => {
-      themeState.setTheme(newTheme)
+      void withTransitionsDisabled(() => {
+        themeState.setTheme(newTheme)
+      })
     },
-    [themeState],
+    [themeState, withTransitionsDisabled],
   )
 
   const setColorThemeWithServer = useCallback(
     (newColorTheme: ColorTheme) => {
-      themeState.setColorTheme(newColorTheme)
+      void withTransitionsDisabled(() => {
+        themeState.setColorTheme(newColorTheme)
+      })
     },
-    [themeState],
+    [themeState, withTransitionsDisabled],
   )
 
   const switchThemeWithHydrationAwareness = useCallback(
@@ -192,9 +201,11 @@ export function TanStackThemeProvider({
         return
       }
 
-      await themeState.switchTheme(theme, animationOff)
+      await withTransitionsDisabled(async () =>
+        themeState.switchTheme(theme, animationOff),
+      )
     },
-    [isHydrated, themeState, setThemeWithServer],
+    [isHydrated, themeState, setThemeWithServer, withTransitionsDisabled],
   )
 
   const toggleThemeWithHydrationAwareness = useCallback(
@@ -207,9 +218,11 @@ export function TanStackThemeProvider({
         return
       }
 
-      await themeState.toggleTheme(animationOff)
+      await withTransitionsDisabled(async () =>
+        themeState.toggleTheme(animationOff),
+      )
     },
-    [isHydrated, themeState, setThemeWithServer],
+    [isHydrated, themeState, setThemeWithServer, withTransitionsDisabled],
   )
 
   const toggleLightThemeWithHydrationAwareness = useCallback(
@@ -220,9 +233,11 @@ export function TanStackThemeProvider({
         return
       }
 
-      await themeState.toggleLightTheme(animationOff)
+      await withTransitionsDisabled(async () =>
+        themeState.toggleLightTheme(animationOff),
+      )
     },
-    [isHydrated, themeState, setThemeWithServer],
+    [isHydrated, themeState, setThemeWithServer, withTransitionsDisabled],
   )
 
   const toggleDarkThemeWithHydrationAwareness = useCallback(
@@ -233,24 +248,30 @@ export function TanStackThemeProvider({
         return
       }
 
-      await themeState.toggleDarkTheme(animationOff)
+      await withTransitionsDisabled(async () =>
+        themeState.toggleDarkTheme(animationOff),
+      )
     },
-    [isHydrated, themeState, setThemeWithServer],
+    [isHydrated, themeState, setThemeWithServer, withTransitionsDisabled],
   )
 
   const switchColorThemeWithServer = useCallback(
     async (newColorTheme: ColorTheme, options?: ThemeTransitionInput) => {
       if (!colorThemes.includes(newColorTheme)) return
-      await themeState.switchColorTheme(newColorTheme, options)
+      await withTransitionsDisabled(async () =>
+        themeState.switchColorTheme(newColorTheme, options),
+      )
     },
-    [colorThemes, themeState],
+    [colorThemes, themeState, withTransitionsDisabled],
   )
 
   const toggleColorThemeWithServer: ColorThemeToggle = useCallback(
     async (input) => {
-      await themeState.toggleColorTheme(input)
+      await withTransitionsDisabled(async () =>
+        themeState.toggleColorTheme(input),
+      )
     },
-    [themeState],
+    [themeState, withTransitionsDisabled],
   )
 
   const createColorThemeToggleWithServer = useCallback(
@@ -271,9 +292,11 @@ export function TanStackThemeProvider({
         return
       }
 
-      await themeState.switchTheme(theme, { element })
+      await withTransitionsDisabled(async () =>
+        themeState.switchTheme(theme, { element }),
+      )
     },
-    [isHydrated, themeState, setThemeWithServer],
+    [isHydrated, themeState, setThemeWithServer, withTransitionsDisabled],
   )
 
   const systemTheme = getBrowserSystemTheme()
