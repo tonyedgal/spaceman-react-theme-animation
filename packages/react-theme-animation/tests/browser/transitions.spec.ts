@@ -1335,55 +1335,120 @@ for (const provider of ['ui', 'next', 'vite', 'tanstack']) {
           `provider=${provider}${frozen ? '&disableTransitions' : ''}`,
         )
 
-        const result = await page.evaluate(async (name) => {
-          const style = document.createElement('style')
-          style.textContent =
-            '.probe{background-color:rgb(255,255,255);transition:background-color 1s linear}.dark .probe,.theme-ocean .probe{background-color:rgb(0,0,0)}'
-          document.head.append(style)
-          const probe = document.createElement('div')
-          probe.className = 'probe'
-          document.body.append(probe)
-          void getComputedStyle(probe).backgroundColor
-          const root = document.documentElement
+        const result = await page.evaluate(
+          async ([name, isFrozen]) => {
+            const style = document.createElement('style')
+            style.textContent =
+              '.probe{background-color:rgb(255,255,255);transition:background-color 1s linear}.dark .probe,.theme-ocean .probe{background-color:rgb(0,0,0)}'
+            document.head.append(style)
+            const probe = document.createElement('div')
+            probe.className = 'probe'
+            document.body.append(probe)
+            void getComputedStyle(probe).backgroundColor
+            const root = document.documentElement
 
-          const changed = new Promise<string>((resolve) => {
-            const observer = new MutationObserver(() => {
-              if (
-                root.classList.contains('dark') ||
-                root.classList.contains('theme-ocean')
-              ) {
-                observer.disconnect()
-                resolve(getComputedStyle(probe).backgroundColor)
-              }
+            const isFreeze = (node: Readonly<Node>): boolean =>
+              node instanceof HTMLStyleElement &&
+              node.textContent.includes('transition:none')
+
+            const frozenNow = (): boolean =>
+              [...document.head.childNodes].some(isFreeze)
+
+            let frozenAtCommit: boolean | undefined
+
+            const done = new Promise<void>((resolve) => {
+              const classes = new MutationObserver(() => {
+                if (
+                  frozenAtCommit === undefined &&
+                  (root.classList.contains('dark') ||
+                    root.classList.contains('theme-ocean'))
+                ) {
+                  frozenAtCommit = frozenNow()
+
+                  if (!isFrozen) resolve()
+                }
+              })
+
+              const head = new MutationObserver((records) => {
+                if (
+                  records.some((record) =>
+                    [...record.removedNodes].some(isFreeze),
+                  )
+                )
+                  resolve()
+              })
+
+              classes.observe(root, { attributes: true })
+              head.observe(document.head, { childList: true })
             })
 
-            observer.observe(root, { attributes: true })
-          })
+            if (name === 'setTheme') window.themeFixture.state.setTheme('dark')
+            else window.themeFixture.state.setColorTheme('ocean')
 
-          if (name === 'setTheme') window.themeFixture.state.setTheme('dark')
-          else window.themeFixture.state.setColorTheme('ocean')
+            await done
 
-          const now = await changed
-          await new Promise<void>((resolve) => {
-            setTimeout(() => {
-              resolve()
-            }, 50)
-          })
+            return {
+              frozenAtCommit,
+              color: getComputedStyle(probe).backgroundColor,
+              transitions: probe.getAnimations().length,
+              restored: !frozenNow(),
+            }
+          },
+          [method, frozen] as const,
+        )
 
-          return {
-            now,
-            restored: ![...document.head.querySelectorAll('style')].some(
-              (element) => element.textContent.includes('transition:none'),
-            ),
-          }
-        }, method)
-
-        if (frozen) expect(result.now).toBe('rgb(0, 0, 0)')
-        else expect(result.now).not.toBe('rgb(0, 0, 0)')
-
+        expect(result.frozenAtCommit).toBe(frozen)
         expect(result.restored).toBe(true)
+
+        if (frozen) {
+          expect(result.color).toBe('rgb(0, 0, 0)')
+          expect(result.transitions).toBe(0)
+        } else {
+          expect(result.color).not.toBe('rgb(0, 0, 0)')
+          expect(result.transitions).toBe(1)
+        }
       })
     }
+
+    test(`${provider} ${method} to the current value releases the transition freeze`, async ({
+      page,
+    }) => {
+      await open(page, `provider=${provider}&disableTransitions`)
+
+      const result = await page.evaluate(async (name) => {
+        const root = document.documentElement
+        const before = root.className
+
+        const isFreeze = (node: Readonly<Node>): boolean =>
+          node instanceof HTMLStyleElement &&
+          node.textContent.includes('transition:none')
+
+        let added = 0
+
+        const released = new Promise<void>((resolve) => {
+          new MutationObserver((records) => {
+            for (const record of records) {
+              added += [...record.addedNodes].filter(isFreeze).length
+
+              if ([...record.removedNodes].some(isFreeze)) resolve()
+            }
+          }).observe(document.head, { childList: true })
+        })
+
+        if (name === 'setTheme') window.themeFixture.state.setTheme('light')
+        else window.themeFixture.state.setColorTheme('default')
+
+        await released
+
+        return {
+          added,
+          unchanged: root.className === before,
+          restored: ![...document.head.childNodes].some(isFreeze),
+        }
+      }, method)
+
+      expect(result).toEqual({ added: 1, unchanged: true, restored: true })
+    })
   }
 }
 
@@ -1473,13 +1538,24 @@ for (const provider of ['ui', 'next', 'vite', 'tanstack']) {
               added.push(node.nonce)
       })
 
+      const released = new Promise<void>((resolve) => {
+        new MutationObserver((records) => {
+          if (
+            records.some((record) =>
+              [...record.removedNodes].some(
+                (node) =>
+                  node instanceof HTMLStyleElement &&
+                  node.textContent.includes('transition:none'),
+              ),
+            )
+          )
+            resolve()
+        }).observe(document.head, { childList: true })
+      })
+
       observer.observe(document.head, { childList: true })
       window.themeFixture.state.setTheme('dark')
-      await new Promise<void>((resolve) => {
-        setTimeout(() => {
-          resolve()
-        }, 20)
-      })
+      await released
       observer.disconnect()
 
       return added
